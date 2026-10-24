@@ -67,7 +67,8 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 
 ## 7. Pendientes / riesgos conocidos
 - [ ] Crear proyecto Supabase, ejecutar `schema.sql`, completar `.env.local`, `npm run seed` (requiere cuenta del usuario).
-- [ ] Repositorio en GitHub + proyecto en Vercel + dominio `shopuxapp.com`.
+- [x] Repositorio en GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual
+- [ ] Proyecto en Vercel (importar ese repo) + dominio `shopuxapp.com`.
 - Periodos “día/semana” se calculan con la hora del servidor (UTC en Vercel); ajustar a hora de Venezuela si hace falta.
 - Registro sin verificación de email (rápido para MVP); considerar activar confirmación más adelante.
 - La tienda puede cambiar manualmente el estado de un pedido (incluido “cancelado”), lo que afecta la comisión: auditar en Superadmin.
@@ -83,4 +84,5 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - Esquema SQL con RLS + script de seed con los 3 usuarios de prueba.
 - `next build` OK (tipos válidos, 23 rutas). Smoke test: `/`, `/login`, `/registro`, iconos, manifest y `sw.js` responden 200.
 - Repositorio git local inicializado con el primer commit.
+- Código subido a GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual (rama `main`).
 - Siguiente paso: conectar Supabase y Vercel (Etapa 8).
