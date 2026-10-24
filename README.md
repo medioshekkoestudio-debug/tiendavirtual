@@ -6,7 +6,8 @@ Contexto completo y bitácora: [`memoria.md`](./memoria.md) · Plan por etapas: 
 ## Puesta en marcha (15 minutos)
 
 1. **Supabase** → crea un proyecto en https://supabase.com
-   - SQL Editor → New query → pega todo `supabase/schema.sql` → **Run**
+   - Aplica las migraciones: `npm run db:login` → `npm run db:link` → `npm run db:push`
+     (o deja que lo haga el GitHub Action, ver “Migraciones”)
    - Project Settings → API → copia `Project URL`, `anon public key` y `service_role key`
 2. **Variables**: copia `.env.example` a `.env.local` y completa los valores.
 3. Instala y crea los usuarios de prueba:
@@ -28,6 +29,22 @@ Contexto completo y bitácora: [`memoria.md`](./memoria.md) · Plan por etapas: 
 | Cliente | cliente@shopux.app | `Cliente#2026` | `/empresax/login` |
 
 > Cámbialas antes de abrir la plataforma al público.
+
+## Migraciones de base de datos
+
+Cada cambio de base de datos es un archivo SQL nuevo en `supabase/migrations/` (nunca se edita uno ya aplicado).
+
+```bash
+npm run db:new agregar_cupones     # crea supabase/migrations/<fecha>_agregar_cupones.sql → escribe el SQL ahí
+npm run db:status                  # qué migraciones están aplicadas en Supabase
+npm run db:push                    # aplica las pendientes (o haz push a main y lo hace el Action)
+npm run db:diff                    # si cambiaste algo en el dashboard, genera el SQL equivalente
+```
+
+**Automático:** `.github/workflows/supabase-migrations.yml` aplica las migraciones al hacer push a `main`.
+Requiere en GitHub → Settings → Secrets and variables → Actions:
+`SUPABASE_ACCESS_TOKEN` (https://supabase.com/dashboard/account/tokens) y `SUPABASE_DB_PASSWORD`
+(Supabase → Project Settings → Database).
 
 ## Rutas
 

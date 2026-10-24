@@ -31,7 +31,9 @@ Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones po
 ## 3. Estructura
 ```
 shopux/
-├─ supabase/schema.sql      ← ejecutar en Supabase SQL Editor (tablas, RLS, RPC, storage, realtime, landing inicial)
+├─ supabase/config.toml     ← config de la Supabase CLI (project_id "shopux")
+├─ supabase/migrations/     ← UNA migración por cambio de BD; 20261024000000_init.sql = esquema inicial
+├─ .github/workflows/supabase-migrations.yml ← aplica migraciones en Supabase al hacer push a main
 ├─ scripts/seed.mjs         ← npm run seed: 3 usuarios + Empresa X + productos, pedidos, pagos, chat
 ├─ src/middleware.ts        ← refresca sesión; protege /panel, /onboarding, /superadmin
 ├─ src/lib/                 ← supabase (client/server/admin), auth, constants, types, utils, store-actions (server actions del panel)
@@ -66,7 +68,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - Variables en `.env.local` (plantilla en `.env.example`). **Nunca** subir `.env.local` ni exponer `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## 7. Pendientes / riesgos conocidos
-- [ ] Crear proyecto Supabase, ejecutar `schema.sql`, completar `.env.local`, `npm run seed` (requiere cuenta del usuario).
+- [ ] Aplicar migración inicial en Supabase (`npm run db:push` o Action con secretos), `npm run seed`, `npm run verify:prod`.
 - [x] Repositorio en GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual
 - [ ] Proyecto en Vercel (importar ese repo) + dominio `shopuxapp.com`.
 - Periodos “día/semana” se calculan con la hora del servidor (UTC en Vercel); ajustar a hora de Venezuela si hace falta.
@@ -90,4 +92,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   Lección: verificar `next build` por **código de salida**, no buscando texto en la salida.
 - Proyecto Supabase del usuario: ref `pozexcjbxmoluftfxxus` → URL `https://pozexcjbxmoluftfxxus.supabase.co`
   (dashboard: https://supabase.com/dashboard/project/pozexcjbxmoluftfxxus).
+- Verificación de producción (https://tiendavirtual-ruddy.vercel.app): páginas estáticas OK; la BD estaba vacía
+  (tablas sin crear) y el deploy no tenía las variables → `/panel` y `/empresax` daban 500. Creado `scripts/verify-prod.mjs`
+  (`npm run verify:prod`): prueba logins, roles, RLS, checkout de invitado, aprobar/rechazar pago, chat y páginas con sesión.
+- **Migraciones configuradas** (pedido del usuario: “subir migraciones por cada cambio a Supabase”):
+  Supabase CLI 2.122.0 como devDependency, `schema.sql` → `supabase/migrations/20261024000000_init.sql`,
+  scripts `npm run db:*`, y GitHub Action que hace `supabase db push` en cada push a main.
+  **Regla:** todo cambio de BD = nueva migración (`npm run db:new <nombre>`); nunca editar una ya aplicada.
+  Si la inicial se ejecutó a mano en el SQL Editor, marcarla aplicada: `npx supabase migration repair --status applied 20261024000000 --linked`.
 - Siguiente paso: conectar Supabase y Vercel (Etapa 8).

@@ -63,7 +63,8 @@ Leyenda: `[x]` hecho · `[ ]` pendiente · `[~]` requiere acción del dueño del
 - [x] Editor de la landing principal
 
 ## Etapa 8 — Despliegue
-- [~] Ejecutar `supabase/schema.sql` en el SQL Editor de Supabase
+- [x] Migraciones con Supabase CLI (`supabase/migrations/`) + GitHub Action que las aplica al llegar a `main`
+- [~] Aplicar la migración inicial (`npm run db:push` o Action) — requiere token de Supabase y contraseña de la BD
 - [~] Configurar variables en Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`)
 - [~] `npm run seed` para crear los 3 usuarios de prueba
 - [~] Deploy en Vercel + dominio

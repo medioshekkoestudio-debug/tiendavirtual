@@ -1,7 +1,8 @@
 -- =====================================================================
--- Shopux.app — Esquema de base de datos (Supabase / PostgreSQL)
--- Ejecutar completo en: Supabase → SQL Editor → New query → Run
--- Es idempotente en lo posible (se puede volver a ejecutar).
+-- Shopux.app — Migración inicial (Supabase / PostgreSQL)
+-- Se aplica con `npm run db:push` o con el GitHub Action al llegar a main.
+-- Es idempotente en lo posible: también se puede pegar en el SQL Editor.
+-- NO edites esta migración ya aplicada: crea una nueva con `npm run db:new <nombre>`.
 -- =====================================================================
 
 create extension if not exists pgcrypto;
