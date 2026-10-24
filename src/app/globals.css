@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
+/* Paleta Shopux: verde #78B913 (acento/CTA), gris oscuro #333333 (texto),
+   gris medio #666666 (secundario), gris claro #F4F5F7 (fondos).
+   Las tiendas sobrescriben --brand/--brand-2/--accent con sus propios colores. */
 :root {
-  --brand: #7c3aed;
-  --brand-2: #1e1b4b;
-  --accent: #f59e0b;
+  --brand: #78b913;
+  --brand-2: #333333;
+  --accent: #666666;
   --on-brand: #ffffff;
   --brand-font: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
@@ -16,13 +19,33 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Grises neutros de la marca en lugar del slate azulado de Tailwind */
+@theme {
+  --color-shopux-green: #78b913;
+  --color-shopux-green-dark: #5e9410;
+  --color-shopux-ink: #333333;
+  --color-shopux-gray: #666666;
+  --color-shopux-bg: #f4f5f7;
+  --color-slate-50: #f4f5f7;
+  --color-slate-100: #ebecef;
+  --color-slate-200: #dcdde1;
+  --color-slate-300: #c5c6cb;
+  --color-slate-400: #9b9ca1;
+  --color-slate-500: #717171;
+  --color-slate-600: #666666;
+  --color-slate-700: #4d4d4d;
+  --color-slate-800: #3d3d3d;
+  --color-slate-900: #333333;
+  --color-slate-950: #1f1f1f;
+}
+
 html {
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: #f8fafc;
-  color: #0f172a;
+  background: #f4f5f7;
+  color: #333333;
 }
 
 .font-brand {

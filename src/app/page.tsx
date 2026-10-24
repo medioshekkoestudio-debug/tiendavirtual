@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, CreditCard, MessageCircle, Palette, Smartphone, Store } from "lucide-react";
+import { ArrowRight, CreditCard, MessageCircle, Palette, Smartphone } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
 import { SITE_DOMAIN } from "@/lib/constants";
 
@@ -13,11 +14,8 @@ export default async function LandingPage() {
       {/* Barra de navegación */}
       <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 text-lg font-extrabold text-slate-900">
-            <span className="grid size-9 place-items-center rounded-xl bg-brand text-white">
-              <Store className="size-5" />
-            </span>
-            {c.brand_name}
+          <Link href="/" aria-label={c.brand_name}>
+            <Logo className="h-9 md:h-11" />
           </Link>
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <a href="#que-es" className="hover:text-slate-900">¿Qué es?</a>
@@ -34,12 +32,16 @@ export default async function LandingPage() {
       {/* Banner */}
       <section className="relative overflow-hidden">
         <div
-          className="absolute inset-0 bg-gradient-to-br from-violet-700 via-brand to-fuchsia-500"
-          style={c.hero_image ? { backgroundImage: `linear-gradient(rgba(30,27,75,.65),rgba(30,27,75,.65)), url(${c.hero_image})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+          className="absolute inset-0 bg-gradient-to-br from-[#333333] via-[#4d4d4d] to-[#666666]"
+          style={c.hero_image ? { backgroundImage: `linear-gradient(rgba(51,51,51,.7),rgba(51,51,51,.7)), url(${c.hero_image})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+        />
+        <div
+          aria-hidden
+          className="absolute -right-24 -top-24 size-96 rounded-full bg-brand/30 blur-3xl"
         />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 text-white md:grid-cols-2 md:py-24">
           <div className="flex flex-col justify-center">
-            <span className="mb-4 w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide">
+            <span className="mb-4 w-fit rounded-full bg-brand px-3 py-1 text-xs font-semibold tracking-wide text-white">
               Marketplace de tiendas · PWA
             </span>
             <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">{c.hero_title}</h1>
@@ -50,7 +52,7 @@ export default async function LandingPage() {
           </div>
           <div className="hidden items-center justify-center md:flex">
             <div className="w-64 rounded-[2.5rem] border-8 border-white/20 bg-white p-3 text-slate-900 shadow-2xl">
-              <div className="h-24 rounded-2xl bg-gradient-to-r from-amber-300 to-rose-400" />
+              <div className="h-24 rounded-2xl bg-gradient-to-r from-brand to-[#9fd94a]" />
               <div className="mt-3 h-3 w-24 rounded bg-slate-200" />
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -115,7 +117,7 @@ export default async function LandingPage() {
       {/* Botón grande */}
       <section className="px-4 pb-20">
         <div className="mx-auto max-w-4xl rounded-3xl bg-slate-900 px-6 py-12 text-center text-white">
-          <Smartphone className="mx-auto size-10 text-amber-300" />
+          <Smartphone className="mx-auto size-10 text-brand" />
           <h2 className="mt-4 text-2xl font-bold md:text-3xl">Tu tienda, como app, lista hoy</h2>
           <Link
             href="/registro"
@@ -129,7 +131,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t py-8 text-center text-sm text-slate-500">{c.footer_text}</footer>
+      <footer className="flex flex-col items-center gap-3 border-t py-8 text-center text-sm text-slate-500">
+        <Logo className="h-7" />
+        {c.footer_text}
+      </footer>
     </div>
   );
 }

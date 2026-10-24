@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
+import { Logo } from "@/components/logo";
 import { getSession } from "@/lib/auth";
 import { SuperadminTabs } from "./tabs";
 
@@ -14,17 +15,19 @@ export default async function SuperadminLayout({ children }: { children: React.R
 
   return (
     <div className="min-h-dvh bg-slate-50">
-      <header className="sticky top-0 z-30 bg-slate-900 text-white">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white text-slate-900">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <ShieldCheck className="size-6 text-amber-300" />
-          <div className="flex-1">
-            <p className="font-bold leading-tight">Shopux · Superadmin</p>
-            <p className="text-xs text-white/60">{profile.email}</p>
+          <Logo className="h-8" />
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1 text-sm font-bold leading-tight">
+              <ShieldCheck className="size-4 text-brand" /> Superadmin
+            </p>
+            <p className="truncate text-xs text-slate-500">{profile.email}</p>
           </div>
-          <Link href="/" target="_blank" className="rounded-lg px-3 py-1.5 text-sm text-white/80 hover:bg-white/10">Ver landing</Link>
+          <Link href="/" target="_blank" className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100">Ver landing</Link>
           <form action={signOut}>
             <input type="hidden" name="next" value="/login" />
-            <button className="rounded-lg p-2 hover:bg-white/10" aria-label="Cerrar sesión">
+            <button className="rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Cerrar sesión">
               <LogOut className="size-5" />
             </button>
           </form>

@@ -1,15 +1,12 @@
 import Link from "next/link";
-import { Store } from "lucide-react";
+import { Logo } from "./logo";
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh place-items-center bg-gradient-to-br from-violet-50 to-slate-100 px-4 py-10">
+    <div className="grid min-h-dvh place-items-center bg-slate-50 px-4 py-10">
       <div className="w-full max-w-md">
-        <Link href="/" className="mb-6 flex items-center justify-center gap-2 text-xl font-extrabold">
-          <span className="grid size-10 place-items-center rounded-xl bg-brand text-white">
-            <Store className="size-5" />
-          </span>
-          Shopux
+        <Link href="/" className="mb-6 flex justify-center" aria-label="Shopux.app">
+          <Logo className="h-12" />
         </Link>
         <div className="card p-6">
           <h1 className="text-2xl font-bold">{title}</h1>

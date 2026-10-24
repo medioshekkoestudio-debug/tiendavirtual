@@ -90,6 +90,7 @@ export const PERIODS = {
 export type PeriodKey = keyof typeof PERIODS;
 
 export const COLOR_PRESETS = [
+  { name: "Shopux", primary: "#78b913", secondary: "#333333", accent: "#666666" },
   { name: "Violeta", primary: "#7c3aed", secondary: "#1e1b4b", accent: "#f59e0b" },
   { name: "Océano", primary: "#0284c7", secondary: "#0c4a6e", accent: "#22d3ee" },
   { name: "Bosque", primary: "#16a34a", secondary: "#14532d", accent: "#facc15" },
