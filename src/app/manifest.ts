@@ -1,0 +1,18 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Shopux — Marketplace de tiendas",
+    short_name: "Shopux",
+    description: "Crea y administra tu tienda online como una app.",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#7c3aed",
+    icons: [
+      { src: "/icons/192", sizes: "192x192", type: "image/png" },
+      { src: "/icons/512", sizes: "512x512", type: "image/png" },
+      { src: "/icons/512?maskable=1", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
+  };
+}
