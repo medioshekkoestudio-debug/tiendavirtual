@@ -159,7 +159,7 @@ export function StoreManager({
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <input className="input pl-9" placeholder="Buscar por nombre" value={query} onChange={(e) => setQuery(e.target.value)} />
               </label>
-              <button type="button" className="btn-primary" onClick={() => setEditing("new")}>
+              <button type="button" className="btn-primary" aria-label="Nuevo producto" onClick={() => setEditing("new")}>
                 <Plus className="size-4" /> <span className="hidden sm:inline">Nuevo producto</span>
               </button>
             </div>
