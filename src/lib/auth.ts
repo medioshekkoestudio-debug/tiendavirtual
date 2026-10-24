@@ -1,9 +1,12 @@
 import { cache } from "react";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "./supabase/server";
 import type { Profile, Store } from "./types";
 
 export const getSession = cache(async () => {
+  // Leer cookies primero marca la ruta como dinámica: así el build nunca intenta prerenderizarla.
+  await cookies();
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase no está configurado: copia .env.example a .env.local y completa las claves.");
   }
