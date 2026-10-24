@@ -85,4 +85,9 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - `next build` OK (tipos válidos, 23 rutas). Smoke test: `/`, `/login`, `/registro`, iconos, manifest y `sw.js` responden 200.
 - Repositorio git local inicializado con el primer commit.
 - Código subido a GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual (rama `main`).
+- Primer deploy en Vercel falló: faltaban variables de entorno y `getSession` lanzaba el error antes de leer cookies,
+  por lo que Next intentaba prerenderizar `/onboarding`. Corregido (commit `10037ee`): `getSession` llama a `cookies()` primero.
+  Lección: verificar `next build` por **código de salida**, no buscando texto en la salida.
+- Proyecto Supabase del usuario: ref `pozexcjbxmoluftfxxus` → URL `https://pozexcjbxmoluftfxxus.supabase.co`
+  (dashboard: https://supabase.com/dashboard/project/pozexcjbxmoluftfxxus).
 - Siguiente paso: conectar Supabase y Vercel (Etapa 8).
