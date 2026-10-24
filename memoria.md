@@ -68,7 +68,9 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - Variables en `.env.local` (plantilla en `.env.example`). **Nunca** subir `.env.local` ni exponer `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## 7. Pendientes / riesgos conocidos
-- [ ] Aplicar migración inicial en Supabase (`npm run db:push` o Action con secretos), `npm run seed`, `npm run verify:prod`.
+- [x] Migración inicial aplicada (Action), usuarios creados (`npm run seed`), producción verificada (`npm run verify:prod`).
+- [ ] Mover las claves reales de `.env.example` a `.env.local` (`.env.example` está versionado: NO commitear con claves).
+- [ ] Dominio `shopuxapp.com` en Vercel.
 - [x] Repositorio en GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual
 - [ ] Proyecto en Vercel (importar ese repo) + dominio `shopuxapp.com`.
 - Periodos “día/semana” se calculan con la hora del servidor (UTC en Vercel); ajustar a hora de Venezuela si hace falta.
@@ -100,4 +102,9 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   scripts `npm run db:*`, y GitHub Action que hace `supabase db push` en cada push a main.
   **Regla:** todo cambio de BD = nueva migración (`npm run db:new <nombre>`); nunca editar una ya aplicada.
   Si la inicial se ejecutó a mano en el SQL Editor, marcarla aplicada: `npx supabase migration repair --status applied 20261024000000 --linked`.
+- GitHub Action de migraciones en verde → tablas creadas. `npm run seed` creó los 3 usuarios + Empresa X (8 productos,
+  11 pedidos, chat). `verify:prod` en https://tiendavirtual-ruddy.vercel.app: **35/35 OK** (logins, roles, RLS, checkout
+  invitado, stock, aprobar/rechazar pago, chat, todas las páginas del panel/superadmin/cliente con sesión).
+  Storage: subida a carpeta propia OK, imagen pública OK, carpeta ajena bloqueada.
+  Pendiente de probar a mano en el navegador: formularios (registro, onboarding, checkout UI) e instalación PWA en el móvil.
 - Siguiente paso: conectar Supabase y Vercel (Etapa 8).

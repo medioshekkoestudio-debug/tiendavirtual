@@ -64,10 +64,11 @@ Leyenda: `[x]` hecho · `[ ]` pendiente · `[~]` requiere acción del dueño del
 
 ## Etapa 8 — Despliegue
 - [x] Migraciones con Supabase CLI (`supabase/migrations/`) + GitHub Action que las aplica al llegar a `main`
-- [~] Aplicar la migración inicial (`npm run db:push` o Action) — requiere token de Supabase y contraseña de la BD
-- [~] Configurar variables en Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`)
-- [~] `npm run seed` para crear los 3 usuarios de prueba
-- [~] Deploy en Vercel + dominio
+- [x] Aplicar la migración inicial (GitHub Action en verde)
+- [x] Configurar variables en Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`)
+- [x] `npm run seed` para crear los 3 usuarios de prueba
+- [x] Deploy en Vercel: https://tiendavirtual-ruddy.vercel.app — verificado con `npm run verify:prod` (35/35 OK) + prueba de Storage
+- [ ] Conectar el dominio `shopuxapp.com` en Vercel y actualizar `NEXT_PUBLIC_SITE_URL`
 
 ## Etapa 9 — Próximas mejoras (backlog)
 - [ ] Notificaciones push (Web Push) para nuevos pedidos/mensajes
