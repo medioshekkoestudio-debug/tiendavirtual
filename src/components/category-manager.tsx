@@ -164,6 +164,7 @@ export function CategoryManager({ categories, productCounts }: { categories: Cat
           <input className="input py-1" value={editName} onChange={(e) => setEditName(e.target.value)} autoFocus />
           <button
             type="button"
+            aria-label="Guardar nombre"
             className="btn-primary px-3 py-1"
             onClick={() => {
               setEditing(null);
