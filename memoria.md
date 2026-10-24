@@ -26,7 +26,8 @@ Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones po
 | Registro | Server action con service role (`auth.admin.createUser` con `email_confirm: true`), luego inicia sesión. No requiere confirmar email |
 | Checkout | RPC `place_order` (security definer): calcula precios y descuenta stock en el servidor; funciona sin cuenta |
 | Pagos | Manuales: el cliente registra método + referencia; la tienda aprueba/rechaza (RPC `review_payment`, rechazo devuelve stock) |
-| Moneda | USD (`formatMoney`), locale es-VE |
+| Moneda | USD (`formatMoney` → `$1.234,50`), locale es-VE |
+| Identidad Shopux | Verde **#78B913** (CTA/acentos), gris oscuro **#333333** (texto/títulos), gris medio **#666666** (secundario), gris claro **#F4F5F7** (fondos). Definida en `globals.css` (`--brand` por defecto + escala `slate` reemplazada por grises neutros). Logo oficial `public/brand/shopux-logo.jpg` vía `components/logo.tsx` (mix-blend-multiply para ocultar el fondo blanco). Icono PWA de la plataforma: fondo #333 con triángulo verde (`/icons/[size]` sin `l`). Panel y tienda pública usan los colores de cada tienda; tiendas nuevas arrancan con la paleta Shopux (migración `20261024120000`) |
 
 ## 3. Estructura
 ```
@@ -107,4 +108,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   invitado, stock, aprobar/rechazar pago, chat, todas las páginas del panel/superadmin/cliente con sesión).
   Storage: subida a carpeta propia OK, imagen pública OK, carpeta ajena bloqueada.
   Pendiente de probar a mano en el navegador: formularios (registro, onboarding, checkout UI) e instalación PWA en el móvil.
-- Siguiente paso: conectar Supabase y Vercel (Etapa 8).
+- Pruebas E2E en navegador (Playwright, viewport iPhone 13, script fuera del repo): registro de tienda + onboarding
+  (logo/slider subidos), CRUD de categorías/productos con imagen, métodos de pago, login de los 3 roles, permisos entre roles,
+  suspender/reactivar tiendas → OK. Bugs reales corregidos: precios salían "USD 45,00" → ahora `$45,00`;
+  botón "Nuevo producto" sin nombre accesible en móvil → `aria-label`. La última pasada completa se colgó (sin salida) y se detuvo;
+  pendiente re-ejecutarla registrando a archivo.
+- **Identidad visual Shopux** (commit `5541578`): paleta #78B913 / #333333 / #666666 / #F4F5F7, logo oficial en landing,
+  login/registro, footer y superadmin; icono PWA nuevo; preset "Shopux" en branding; migración con colores por defecto.
+  Build y typecheck OK (exit 0), Action de migraciones en verde, `verify:prod` OK, logo servido en producción.
+- Git en Windows: `C:\Program Files\Git\cmd` no está en el PATH de PowerShell del agente → anteponerlo en cada comando.
