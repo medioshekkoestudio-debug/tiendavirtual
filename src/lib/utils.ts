@@ -4,9 +4,11 @@ export function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const money = new Intl.NumberFormat("es-VE", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+const money = new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** Montos en dólares con formato venezolano: $1.234,50 */
 export function formatMoney(value: number | string | null | undefined) {
-  return money.format(Number(value ?? 0)).replace("US$", "$");
+  const n = Number(value ?? 0);
+  return `${n < 0 ? "-" : ""}$${money.format(Math.abs(n))}`;
 }
 
 export function formatDate(value: string | null | undefined, withTime = true) {
