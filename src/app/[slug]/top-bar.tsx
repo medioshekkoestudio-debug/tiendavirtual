@@ -55,9 +55,10 @@ export function StoreTopBar({
               {initials(user.name)}
             </button>
             {menu && (
-              <div className="absolute right-0 top-11 w-52 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-lg" onClick={() => setMenu(false)}>
+              // El formulario de cerrar sesión debe seguir montado al hacer clic: cerrar el menú solo desde el enlace
+              <div className="absolute right-0 top-11 w-52 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-lg">
                 <p className="truncate px-3 py-2 text-xs text-slate-500">{user.name}</p>
-                <Link href={`${base}/compras`} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-slate-50">
+                <Link href={`${base}/compras`} onClick={() => setMenu(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-slate-50">
                   <ShoppingBag className="size-4" /> Mis compras
                 </Link>
                 <form action={signOut}>
