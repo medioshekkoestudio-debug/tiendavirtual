@@ -29,7 +29,7 @@ export default async function CustomerMessagesPage({ params }: { params: Promise
     .order("created_at", { ascending: true });
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem-5rem)] flex-col bg-slate-100">
+    <div className="flex h-[calc(100dvh-3.5rem-6rem)] flex-col bg-slate-100">
       <div className="flex items-center gap-3 border-b bg-white px-4 py-2.5">
         {store.logo_url ? (
           // eslint-disable-next-line @next/next/no-img-element

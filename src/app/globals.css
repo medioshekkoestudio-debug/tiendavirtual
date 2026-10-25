@@ -41,11 +41,15 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
+/* overflow-x: clip evita que la página se "estire" de lado sin romper position: sticky */
 body {
   background: #f4f5f7;
   color: #333333;
+  overflow-x: clip;
 }
 
 .font-brand {
@@ -70,8 +74,9 @@ body {
 @utility btn-success {
   @apply btn bg-emerald-600 text-white hover:bg-emerald-700;
 }
+/* text-base (16px) en móvil: con menos, iOS Safari hace zoom al enfocar y la pantalla queda ampliada */
 @utility input {
-  @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20;
+  @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 sm:text-sm outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/20;
 }
 @utility label {
   @apply mb-1 block text-sm font-medium text-slate-700;
