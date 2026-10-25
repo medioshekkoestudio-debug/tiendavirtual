@@ -117,3 +117,15 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   login/registro, footer y superadmin; icono PWA nuevo; preset "Shopux" en branding; migración con colores por defecto.
   Build y typecheck OK (exit 0), Action de migraciones en verde, `verify:prod` OK, logo servido en producción.
 - Git en Windows: `C:\Program Files\Git\cmd` no está en el PATH de PowerShell del agente → anteponerlo en cada comando.
+- E2E completo (la pasada colgada era un bug del script: `getRetry` se llamaba a sí mismo). Bugs reales corregidos:
+  · Cerrar sesión desde el menú de cuenta de la tienda no hacía nada: el menú se cerraba con el clic y desmontaba el
+    `<form>` antes del submit (`0cfd8bb`).
+  · Botón ✓ de renombrar categoría sin nombre accesible → `aria-label="Guardar nombre"` (`7f386f0`).
+  · **Pantalla "estirada" en iPhone** (reporte del usuario con captura): iOS hacía zoom al enfocar inputs de 14px y la
+    barra inferior quedaba a media pantalla. Inputs a 16px en móvil (`text-base sm:text-sm`), `overflow-x: clip` en body,
+    `text-size-adjust: 100%` y alto exacto en Mensajes de tienda y panel (`1575b0c`). Verificado en prod a 390px:
+    sin scroll horizontal, inputs 16px, barra pegada al borde, Mensajes = alto de pantalla.
+  Resultado final: 36/37 (el único fallo, "Editar producto", fue espera por red lenta; pasó en las 3 corridas previas).
+- El usuario renombró Empresa X → **"Tienda Prueba"** (slug `tiendaprueba`) desde Ajustes: `/empresax` ya no existe.
+- Quedan 4 usuarios de prueba de corridas interrumpidas (`e2e.tienda.609222`, `e2e.tienda.263948`, `e2e.cliente.540186`,
+  `e2e.tienda.540186` @shopux.test) con sus tiendas "Prueba E2E …": borrar cuando el usuario lo autorice.
