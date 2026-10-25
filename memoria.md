@@ -60,7 +60,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 | Rol | Email | Contraseña |
 |---|---|---|
 | Superadmin | superadmin@shopux.app | Shopux#Admin2026 |
-| Tienda “Empresa X” (`/empresax`) | tienda@empresax.com | Empresax#2026 |
+| Tienda “Empresa X”, renombrada por el usuario a “Tienda Prueba” (`/tiendaprueba`) | tienda@empresax.com | Empresax#2026 |
 | Cliente | cliente@shopux.app | Cliente#2026 |
 
 ## 6. Entorno local (Windows)
