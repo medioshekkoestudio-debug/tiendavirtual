@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarClock, Check, CheckCircle2, MapPin, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart";
+import { CedulaInput } from "@/components/cedula-input";
 import { Money, RateNote, type Rate } from "@/components/money";
 import { PaymentDetailsView } from "@/components/payment-details-view";
 import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS } from "@/lib/constants";
@@ -266,8 +267,8 @@ export function Checkout({
                 <input id="c-name" className="input" autoComplete="name" value={customer.name} onChange={(e) => setC("name", e.target.value)} />
               </div>
               <div>
-                <label className="label" htmlFor="c-ced">Cédula de identidad</label>
-                <input id="c-ced" className="input" placeholder="V-12345678" value={customer.cedula} onChange={(e) => setC("cedula", e.target.value)} />
+                <label className="label" htmlFor="c-ced">Cédula de identidad / RIF</label>
+                <CedulaInput id="c-ced" defaultValue={customer.cedula} onChange={(v) => setC("cedula", v)} />
               </div>
               <div>
                 <label className="label" htmlFor="c-phone">Teléfono</label>

@@ -26,7 +26,7 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
   if (!data.fullName || !data.company || !data.email || !data.cedula || !data.phone) return { error: "Completa todos los campos" };
   if (data.company.length < 3) return { error: "El nombre de la empresa debe tener al menos 3 caracteres" };
   if (!isRubro(data.industry)) return { error: "Elige el rubro de tu empresa" };
-  if (!/^[VEJGP]-?\d{6,9}(-?\d)?$/.test(data.cedula)) return { error: "Cédula o RIF inválido. Ejemplo: V-12345678 o J-12345678-9" };
+  if (!/^[VEJGPR]-?\d{6,9}(-?\d)?$/.test(data.cedula)) return { error: "Cédula o RIF inválido. Ejemplo: V-12345678 o J-12345678-9" };
   if (data.phone.replace(/\D/g, "").length < 10) return { error: "Teléfono inválido. Ejemplo: 0414-1234567" };
   if (!/^\S+@\S+\.\S+$/.test(data.email)) return { error: "Email inválido" };
   if (data.password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };

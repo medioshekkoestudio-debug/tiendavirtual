@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { registerStore } from "@/app/auth-actions";
 import { FormError } from "@/components/auth-shell";
+import { CedulaInput } from "@/components/cedula-input";
 import { RUBRO_KEYS, RUBROS, SITE_DOMAIN } from "@/lib/constants";
 
 function previewSlug(name: string) {
@@ -66,8 +67,7 @@ export function RegistrationFields() {
     </div>
     <div>
       <label className="label" htmlFor="cedula">Cédula de identidad / RIF</label>
-      <input id="cedula" name="cedula" required className="input" placeholder="V-12345678 o J-12345678-9" autoCapitalize="characters"
-        pattern="[VEJGPvejgp]-?[0-9]{6,9}(-?[0-9])?" title="Ejemplo: V-12345678 o J-12345678-9" />
+      <CedulaInput id="cedula" name="cedula" required />
     </div>
     <div>
       <label className="label" htmlFor="phone">Teléfono</label>
