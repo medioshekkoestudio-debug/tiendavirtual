@@ -139,7 +139,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   colores por defecto, textos de la landing en BD y slugs `linki`/`linkiapp` reservados. Correos de las cuentas de prueba sin cambiar.
 - **Rubros**: migración `20261029130000_rubro_tienda.sql` (`stores.industry`, trigger de registro, `superadmin_store_stats` con rubro).
   Registro pide rubro, responsable, cédula/RIF y teléfono. Categorías sugeridas por rubro en el onboarding.
-- Tienda pública: nombre solo en la barra superior, centrado y en el color principal de la tienda (debajo del banner queda oculto, para lectores de pantalla).
+- Tienda pública: logo a la izquierda de la barra superior y nombre centrado en el color principal de la tienda (debajo del banner queda oculto, para lectores de pantalla).
 - Formulario de producto: el modal ya no se cierra al tocar fuera; borrador en localStorage por producto (sobrevive a recargas de Android al elegir foto).
 - Landing: imagen de teléfonos + foto de fondo con velo azul marino.
 - Local apunta a la Supabase de producción: lo que dependa de migraciones nuevas solo funciona tras el push.

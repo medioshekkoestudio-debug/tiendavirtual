@@ -24,17 +24,18 @@ export function StoreTopBar({
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b border-slate-200 bg-white/95 backdrop-blur">
-      {/* 3 columnas: la del medio (logo + nombre) queda centrada aunque los botones de la derecha cambien de ancho */}
+      {/* 3 columnas: logo a la izquierda, nombre centrado (aunque los botones de la derecha cambien de ancho), acciones a la derecha */}
       <div className="mx-auto grid h-full max-w-3xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
-        <span aria-hidden />
-        <Link href={base} className="flex min-w-0 max-w-[55vw] items-center justify-center gap-2 sm:max-w-md">
+        <Link href={base} className="justify-self-start" aria-label={`Inicio de ${name}`}>
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt="" className="size-9 rounded-xl object-contain" />
           ) : (
             <span className="grid size-9 place-items-center rounded-xl bg-brand text-sm font-bold text-on-brand">{initials(name)}</span>
           )}
-          <span className="font-brand truncate text-lg font-bold text-brand">{name}</span>
+        </Link>
+        <Link href={base} className="min-w-0 max-w-[55vw] text-center sm:max-w-md">
+          <span className="font-brand block truncate text-lg font-bold text-brand">{name}</span>
         </Link>
 
         <div className="flex items-center justify-end gap-2">
