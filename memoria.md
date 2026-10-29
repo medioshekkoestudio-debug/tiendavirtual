@@ -20,7 +20,7 @@ Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones po
 | PWA | `app/manifest.ts` + manifest por tienda (`/<slug>/manifest.webmanifest`) y del panel; `public/sw.js` (offline); iconos generados en `/icons/[size]?l=E&c=%23hex` |
 | Tema por tienda | Variables CSS `--brand`, `--brand-2`, `--accent`, `--on-brand`, `--brand-font` (ver `components/theme-vars.tsx`) |
 | Tipografías | 3 sans (Inter, Poppins, Montserrat) + 3 serif (Playfair, Merriweather, Lora) con visualizador |
-| Slider | 3 slides, 25 % del alto (`h-[25vh]`), sugerencia **1920×480 px (4:1)** |
+| Slider | 3 slides, proporción fija **2,5:1** (`aspect-[5/2]`), sugerencia **1500×600 px**; imagen con `object-contain` sobre copia desenfocada |
 | Comisión | **1 %** por venta pagada (`stores.commission_rate = 0.01`), guardada por pedido en `orders.commission` |
 | Slug | `"Empresa X" → "empresax"` (sin espacios ni acentos, función SQL `slugify`/`unique_slug`); editable en Ajustes |
 | Registro | Server action con service role (`auth.admin.createUser` con `email_confirm: true`), luego inicia sesión. No requiere confirmar email |
@@ -75,7 +75,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - [x] Dominio `linkiapp.com` conectado en Vercel (29-oct).
 - [ ] `NEXT_PUBLIC_SITE_URL=https://linkiapp.com` en Vercel y Site URL en Supabase Auth.
 - [x] Repositorio en GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual
-- [ ] Banner de tienda con alto = 25 % de la pantalla: recorta las imágenes según el dispositivo. Propuesta: proporción fija 2,5:1 (1500×600).
+- [x] Banner de tienda: proporción fija 2,5:1 (1500×600) e imagen siempre completa con relleno desenfocado (antes 25 % del alto → recortes distintos por equipo).
 - [ ] `landing_content.hero_image` apunta a un adjunto de Gmail (no carga para visitantes): borrarlo desde Superadmin → Landing.
 - Periodos “día/semana” se calculan con la hora del servidor (UTC en Vercel); ajustar a hora de Venezuela si hace falta.
 - Registro sin verificación de email (rápido para MVP); considerar activar confirmación más adelante.

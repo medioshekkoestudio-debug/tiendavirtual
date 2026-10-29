@@ -117,7 +117,7 @@ export function BrandingForm({
         <div>
           <h3 className="text-lg font-bold">Slider principal (3 imágenes)</h3>
           <p className="text-sm text-slate-600">
-            El slider ocupa el <strong>25 %</strong> del alto de la pantalla. {SLIDER_HINT}
+            {SLIDER_HINT}
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -128,13 +128,13 @@ export function BrandingForm({
               value={img}
               userId={userId}
               folder="slider"
-              className="aspect-[4/1] w-full"
+              className="aspect-[5/2] w-full"
               onChange={(u) => set("slider_images", form.slider_images.map((x, j) => (j === i ? u : x)))}
             />
           ))}
         </div>
         <div className="overflow-hidden rounded-xl border border-slate-200">
-          <StoreSlider images={form.slider_images.filter((x): x is string => !!x)} storeName={form.name} heightClass="h-32" />
+          <StoreSlider images={form.slider_images.filter((x): x is string => !!x)} storeName={form.name} />
         </div>
       </section>
 

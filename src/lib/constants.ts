@@ -2,8 +2,8 @@ import type { LandingContent, OrderStatus, PaymentMethodKey, PaymentStatus } fro
 
 export const SITE_DOMAIN = "linkiapp.com";
 
-/** Recomendación para las imágenes del slider principal (ocupa 25 % del alto de pantalla). */
-export const SLIDER_HINT = "Tamaño recomendado: 1920 × 480 px (proporción 4:1), JPG o WebP, máx. 1 MB. Mantén el texto importante en el centro.";
+/** Recomendación para las imágenes del slider principal (proporción fija 2,5:1, ver store-slider.tsx). */
+export const SLIDER_HINT = "Tamaño recomendado: 1500 × 600 px (proporción 2,5:1), JPG o WebP, máx. 1 MB. Se ve completa en teléfono y computadora.";
 export const SLIDER_SLOTS = 3;
 
 export const DEFAULT_CATEGORIES: { name: string; subcategories: string[] }[] = [

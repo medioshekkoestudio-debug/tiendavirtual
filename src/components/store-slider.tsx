@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-/** Slider principal de la tienda (por defecto 25 % del alto de la pantalla). */
+/**
+ * Slider principal de la tienda. Proporción fija 2,5:1 (igual en teléfono, tablet y PC) para que la imagen
+ * subida se vea completa: con un alto en % de pantalla la forma cambiaba y la foto se recortaba distinto en cada equipo.
+ */
 export function StoreSlider({
   images,
   storeName,
-  heightClass = "h-[25vh] min-h-36",
+  heightClass = "aspect-[5/2]",
 }: {
   images: string[];
   storeName: string;
@@ -28,8 +31,14 @@ export function StoreSlider({
       <div className="flex h-full transition-transform duration-700" style={{ transform: `translateX(-${index * 100}%)` }}>
         {slides.map((src, i) =>
           src ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={src} alt={`${storeName} — slide ${i + 1}`} className="h-full w-full shrink-0 object-cover" />
+            // Imagen completa (object-contain) sobre una copia desenfocada de sí misma que rellena los bordes
+            // cuando la tienda sube una imagen con otra proporción (vertical, cuadrada, 4:1…). A 2,5:1 llena todo el banner.
+            <div key={i} className="relative h-full w-full shrink-0 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-70 blur-xl" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`${storeName} — slide ${i + 1}`} className="relative size-full object-contain" />
+            </div>
           ) : (
             <div
               key={i}
