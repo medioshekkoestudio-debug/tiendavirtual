@@ -2,17 +2,17 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Shopux — Marketplace de tiendas",
-    short_name: "Shopux",
+    name: "Linki App — Marketplace de tiendas",
+    short_name: "Linki App",
     description: "Crea y administra tu tienda online como una app.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f4f5f7",
-    theme_color: "#78b913",
+    background_color: "#ffffff",
+    theme_color: "#009688",
     icons: [
-      { src: "/icons/192", sizes: "192x192", type: "image/png" },
-      { src: "/icons/512", sizes: "512x512", type: "image/png" },
-      { src: "/icons/512?maskable=1", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/brand/linkiapp-icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/brand/linkiapp-icon-512.png", sizes: "512x512", type: "image/png" },
+      { src: "/brand/linkiapp-icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

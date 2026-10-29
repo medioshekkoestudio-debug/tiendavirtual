@@ -24,16 +24,20 @@ export function StoreTopBar({
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-full max-w-3xl items-center gap-3 px-4">
-        <Link href={base} className="flex min-w-0 flex-1 items-center gap-2">
+      {/* 3 columnas: la del medio (logo + nombre) queda centrada aunque los botones de la derecha cambien de ancho */}
+      <div className="mx-auto grid h-full max-w-3xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
+        <span aria-hidden />
+        <Link href={base} className="flex min-w-0 max-w-[55vw] items-center justify-center gap-2 sm:max-w-md">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt="" className="size-9 rounded-xl object-contain" />
           ) : (
             <span className="grid size-9 place-items-center rounded-xl bg-brand text-sm font-bold text-on-brand">{initials(name)}</span>
           )}
-          <span className="font-brand truncate text-lg font-bold">{name}</span>
+          <span className="font-brand truncate text-lg font-bold text-brand">{name}</span>
         </Link>
+
+        <div className="flex items-center justify-end gap-2">
 
         <Link href={`${base}/checkout`} className="relative rounded-xl p-2 text-slate-700 hover:bg-slate-100" aria-label="Carrito">
           <ShoppingCart className="size-5" />
@@ -71,10 +75,12 @@ export function StoreTopBar({
             )}
           </div>
         ) : (
-          <Link href={`${base}/login`} className="btn-outline px-3 py-1.5 text-xs">
-            <User className="size-4" /> Iniciar sesión
+          // En el teléfono solo el icono, para dejarle espacio al nombre centrado
+          <Link href={`${base}/login`} className="btn-outline px-2 py-1.5 text-xs sm:px-3" aria-label="Iniciar sesión">
+            <User className="size-4" /> <span className="hidden sm:inline">Iniciar sesión</span>
           </Link>
         )}
+        </div>
       </div>
     </header>
   );

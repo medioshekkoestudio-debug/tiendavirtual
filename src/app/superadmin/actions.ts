@@ -15,7 +15,7 @@ async function requireSuperadmin() {
 export async function saveLanding(content: LandingContent): Promise<{ error?: string; ok?: boolean }> {
   const supabase = await requireSuperadmin();
   const clean: LandingContent = {
-    brand_name: content.brand_name.trim().slice(0, 40) || "Shopux",
+    brand_name: content.brand_name.trim().slice(0, 40) || "Linki App",
     hero_title: content.hero_title.trim().slice(0, 140),
     hero_subtitle: content.hero_subtitle.trim().slice(0, 300),
     hero_image: /^https?:\/\//.test(content.hero_image) ? content.hero_image.slice(0, 1000) : "",

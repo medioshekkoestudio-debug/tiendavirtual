@@ -4,15 +4,15 @@ import { fontVariables } from "@/lib/fonts";
 import { RegisterSW } from "@/components/register-sw";
 
 export const metadata: Metadata = {
-  title: { default: "Shopux — Crea tu tienda online", template: "%s · Shopux" },
+  title: { default: "Linki App — Crea tu tienda online", template: "%s · Linki App" },
   description: "Marketplace de tiendas: crea tu tienda PWA con tu marca, pagos locales, pedidos y chat.",
-  applicationName: "Shopux",
-  appleWebApp: { capable: true, title: "Shopux", statusBarStyle: "default" },
-  icons: { icon: "/icons/192", apple: "/icons/180" },
+  applicationName: "Linki App",
+  appleWebApp: { capable: true, title: "Linki App", statusBarStyle: "default" },
+  icons: { icon: "/brand/linkiapp-icon-48.png", apple: "/brand/linkiapp-icon-180.png" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#78b913",
+  themeColor: "#009688",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

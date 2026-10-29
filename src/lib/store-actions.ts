@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "./auth";
 import { FONT_OPTIONS } from "./font-options";
-import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS } from "./constants";
+import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS, isRubro } from "./constants";
 import type { OrderStatus, PaymentMethodConfig, PaymentMethodKey } from "./types";
 
 export type ActionResult = { error?: string; ok?: boolean; id?: string };
@@ -61,6 +61,14 @@ export async function saveSlug(raw: string): Promise<ActionResult> {
   }
   const { error } = await supabase.from("stores").update({ slug }).eq("id", store.id);
   if (error) return { error: error.code === "23505" ? "Ese link ya está en uso" : "Ese link no está disponible" };
+  return done();
+}
+
+export async function saveIndustry(industry: string): Promise<ActionResult> {
+  const { supabase, store } = await getOwnerStore();
+  if (!isRubro(industry)) return { error: "Elige un rubro de la lista" };
+  const { error } = await supabase.from("stores").update({ industry }).eq("id", store.id);
+  if (error) return { error: "No se pudo guardar el rubro" };
   return done();
 }
 

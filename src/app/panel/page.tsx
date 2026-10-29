@@ -48,7 +48,7 @@ export default async function PanelHome() {
           <StatCard
             label="Comisión del mes"
             value={formatMoney(commission)}
-            hint={`${(Number(store.commission_rate) * 100).toFixed(1)} % Shopux`}
+            hint={`${(Number(store.commission_rate) * 100).toFixed(1)} % Linki App`}
           />
         </div>
       </section>

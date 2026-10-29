@@ -1,7 +1,7 @@
 export function GET() {
   return Response.json(
     {
-      name: "Shopux — Panel de mi tienda",
+      name: "Linki App — Panel de mi tienda",
       short_name: "Mi tienda",
       start_url: "/panel",
       scope: "/panel",

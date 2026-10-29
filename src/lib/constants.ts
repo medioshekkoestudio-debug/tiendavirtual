@@ -1,6 +1,6 @@
 import type { LandingContent, OrderStatus, PaymentMethodKey, PaymentStatus } from "./types";
 
-export const SITE_DOMAIN = "shopuxapp.com";
+export const SITE_DOMAIN = "linkiapp.com";
 
 /** Recomendación para las imágenes del slider principal (ocupa 25 % del alto de pantalla). */
 export const SLIDER_HINT = "Tamaño recomendado: 1920 × 480 px (proporción 4:1), JPG o WebP, máx. 1 MB. Mantén el texto importante en el centro.";
@@ -16,7 +16,137 @@ export const DEFAULT_CATEGORIES: { name: string; subcategories: string[] }[] = [
   { name: "Servicios", subcategories: ["Consultoría", "Reparaciones", "Clases", "Delivery"] },
 ];
 
-export type PaymentField = { key: string; label: string; placeholder?: string; type?: string };
+/**
+ * Rubros de la inscripción: el dueño elige a qué se dedica su tienda al registrarse (editable en Ajustes).
+ * Las claves deben coincidir con el check de stores.industry (migración 20261029130000_rubro_tienda.sql).
+ * `categories` son las categorías sugeridas en el onboarding para ese rubro.
+ */
+export const RUBROS = {
+  automotriz: {
+    label: "Automotriz y Repuestos",
+    categories: [
+      { name: "Repuestos", subcategories: ["Motor", "Frenos", "Suspensión", "Eléctricos", "Filtros"] },
+      { name: "Lubricantes y fluidos", subcategories: ["Aceites", "Refrigerantes", "Líquido de frenos"] },
+      { name: "Cauchos y baterías", subcategories: ["Cauchos", "Baterías", "Rines"] },
+      { name: "Accesorios", subcategories: ["Interior", "Exterior", "Audio y luces"] },
+      { name: "Servicios", subcategories: ["Mantenimiento", "Diagnóstico", "Instalación"] },
+    ],
+  },
+  entretenimiento: {
+    label: "Entretenimiento",
+    categories: [
+      { name: "Juegos y juguetes", subcategories: ["Videojuegos", "Juegos de mesa", "Juguetes"] },
+      { name: "Eventos", subcategories: ["Entradas", "Fiestas", "Alquiler de equipos"] },
+      { name: "Música y cine", subcategories: ["Instrumentos", "Películas", "Accesorios"] },
+      { name: "Coleccionables", subcategories: ["Figuras", "Cartas", "Comics"] },
+    ],
+  },
+  ferreteria: {
+    label: "Ferretería",
+    categories: [
+      { name: "Herramientas", subcategories: ["Manuales", "Eléctricas", "Medición"] },
+      { name: "Construcción", subcategories: ["Cemento y agregados", "Tornillería", "Pinturas"] },
+      { name: "Plomería", subcategories: ["Tuberías", "Grifería", "Conexiones"] },
+      { name: "Electricidad", subcategories: ["Cables", "Iluminación", "Interruptores y tomas"] },
+      { name: "Jardinería", subcategories: ["Herramientas de jardín", "Riego"] },
+    ],
+  },
+  hogar: {
+    label: "Hogar y Decoración",
+    categories: [
+      { name: "Muebles", subcategories: ["Sala", "Comedor", "Dormitorio", "Oficina"] },
+      { name: "Decoración", subcategories: ["Cuadros", "Plantas", "Iluminación", "Textiles"] },
+      { name: "Cocina", subcategories: ["Utensilios", "Vajilla", "Electrodomésticos"] },
+      { name: "Baño", subcategories: ["Accesorios", "Toallas"] },
+      { name: "Limpieza", subcategories: ["Productos", "Organización"] },
+    ],
+  },
+  mascotas: {
+    label: "Mascotas y Agropecuaria",
+    categories: [
+      { name: "Alimentos", subcategories: ["Perros", "Gatos", "Aves", "Peces"] },
+      { name: "Accesorios para mascotas", subcategories: ["Camas", "Collares y correas", "Juguetes"] },
+      { name: "Salud animal", subcategories: ["Medicamentos", "Antipulgas", "Vitaminas"] },
+      { name: "Agropecuaria", subcategories: ["Semillas", "Fertilizantes", "Alimento para ganado", "Herramientas"] },
+    ],
+  },
+  moda: {
+    label: "Moda y Boutique",
+    categories: [
+      { name: "Ropa de mujer", subcategories: ["Vestidos", "Blusas", "Pantalones", "Faldas"] },
+      { name: "Ropa de hombre", subcategories: ["Camisas", "Pantalones", "Franelas"] },
+      { name: "Niños", subcategories: ["Niñas", "Niños", "Bebés"] },
+      { name: "Calzado", subcategories: ["Dama", "Caballero", "Deportivo"] },
+      { name: "Accesorios", subcategories: ["Carteras", "Bisutería", "Lentes", "Relojes"] },
+    ],
+  },
+  panaderia: {
+    label: "Panadería y Pastelería",
+    categories: [
+      { name: "Panes", subcategories: ["Pan salado", "Pan dulce", "Integral"] },
+      { name: "Tortas", subcategories: ["Por porción", "Enteras", "Personalizadas"] },
+      { name: "Dulces y postres", subcategories: ["Galletas", "Postres fríos", "Dulces criollos"] },
+      { name: "Salados", subcategories: ["Pastelitos", "Cachitos", "Tequeños"] },
+      { name: "Bebidas", subcategories: ["Café", "Jugos", "Refrescos"] },
+    ],
+  },
+  papeleria: {
+    label: "Papelería y Librería",
+    categories: [
+      { name: "Útiles escolares", subcategories: ["Cuadernos", "Lápices y bolígrafos", "Morrales"] },
+      { name: "Oficina", subcategories: ["Papel", "Archivo", "Tintas y tóner"] },
+      { name: "Libros", subcategories: ["Infantiles", "Literatura", "Textos escolares"] },
+      { name: "Arte y manualidades", subcategories: ["Pinturas", "Papeles especiales", "Pegamentos"] },
+      { name: "Servicios", subcategories: ["Impresiones", "Copias", "Encuadernación"] },
+    ],
+  },
+  salud: {
+    label: "Salud",
+    categories: [
+      { name: "Medicamentos", subcategories: ["Con récipe", "Sin récipe", "Genéricos"] },
+      { name: "Cuidado personal", subcategories: ["Higiene", "Cuidado de la piel", "Cuidado del cabello"] },
+      { name: "Vitaminas y suplementos", subcategories: ["Vitaminas", "Proteínas", "Naturales"] },
+      { name: "Bebés", subcategories: ["Pañales", "Fórmulas", "Higiene"] },
+      { name: "Equipos médicos", subcategories: ["Tensiómetros", "Glucómetros", "Primeros auxilios"] },
+    ],
+  },
+  supermercados: {
+    label: "Supermercados",
+    categories: [
+      { name: "Víveres", subcategories: ["Granos", "Harinas", "Pastas", "Enlatados"] },
+      { name: "Charcutería y lácteos", subcategories: ["Quesos", "Embutidos", "Leche y yogur"] },
+      { name: "Carnes y pescados", subcategories: ["Res", "Pollo", "Cerdo", "Pescados"] },
+      { name: "Frutas y verduras", subcategories: ["Frutas", "Verduras", "Hortalizas"] },
+      { name: "Bebidas", subcategories: ["Agua", "Refrescos", "Jugos", "Licores"] },
+      { name: "Limpieza e higiene", subcategories: ["Hogar", "Higiene personal"] },
+    ],
+  },
+  tecnologia: {
+    label: "Tecnología",
+    categories: [
+      { name: "Computadoras", subcategories: ["Laptops", "Escritorio", "Componentes"] },
+      { name: "Audio y video", subcategories: ["Audífonos", "Cornetas", "Televisores"] },
+      { name: "Accesorios", subcategories: ["Cables y cargadores", "Mouse y teclados", "Almacenamiento"] },
+      { name: "Gaming", subcategories: ["Consolas", "Videojuegos", "Periféricos"] },
+      { name: "Servicio técnico", subcategories: ["Reparación", "Instalación"] },
+    ],
+  },
+  telefonia: {
+    label: "Telefonía",
+    categories: [
+      { name: "Teléfonos", subcategories: ["Android", "iPhone", "Básicos"] },
+      { name: "Accesorios", subcategories: ["Forros", "Protectores de pantalla", "Cargadores", "Audífonos"] },
+      { name: "Repuestos", subcategories: ["Pantallas", "Baterías", "Piezas"] },
+      { name: "Servicios", subcategories: ["Reparación", "Recargas", "Liberación"] },
+    ],
+  },
+} satisfies Record<string, { label: string; categories: { name: string; subcategories: string[] }[] }>;
+
+export type RubroKey = keyof typeof RUBROS;
+export const RUBRO_KEYS = Object.keys(RUBROS) as RubroKey[];
+export const isRubro = (v: unknown): v is RubroKey => typeof v === "string" && v in RUBROS;
+
+export type PaymentField ={ key: string; label: string; placeholder?: string; type?: string };
 
 export const PAYMENT_METHODS: Record<PaymentMethodKey, { label: string; fields: PaymentField[] }> = {
   zelle: {
@@ -90,7 +220,7 @@ export const PERIODS = {
 export type PeriodKey = keyof typeof PERIODS;
 
 export const COLOR_PRESETS = [
-  { name: "Shopux", primary: "#78b913", secondary: "#333333", accent: "#666666" },
+  { name: "Linki App", primary: "#009688", secondary: "#004d40", accent: "#9ccc65" },
   { name: "Violeta", primary: "#7c3aed", secondary: "#1e1b4b", accent: "#f59e0b" },
   { name: "Océano", primary: "#0284c7", secondary: "#0c4a6e", accent: "#22d3ee" },
   { name: "Bosque", primary: "#16a34a", secondary: "#14532d", accent: "#facc15" },
@@ -100,18 +230,18 @@ export const COLOR_PRESETS = [
 ];
 
 export const DEFAULT_LANDING: LandingContent = {
-  brand_name: "Shopux",
+  brand_name: "Linki App",
   hero_title: "Crea tu tienda online en minutos",
   hero_subtitle: "Tu propia app (PWA) con catálogo, pedidos, pagos y chat con tus clientes. Sin programar.",
   hero_image: "",
-  description_title: "¿Qué es Shopux?",
+  description_title: "¿Qué es Linki App?",
   description:
-    "Shopux es un marketplace de tiendas: cada empresa obtiene su propia tienda instalable en el teléfono, con su marca, sus colores y su link (shopuxapp.com/tuempresa). Administra productos, stock, pagos (Zelle, PayPal, Pago móvil, Binance, transferencias) y pedidos desde un solo panel.",
+    "Linki App es un marketplace de tiendas: cada empresa obtiene su propia tienda instalable en el teléfono, con su marca, sus colores y su link (linkiapp.com/tuempresa). Administra productos, stock, pagos (Zelle, PayPal, Pago móvil, Binance, transferencias) y pedidos desde un solo panel.",
   cta_text: "Crear mi tienda gratis",
   features: [
     { title: "Tu marca, tu app", text: "Logo, colores, tipografía y slider propios. Tus clientes la instalan como app." },
     { title: "Pagos locales", text: "Zelle, PayPal, Pago móvil, Binance y transferencias. Aprueba cada pago con un toque." },
     { title: "Pedidos y chat", text: "Controla pedidos por categoría y conversa con tus clientes en tiempo real." },
   ],
-  footer_text: "© Shopux.app — Marketplace de tiendas",
+  footer_text: "© Linki App — Marketplace de tiendas",
 };

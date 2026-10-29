@@ -79,8 +79,9 @@ export function StorefrontHome({
 
       {store.description && (
         <section className="px-4 pt-5">
-          <h1 className="font-brand text-2xl font-bold">{store.name}</h1>
-          <p className="mt-1 text-sm leading-relaxed text-slate-600">{store.description}</p>
+          {/* El nombre ya se ve en la barra superior: aquí solo queda para lectores de pantalla */}
+          <h1 className="sr-only">{store.name}</h1>
+          <p className="text-sm leading-relaxed text-slate-600">{store.description}</p>
         </section>
       )}
 

@@ -1,5 +1,5 @@
-// Service worker de Shopux: cachea estáticos y ofrece una página offline.
-const CACHE = "shopux-v1";
+// Service worker de Linki App: cachea estáticos y ofrece una página offline.
+const CACHE = "linkiapp-v1";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { StatCard } from "@/components/ui";
 import { getSession } from "@/lib/auth";
-import { SITE_DOMAIN } from "@/lib/constants";
+import { RUBROS, SITE_DOMAIN, isRubro } from "@/lib/constants";
 import { formatDate, formatMoney } from "@/lib/utils";
 import { StoreToggle } from "./store-toggle";
 
@@ -9,6 +9,7 @@ type StatRow = {
   store_id: string;
   name: string;
   slug: string;
+  industry: string | null;
   owner_email: string;
   is_active: boolean;
   created_at: string;
@@ -59,6 +60,7 @@ export default async function SuperadminHome() {
                 <tr key={r.store_id}>
                   <td className="px-4 py-3">
                     <p className="font-semibold">{r.name}</p>
+                    <p className="text-xs text-slate-500">{isRubro(r.industry) ? RUBROS[r.industry].label : "Sin rubro"}</p>
                     <Link href={`/${r.slug}`} target="_blank" className="font-mono text-xs text-brand">
                       {SITE_DOMAIN}/{r.slug}
                     </Link>

@@ -3,6 +3,7 @@ import { CategoryManager } from "@/components/category-manager";
 import { PaymentMethodsForm } from "@/components/payment-methods-form";
 import { getOwnerStore } from "@/lib/auth";
 import type { Category } from "@/lib/types";
+import { IndustryForm } from "./industry-form";
 import { SlugForm } from "./slug-form";
 
 export const metadata = { title: "Ajustes" };
@@ -18,6 +19,11 @@ export default async function SettingsPage() {
         <h2 className="mb-1 text-lg font-bold">Link de tu tienda</h2>
         <p className="mb-4 text-sm text-slate-600">Es la dirección que compartes con tus clientes.</p>
         <SlugForm slug={store.slug} />
+      </section>
+      <section className="card p-5">
+        <h2 className="mb-1 text-lg font-bold">Rubro</h2>
+        <p className="mb-4 text-sm text-slate-600">A qué se dedica tu tienda.</p>
+        <IndustryForm industry={store.industry} />
       </section>
       <section className="card p-5">
         <h2 className="mb-4 text-lg font-bold">Imagen de marca</h2>

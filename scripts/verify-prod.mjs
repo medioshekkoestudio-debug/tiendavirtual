@@ -104,7 +104,7 @@ async function main() {
 
   // 5. Páginas (servidor Next.js en Vercel)
   const pages = [
-    ["/", null, 200, "Shopux"],
+    ["/", null, 200, "Linki App"],
     ["/empresax", null, 200, "Empresa X"],
     ["/empresax/checkout", null, 200, "Carrito"],
     ["/empresax/manifest.webmanifest", null, 200, "empresax"],

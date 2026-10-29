@@ -1,4 +1,4 @@
-# Shopux.app
+# Linki App (linkiapp.com)
 
 Marketplace de tiendas PWA — **Next.js 15 + Supabase + Vercel**.
 Contexto completo y bitácora: [`memoria.md`](./memoria.md) · Plan por etapas: [`PLAN.md`](./PLAN.md)
@@ -17,8 +17,8 @@ Contexto completo y bitácora: [`memoria.md`](./memoria.md) · Plan por etapas: 
    npm run dev      # http://localhost:3000
    ```
 4. **Vercel** → New Project → importa el repo de GitHub → agrega las mismas 4 variables de entorno
-   (`NEXT_PUBLIC_SITE_URL=https://shopuxapp.com`) → Deploy → Settings → Domains → `shopuxapp.com`.
-5. En Supabase → Authentication → URL Configuration → Site URL = `https://shopuxapp.com`.
+   (`NEXT_PUBLIC_SITE_URL=https://linkiapp.com`) → Deploy → Settings → Domains → `linkiapp.com`.
+5. En Supabase → Authentication → URL Configuration → Site URL = `https://linkiapp.com`.
 
 ## Usuarios de prueba (creados por `npm run seed`)
 

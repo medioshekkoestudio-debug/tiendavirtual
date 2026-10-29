@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export async function generateViewport({ params }: Params): Promise<Viewport> {
   const { slug } = await params;
   const store = await getStoreBySlug(slug);
-  return { themeColor: store?.primary_color ?? "#78b913" };
+  return { themeColor: store?.primary_color ?? "#009688" };
 }
 
 export default async function StoreLayout({ children, params }: Params & { children: React.ReactNode }) {

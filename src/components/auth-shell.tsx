@@ -5,8 +5,8 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
   return (
     <div className="grid min-h-dvh place-items-center bg-slate-50 px-4 py-10">
       <div className="w-full max-w-md">
-        <Link href="/" className="mb-6 flex justify-center" aria-label="Shopux.app">
-          <Logo className="h-12" />
+        <Link href="/" className="mb-6 flex justify-center" aria-label="Linki App">
+          <Logo variant="vertical" className="h-24" />
         </Link>
         <div className="card p-6">
           <h1 className="text-2xl font-bold">{title}</h1>

@@ -1,10 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveProduct, type ProductInput } from "@/lib/store-actions";
 import type { Category, Product } from "@/lib/types";
 import { ImageUpload } from "./image-upload";
+
+function readDraft(key: string): ProductInput | null {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as ProductInput) : null;
+  } catch {
+    return null;
+  }
+}
 
 export function ProductForm({
   product,
@@ -20,7 +29,7 @@ export function ProductForm({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<ProductInput>({
+  const initial: ProductInput = {
     id: product?.id,
     name: product?.name ?? "",
     description: product?.description ?? "",
@@ -30,10 +39,42 @@ export function ProductForm({
     subcategory_id: product?.subcategory_id ?? null,
     image_url: product?.image_url ?? null,
     is_active: product?.is_active ?? true,
-  });
+  };
+  // Borrador en este navegador: si la ventana se cierra o el teléfono recarga la página al elegir la foto,
+  // lo escrito se recupera al volver a abrir el mismo producto. Se borra al guardar.
+  const draftKey = `linki:product-draft:${userId}:${product?.id ?? "new"}`;
+  const [form, setForm] = useState<ProductInput>(initial);
+  const [restored, setRestored] = useState(false);
+  const [ready, setReady] = useState(false);
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) => setForm((f) => ({ ...f, [k]: v }));
   const parents = categories.filter((c) => !c.parent_id);
   const subs = categories.filter((c) => c.parent_id && c.parent_id === form.category_id);
+
+  // El borrador se lee al montar (no en el render) para no desajustar el HTML que viene del servidor
+  useEffect(() => {
+    const draft = readDraft(draftKey);
+    if (draft) {
+      setForm(draft);
+      setRestored(true);
+    }
+    setReady(true);
+  }, [draftKey]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const changed = JSON.stringify(form) !== JSON.stringify(initial);
+    try {
+      if (changed) localStorage.setItem(draftKey, JSON.stringify(form));
+      else localStorage.removeItem(draftKey);
+    } catch {}
+    // initial se recalcula en cada render a partir de product; basta con reaccionar a los cambios del formulario
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, draftKey, ready]);
+
+  function discardDraft() {
+    setForm(initial);
+    setRestored(false);
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +82,9 @@ export function ProductForm({
     startTransition(async () => {
       const res = await saveProduct(form);
       if (res.error) return setError(res.error);
+      try {
+        localStorage.removeItem(draftKey);
+      } catch {}
       router.refresh();
       onDone?.();
     });
@@ -48,6 +92,14 @@ export function ProductForm({
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {restored && (
+        <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <span className="flex-1">Recuperamos lo que estabas escribiendo.</span>
+          <button type="button" className="font-semibold underline" onClick={discardDraft}>
+            Descartar
+          </button>
+        </div>
+      )}
       <ImageUpload
         label="Imagen del producto"
         value={form.image_url}

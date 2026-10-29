@@ -22,6 +22,8 @@ export type Store = {
   owner_id: string;
   name: string;
   slug: string;
+  /** Rubro (clave de RUBROS en constants.ts); null en tiendas creadas antes de existir el campo. */
+  industry: string | null;
   description: string;
   logo_url: string | null;
   primary_color: string;

@@ -91,7 +91,7 @@ export function LandingEditor({ initial }: { initial: LandingContent }) {
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b px-4 py-2 text-sm font-extrabold">{c.brand_name}</div>
           <div
-            className="bg-gradient-to-br from-[#333333] to-[#666666] px-4 py-8 text-white"
+            className="bg-gradient-to-br from-[#004d40] to-[#009688] px-4 py-8 text-white"
             style={c.hero_image ? { backgroundImage: `linear-gradient(rgba(51,51,51,.7),rgba(51,51,51,.7)), url(${c.hero_image})`, backgroundSize: "cover" } : undefined}
           >
             <p className="text-xl font-extrabold leading-tight">{c.hero_title}</p>

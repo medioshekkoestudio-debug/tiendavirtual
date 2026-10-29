@@ -11,7 +11,7 @@ if (!url || !key) {
 const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
 export const USERS = {
-  superadmin: { email: "superadmin@shopux.app", password: "Shopux#Admin2026", meta: { role: "customer", full_name: "Superadmin Shopux" } },
+  superadmin: { email: "superadmin@shopux.app", password: "Shopux#Admin2026", meta: { role: "customer", full_name: "Superadmin Linki App" } },
   tienda: { email: "tienda@empresax.com", password: "Empresax#2026", meta: { role: "store_owner", full_name: "Admin Empresa X", company_name: "Empresa X" } },
   cliente: { email: "cliente@shopux.app", password: "Cliente#2026", meta: { role: "customer", full_name: "María Pérez", phone: "0414-5551234", cedula: "V-20123456" } },
 };

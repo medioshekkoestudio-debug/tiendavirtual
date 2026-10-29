@@ -1,4 +1,4 @@
-# Shopux.app — Plan de trabajo por etapas
+# Linki App (antes Shopux.app) — Plan de trabajo por etapas
 
 Stack: **Next.js 15 (App Router) + Supabase (Postgres, Auth, Storage, Realtime) + Vercel**, instalable como **PWA**.
 Leyenda: `[x]` hecho · `[ ]` pendiente · `[~]` requiere acción del dueño del proyecto (credenciales/cuentas).
@@ -68,7 +68,7 @@ Leyenda: `[x]` hecho · `[ ]` pendiente · `[~]` requiere acción del dueño del
 - [x] Configurar variables en Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`)
 - [x] `npm run seed` para crear los 3 usuarios de prueba
 - [x] Deploy en Vercel: https://tiendavirtual-ruddy.vercel.app — verificado con `npm run verify:prod` (35/35 OK) + prueba de Storage
-- [ ] Conectar el dominio `shopuxapp.com` en Vercel y actualizar `NEXT_PUBLIC_SITE_URL`
+- [x] Conectar el dominio `linkiapp.com` en Vercel (falta actualizar `NEXT_PUBLIC_SITE_URL`)
 
 ## Etapa 9 — Próximas mejoras (backlog)
 - [ ] Notificaciones push (Web Push) para nuevos pedidos/mensajes

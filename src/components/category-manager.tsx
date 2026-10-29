@@ -3,20 +3,32 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
-import { DEFAULT_CATEGORIES } from "@/lib/constants";
+import { DEFAULT_CATEGORIES, RUBROS, isRubro } from "@/lib/constants";
 import { addCategoryTree, createCategory, deleteCategory, renameCategory } from "@/lib/store-actions";
 import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-/** Selector de categorías por defecto + creación de categorías propias (usado en el onboarding). */
-export function DefaultCategoryPicker({ onSaved, existing }: { onSaved?: () => void; existing: Category[] }) {
+/**
+ * Selector de categorías sugeridas + creación de categorías propias (usado en el onboarding).
+ * Con rubro: sugiere las categorías de ese rubro, ya marcadas. Sin rubro (tiendas antiguas): las genéricas, sin marcar.
+ */
+export function DefaultCategoryPicker({
+  onSaved,
+  existing,
+  industry,
+}: {
+  onSaved?: () => void;
+  existing: Category[];
+  industry?: string | null;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const suggested = isRubro(industry) ? RUBROS[industry].categories : DEFAULT_CATEGORIES;
   const [tree, setTree] = useState(() =>
-    DEFAULT_CATEGORIES.map((c) => ({
+    suggested.map((c) => ({
       name: c.name,
-      selected: existing.some((e) => !e.parent_id && e.name === c.name),
+      selected: isRubro(industry) || existing.some((e) => !e.parent_id && e.name === c.name),
       open: false,
       subcategories: c.subcategories.map((s) => ({ name: s, selected: true })),
     })),

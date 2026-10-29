@@ -100,7 +100,7 @@ export function OnboardingWizard({ store, userId, categories }: { store: Store; 
               <p className="text-sm text-slate-600">Opcional: también puedes completarlo luego desde tu app.</p>
             </div>
             {categories.length === 0 ? (
-              <DefaultCategoryPicker existing={categories} />
+              <DefaultCategoryPicker existing={categories} industry={store.industry} />
             ) : (
               <>
                 <CategoryManager categories={categories} />

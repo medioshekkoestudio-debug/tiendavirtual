@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { registerStore } from "@/app/auth-actions";
 import { FormError } from "@/components/auth-shell";
-import { SITE_DOMAIN } from "@/lib/constants";
+import { RUBRO_KEYS, RUBROS, SITE_DOMAIN } from "@/lib/constants";
 
 function previewSlug(name: string) {
   return name
@@ -38,8 +38,28 @@ export function RegisterForm() {
         </p>
       </div>
       <div>
-        <label className="label" htmlFor="full_name">Tu nombre y apellido</label>
+        <label className="label" htmlFor="industry">Rubro de la empresa</label>
+        <select id="industry" name="industry" required className="input" defaultValue="">
+          <option value="" disabled>¿Qué vendes?</option>
+          {RUBRO_KEYS.map((k) => (
+            <option key={k} value={k}>{RUBROS[k].label}</option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-slate-500">Te sugeriremos categorías según tu rubro. Puedes cambiarlo luego en Ajustes.</p>
+      </div>
+      <div>
+        <label className="label" htmlFor="full_name">Nombre y apellido del responsable</label>
         <input id="full_name" name="full_name" required className="input" autoComplete="name" />
+      </div>
+      <div>
+        <label className="label" htmlFor="cedula">Cédula de identidad / RIF</label>
+        <input id="cedula" name="cedula" required className="input" placeholder="V-12345678 o J-12345678-9" autoCapitalize="characters"
+          pattern="[VEJGPvejgp]-?[0-9]{6,9}(-?[0-9])?" title="Ejemplo: V-12345678 o J-12345678-9" />
+      </div>
+      <div>
+        <label className="label" htmlFor="phone">Teléfono</label>
+        <input id="phone" name="phone" type="tel" required className="input" placeholder="0414-1234567" autoComplete="tel"
+          pattern="[0-9+\(\) \-]{10,}" title="Ejemplo: 0414-1234567" />
       </div>
       <div>
         <label className="label" htmlFor="email">Email</label>

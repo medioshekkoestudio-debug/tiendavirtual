@@ -31,17 +31,22 @@ export default async function LandingPage() {
 
       {/* Banner */}
       <section className="relative overflow-hidden">
+        {/* Fondo: foto de la landing (o la que se suba desde el Superadmin) bajo un velo Azul Marino que deja leer el texto */}
         <div
-          className="absolute inset-0 bg-gradient-to-br from-[#333333] via-[#4d4d4d] to-[#666666]"
-          style={c.hero_image ? { backgroundImage: `linear-gradient(rgba(51,51,51,.7),rgba(51,51,51,.7)), url(${c.hero_image})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+          className="absolute inset-0 bg-[#004d40]"
+          style={{
+            backgroundImage: `linear-gradient(90deg, rgba(0,77,64,.92) 0%, rgba(0,77,64,.78) 50%, rgba(0,77,64,.45) 100%), url(${c.hero_image || "/landing/hero-fondo.jpg"})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         />
         <div
           aria-hidden
-          className="absolute -right-24 -top-24 size-96 rounded-full bg-brand/30 blur-3xl"
+          className="absolute -right-24 -top-24 size-96 rounded-full bg-accent/40 blur-3xl"
         />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 text-white md:grid-cols-2 md:py-24">
           <div className="flex flex-col justify-center">
-            <span className="mb-4 w-fit rounded-full bg-brand px-3 py-1 text-xs font-semibold tracking-wide text-white">
+            <span className="mb-4 w-fit rounded-full bg-accent px-3 py-1 text-xs font-semibold tracking-wide text-white">
               Marketplace de tiendas · PWA
             </span>
             <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">{c.hero_title}</h1>
@@ -50,22 +55,15 @@ export default async function LandingPage() {
               Tu link: <span className="rounded-md bg-white/15 px-2 py-0.5 font-mono">{SITE_DOMAIN}/tuempresa</span>
             </p>
           </div>
-          <div className="hidden items-center justify-center md:flex">
-            <div className="w-64 rounded-[2.5rem] border-8 border-white/20 bg-white p-3 text-slate-900 shadow-2xl">
-              <div className="h-24 rounded-2xl bg-gradient-to-r from-brand to-[#9fd94a]" />
-              <div className="mt-3 h-3 w-24 rounded bg-slate-200" />
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="rounded-xl bg-slate-100 p-2">
-                    <div className="h-14 rounded-lg bg-slate-200" />
-                    <div className="mt-2 h-2 w-12 rounded bg-slate-300" />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3 flex justify-around border-t pt-2 text-[10px] text-slate-500">
-                <span>Inicio</span><span>Tienda</span><span>Pagos</span><span>Pedidos</span>
-              </div>
-            </div>
+          <div className="flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/landing/hero-telefonos.png"
+              alt="Dos tiendas creadas con Linki App vistas en el teléfono"
+              width={430}
+              height={485}
+              className="w-64 drop-shadow-2xl md:w-full md:max-w-sm"
+            />
           </div>
         </div>
       </section>
@@ -99,7 +97,7 @@ export default async function LandingPage() {
         <h2 className="text-center text-3xl font-bold">Cómo funciona</h2>
         <ol className="mt-10 grid gap-6 md:grid-cols-3">
           {[
-            ["Regístrate", "Crea tu cuenta y obtén tu link shopuxapp.com/tuempresa al instante."],
+            ["Regístrate", `Crea tu cuenta y obtén tu link ${SITE_DOMAIN}/tuempresa al instante.`],
             ["Personaliza", "Sube tu logo, colores, slider, tipografía y tus productos."],
             ["Vende", "Comparte tu link, recibe pedidos y aprueba pagos desde tu app."],
           ].map(([t, d], i) => (

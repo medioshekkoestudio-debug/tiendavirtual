@@ -1,11 +1,11 @@
-# memoria.md — Contexto vivo de Shopux.app
+# memoria.md — Contexto vivo de Linki App (antes Shopux.app)
 
 > Archivo de contexto del proyecto. **Se actualiza en cada sesión de trabajo** (ver Bitácora al final).
 > Si retomas el proyecto (tú o Claude): lee este archivo primero.
 
 ## 1. Qué es
-**Shopux.app** es un marketplace de tiendas. Cada empresa se registra, obtiene su link `shopuxapp.com/<slug>`
-(ej. `shopuxapp.com/empresax`) y una **PWA** con dos caras:
+**Linki App** (renombrada desde Shopux el 29-oct-2026) es un marketplace de tiendas. Cada empresa se registra, obtiene su link `linkiapp.com/<slug>`
+(ej. `linkiapp.com/tuempresa`) y una **PWA** con dos caras:
 - **Panel de la tienda** (admin de la empresa): Inicio · Tienda · Pagos · Pedidos · Mensajes (+ Ajustes).
 - **Tienda pública** (cliente final): Inicio · Mis compras · Mensajes, barra superior con carrito e inicio de sesión.
 Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones por cobrar y editor de la landing.
@@ -16,7 +16,7 @@ Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones po
 | Framework | Next.js **15.5.28** (App Router, Server Actions). Se eligió 15.x (con parches de seguridad) en vez de 16.x para evitar cambios de API |
 | UI | Tailwind CSS 4 (clases propias con `@utility` en `globals.css`: btn, input, card, chip…), lucide-react |
 | Backend | Supabase: Postgres + RLS, Auth (email/contraseña), Storage (`store-assets`), Realtime (chat) |
-| Hosting | Vercel (dominio `shopuxapp.com`) |
+| Hosting | Vercel (dominio `linkiapp.com`) |
 | PWA | `app/manifest.ts` + manifest por tienda (`/<slug>/manifest.webmanifest`) y del panel; `public/sw.js` (offline); iconos generados en `/icons/[size]?l=E&c=%23hex` |
 | Tema por tienda | Variables CSS `--brand`, `--brand-2`, `--accent`, `--on-brand`, `--brand-font` (ver `components/theme-vars.tsx`) |
 | Tipografías | 3 sans (Inter, Poppins, Montserrat) + 3 serif (Playfair, Merriweather, Lora) con visualizador |
@@ -27,7 +27,8 @@ Los dueños del marketplace usan el **Superadmin**: estadísticas, comisiones po
 | Checkout | RPC `place_order` (security definer): calcula precios y descuenta stock en el servidor; funciona sin cuenta |
 | Pagos | Manuales: el cliente registra método + referencia; la tienda aprueba/rechaza (RPC `review_payment`, rechazo devuelve stock) |
 | Moneda | USD (`formatMoney` → `$1.234,50`), locale es-VE |
-| Identidad Shopux | Verde **#78B913** (CTA/acentos), gris oscuro **#333333** (texto/títulos), gris medio **#666666** (secundario), gris claro **#F4F5F7** (fondos). Definida en `globals.css` (`--brand` por defecto + escala `slate` reemplazada por grises neutros). Logo oficial `public/brand/shopux-logo.jpg` vía `components/logo.tsx` (mix-blend-multiply para ocultar el fondo blanco). Icono PWA de la plataforma: fondo #333 con triángulo verde (`/icons/[size]` sin `l`). Panel y tienda pública usan los colores de cada tienda; tiendas nuevas arrancan con la paleta Shopux (migración `20261024120000`) |
+| Identidad Linki App | Paleta oficial: Azul Marino Tech **#004D40** (títulos/texto/fondos premium), Cian Digital **#009688** (CTA), Verde Lima **#9CCC65** (éxito/acentos), Gris Neutro **#9E9E9E** (líneas; subtítulos en #757575 por legibilidad). Tipografía Inter. En `globals.css`: `--brand`, `--brand-2`, `--accent`, escala `slate` → grises/azul marino y `emerald` → tonos lima. Logos en `public/brand/`: horizontal (barras/footer) y vertical (login/registro) vía `components/logo.tsx` (`variant`); iconos PWA estáticos `linkiapp-icon-*.png` (símbolo del logo). Landing: fondo `public/landing/hero-fondo.jpg` + `hero-telefonos.png`. Tiendas nuevas arrancan con la paleta (migración `20261029120000`) |
+| Rubro | `stores.industry`, 12 rubros (`RUBROS` en `constants.ts`, check en BD). Se elige en el registro (junto con responsable, cédula/RIF y teléfono → `profiles`), sugiere categorías en el onboarding y se edita en Ajustes |
 
 ## 3. Estructura
 ```
@@ -71,9 +72,11 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 ## 7. Pendientes / riesgos conocidos
 - [x] Migración inicial aplicada (Action), usuarios creados (`npm run seed`), producción verificada (`npm run verify:prod`).
 - [ ] Mover las claves reales de `.env.example` a `.env.local` (`.env.example` está versionado: NO commitear con claves).
-- [ ] Dominio `shopuxapp.com` en Vercel.
+- [x] Dominio `linkiapp.com` conectado en Vercel (29-oct).
+- [ ] `NEXT_PUBLIC_SITE_URL=https://linkiapp.com` en Vercel y Site URL en Supabase Auth.
 - [x] Repositorio en GitHub: https://github.com/medioshekkoestudio-debug/tiendavirtual
-- [ ] Proyecto en Vercel (importar ese repo) + dominio `shopuxapp.com`.
+- [ ] Banner de tienda con alto = 25 % de la pantalla: recorta las imágenes según el dispositivo. Propuesta: proporción fija 2,5:1 (1500×600).
+- [ ] `landing_content.hero_image` apunta a un adjunto de Gmail (no carga para visitantes): borrarlo desde Superadmin → Landing.
 - Periodos “día/semana” se calculan con la hora del servidor (UTC en Vercel); ajustar a hora de Venezuela si hace falta.
 - Registro sin verificación de email (rápido para MVP); considerar activar confirmación más adelante.
 - La tienda puede cambiar manualmente el estado de un pedido (incluido “cancelado”), lo que afecta la comisión: auditar en Superadmin.
@@ -129,3 +132,14 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - El usuario renombró Empresa X → **"Tienda Prueba"** (slug `tiendaprueba`) desde Ajustes: `/empresax` ya no existe.
 - Quedan 4 usuarios de prueba de corridas interrumpidas (`e2e.tienda.609222`, `e2e.tienda.263948`, `e2e.cliente.540186`,
   `e2e.tienda.540186` @shopux.test) con sus tiendas "Prueba E2E …": borrar cuando el usuario lo autorice.
+
+### 2026-10-29 — Sesión 2 (proyecto clonado en otra PC: `C:\Users\estef\Documents\tiendavirtual`)
+- **Cambio de marca Shopux → Linki App** con dominio `linkiapp.com`: nombre en títulos, manifest, 404, offline, landing;
+  logos nuevos, iconos PWA desde el símbolo del logo, paleta oficial (ver tabla). Migración `20261029120000_linkiapp_marca.sql`:
+  colores por defecto, textos de la landing en BD y slugs `linki`/`linkiapp` reservados. Correos de las cuentas de prueba sin cambiar.
+- **Rubros**: migración `20261029130000_rubro_tienda.sql` (`stores.industry`, trigger de registro, `superadmin_store_stats` con rubro).
+  Registro pide rubro, responsable, cédula/RIF y teléfono. Categorías sugeridas por rubro en el onboarding.
+- Tienda pública: nombre solo en la barra superior, centrado y en el color principal de la tienda (debajo del banner queda oculto, para lectores de pantalla).
+- Formulario de producto: el modal ya no se cierra al tocar fuera; borrador en localStorage por producto (sobrevive a recargas de Android al elegir foto).
+- Landing: imagen de teléfonos + foto de fondo con velo azul marino.
+- Local apunta a la Supabase de producción: lo que dependa de migraciones nuevas solo funciona tras el push.
