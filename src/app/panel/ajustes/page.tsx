@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { BrandingForm } from "@/components/branding-form";
+import { PLANS } from "@/lib/constants";
 import { CategoryManager } from "@/components/category-manager";
 import { PaymentMethodsForm } from "@/components/payment-methods-form";
 import { getOwnerStore } from "@/lib/auth";
@@ -15,6 +17,15 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Ajustes de la tienda</h1>
+      <section className="card flex items-center gap-3 p-5">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-bold">Mi plan</h2>
+          <p className="text-sm text-slate-600">
+            {store.plan ? `Plan ${PLANS[store.plan].label}` : "Prueba gratis"} · elige o renueva tu plan y paga desde aquí.
+          </p>
+        </div>
+        <Link href="/suscripcion" className="btn-primary shrink-0">Ver planes</Link>
+      </section>
       <section className="card p-5">
         <h2 className="mb-1 text-lg font-bold">Link de tu tienda</h2>
         <p className="mb-4 text-sm text-slate-600">Es la dirección que compartes con tus clientes.</p>

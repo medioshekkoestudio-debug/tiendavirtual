@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { LandingContent } from "@/lib/types";
+import { PLAN_PAYMENT_METHOD_KEYS } from "@/lib/constants";
+import { cleanMethodConfig } from "@/lib/payment-details";
+import type { LandingContent, PaymentMethodConfig, PlanPaymentMethodKey } from "@/lib/types";
 
 async function requireSuperadmin() {
   const { supabase, profile } = await getSession();
@@ -32,6 +34,48 @@ export async function saveLanding(content: LandingContent): Promise<{ error?: st
   if (error) return { error: error.message };
   revalidatePath("/");
   return { ok: true };
+}
+
+/** Datos de cobro de Linki App (Pago móvil, PayPal, Binance) que ven las tiendas al pagar su plan. */
+export async function savePlatformPaymentMethods(
+  input: Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>,
+): Promise<{ error?: string; ok?: boolean }> {
+  const supabase = await requireSuperadmin();
+  const clean: Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>> = {};
+  for (const key of PLAN_PAYMENT_METHOD_KEYS) {
+    const src = input[key];
+    if (!src) continue;
+    clean[key] = cleanMethodConfig(src);
+  }
+  const { error } = await supabase
+    .from("platform_settings")
+    .update({ payment_methods: clean, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+  if (error) return { error: error.message };
+  revalidatePath("/superadmin/planes");
+  revalidatePath("/suscripcion");
+  return { ok: true };
+}
+
+/**
+ * Aprobar activa (o extiende) el plan de la tienda, ajusta su comisión y desbloquea la cuenta
+ * si se creó en la pasarela. Rechazar solo marca el pago (la cuenta nueva sigue bloqueada).
+ */
+export async function reviewSubscriptionPayment(id: string, approve: boolean): Promise<{ error?: string }> {
+  const supabase = await requireSuperadmin();
+  const { error } = await supabase.rpc("review_subscription_payment", { p_id: id, p_approve: approve });
+  if (error) return { error: error.message };
+  if (approve) {
+    const admin = createAdminClient();
+    const { data } = await admin.from("subscription_payments").select("stores(owner_id)").eq("id", id).single<{ stores: { owner_id: string } | null }>();
+    if (data?.stores) {
+      const { error: unbanError } = await admin.auth.admin.updateUserById(data.stores.owner_id, { ban_duration: "none" });
+      if (unbanError) return { error: "Pago aprobado, pero no se pudo activar la cuenta: " + unbanError.message };
+    }
+  }
+  revalidatePath("/superadmin/planes");
+  revalidatePath("/superadmin");
+  return {};
 }
 
 export async function setStoreActive(storeId: string, active: boolean): Promise<{ error?: string }> {

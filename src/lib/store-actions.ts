@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "./auth";
 import { FONT_OPTIONS } from "./font-options";
-import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS, isRubro } from "./constants";
+import { PAYMENT_METHOD_KEYS, isRubro } from "./constants";
+import { cleanMethodConfig } from "./payment-details";
 import type { OrderStatus, PaymentMethodConfig, PaymentMethodKey } from "./types";
 
 export type ActionResult = { error?: string; ok?: boolean; id?: string };
@@ -81,9 +82,7 @@ export async function savePaymentMethods(
   for (const key of PAYMENT_METHOD_KEYS) {
     const src = input[key];
     if (!src) continue;
-    const cfg: PaymentMethodConfig = { enabled: Boolean(src.enabled) };
-    for (const f of PAYMENT_METHODS[key].fields) cfg[f.key] = String(src[f.key] ?? "").trim().slice(0, 200);
-    clean[key] = cfg;
+    clean[key] = cleanMethodConfig(src);
   }
   const { error } = await supabase
     .from("stores")

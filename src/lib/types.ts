@@ -12,9 +12,16 @@ export type Profile = {
 
 export type PaymentMethodKey = "zelle" | "paypal" | "pago_movil" | "binance" | "transferencia";
 
+/** Un dato de cobro libre (etiqueta y valor), p. ej. «Banco: Bancamiga». */
+export type PaymentDetail = { label: string; value: string };
+
 export type PaymentMethodConfig = {
   enabled: boolean;
-  [field: string]: string | boolean;
+  /** Datos de cobro editables. Las configuraciones viejas no lo tienen: usan las claves fijas de PAYMENT_METHODS. */
+  details?: PaymentDetail[];
+  /** Imagen o QR para pagar */
+  image_url?: string;
+  [legacyField: string]: unknown;
 };
 
 export type Store = {
@@ -36,7 +43,30 @@ export type Store = {
   onboarding_step: number;
   onboarding_completed: boolean;
   is_active: boolean;
+  /** Plan de suscripción (null = en prueba o sin plan). Solo cambia al aprobar un pago de suscripción. */
+  plan: PlanKey | null;
+  plan_cycle: PlanCycle | null;
+  plan_expires_at: string | null;
+  trial_ends_at: string | null;
   created_at: string;
+};
+
+export type PlanKey = "emprendedor" | "pro" | "business";
+export type PlanCycle = "mensual" | "anual";
+export type PlanPaymentMethodKey = "pago_movil" | "paypal" | "binance";
+
+export type SubscriptionPayment = {
+  id: string;
+  store_id: string;
+  plan: PlanKey;
+  cycle: PlanCycle;
+  amount_usd: number;
+  method: PlanPaymentMethodKey;
+  reference: string;
+  receipt_path: string | null;
+  status: PaymentStatus;
+  created_at: string;
+  reviewed_at: string | null;
 };
 
 export type Category = {

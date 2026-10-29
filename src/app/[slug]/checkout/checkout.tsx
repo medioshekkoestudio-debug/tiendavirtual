@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarClock, Check, CheckCircle2, Copy, MapPin, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { CalendarClock, Check, CheckCircle2, MapPin, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart";
+import { PaymentDetailsView } from "@/components/payment-details-view";
 import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS } from "@/lib/constants";
 import type { PaymentMethodConfig, PaymentMethodKey } from "@/lib/types";
 import { cn, formatMoney } from "@/lib/utils";
@@ -363,29 +364,7 @@ export function Checkout({
             {method && (
               <div className="space-y-2 rounded-2xl bg-slate-50 p-4">
                 <p className="text-sm font-semibold">Datos para pagar con {PAYMENT_METHODS[method].label}</p>
-                <dl className="space-y-1.5">
-                  {PAYMENT_METHODS[method].fields.map((f) => {
-                    const v = String(paymentMethods[method]?.[f.key] ?? "");
-                    if (!v) return null;
-                    return (
-                      <div key={f.key} className="flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2">
-                        <div className="min-w-0">
-                          <dt className="text-[11px] text-slate-500">{f.label}</dt>
-                          <dd className="truncate font-mono text-sm font-semibold">
-                            {f.key === "link" ? (
-                              <a href={v} target="_blank" rel="noreferrer" className="text-brand underline">{v}</a>
-                            ) : (
-                              v
-                            )}
-                          </dd>
-                        </div>
-                        <button type="button" className="text-slate-400 hover:text-brand" aria-label={`Copiar ${f.label}`} onClick={() => navigator.clipboard?.writeText(v)}>
-                          <Copy className="size-4" />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </dl>
+                <PaymentDetailsView method={method} cfg={paymentMethods[method]} />
                 <div className="pt-2">
                   <label className="label" htmlFor="ref">Número de referencia / ID de la transacción</label>
                   <input id="ref" className="input font-mono" value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Ej.: 00123456" />

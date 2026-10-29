@@ -3,6 +3,7 @@ import { ArrowRight, CreditCard, MessageCircle, Palette, Smartphone } from "luci
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
 import { SITE_DOMAIN } from "@/lib/constants";
+import { PlansSection } from "./plans-section";
 
 const FEATURE_ICONS = [Palette, CreditCard, MessageCircle];
 
@@ -21,6 +22,7 @@ export default async function LandingPage() {
             <a href="#que-es" className="hover:text-slate-900">¿Qué es?</a>
             <a href="#beneficios" className="hover:text-slate-900">Beneficios</a>
             <a href="#como-funciona" className="hover:text-slate-900">Cómo funciona</a>
+            <a href="#planes" className="hover:text-slate-900">Planes</a>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login" className="btn-ghost">Iniciar sesión</Link>
@@ -111,6 +113,8 @@ export default async function LandingPage() {
           ))}
         </ol>
       </section>
+
+      <PlansSection />
 
       {/* Botón grande */}
       <section className="px-4 pb-20">

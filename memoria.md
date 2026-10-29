@@ -143,3 +143,11 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - Formulario de producto: el modal ya no se cierra al tocar fuera; borrador en localStorage por producto (sobrevive a recargas de Android al elegir foto).
 - Landing: imagen de teléfonos + foto de fondo con velo azul marino.
 - Local apunta a la Supabase de producción: lo que dependa de migraciones nuevas solo funciona tras el push.
+- **Planes** (migración `20261030120000_planes_suscripcion.sql`): sección `#planes` en la landing (Emprendedor $3, Pro $7, Business $15; anual = 10 meses).
+  Pasarela pública `/suscripcion` por pasos con barra de progreso: Plan → Datos de registro → Pago → Listo. Sin sesión crea
+  cuenta + tienda **bloqueada** (`ban_duration`) y el pago queda pendiente; al aprobarlo en Superadmin → Planes y cobros se activa
+  el plan y se desbloquea la cuenta. Rechazar deja la cuenta bloqueada. Comprobantes en el bucket privado `payment-receipts`
+  (cuentas nuevas suben a `nuevos/` con enlace firmado). Datos de cobro en `platform_settings.payment_methods`.
+- **Métodos de pago editables** (tiendas y Superadmin): cada método guarda `{ enabled, details: [{label, value}], image_url }`.
+  Las configuraciones viejas (claves fijas) se leen igual y pasan al formato nuevo al guardarse (`src/lib/payment-details.ts`).
+- Pendiente: decidir si se bloquea la tienda al vencer la prueba/plan y si se aplican los límites de productos (30/100).

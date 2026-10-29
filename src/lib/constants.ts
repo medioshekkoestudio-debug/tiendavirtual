@@ -1,4 +1,4 @@
-import type { LandingContent, OrderStatus, PaymentMethodKey, PaymentStatus } from "./types";
+import type { LandingContent, OrderStatus, PaymentMethodKey, PaymentStatus, PlanCycle, PlanKey, PlanPaymentMethodKey } from "./types";
 
 export const SITE_DOMAIN = "linkiapp.com";
 
@@ -146,7 +146,67 @@ export type RubroKey = keyof typeof RUBROS;
 export const RUBRO_KEYS = Object.keys(RUBROS) as RubroKey[];
 export const isRubro = (v: unknown): v is RubroKey => typeof v === "string" && v in RUBROS;
 
-export type PaymentField ={ key: string; label: string; placeholder?: string; type?: string };
+/**
+ * Planes de suscripción de Linki App. Precios y comisiones deben coincidir con plan_price()
+ * y review_subscription_payment() en la migración 20261030120000_planes_suscripcion.sql.
+ */
+export const TRIAL_DAYS = 15;
+export const PLANS: Record<
+  PlanKey,
+  { label: string; monthly: number; annual: number; products: string; commission: string; recommended?: boolean; intro?: string; features: string[] }
+> = {
+  emprendedor: {
+    label: "Emprendedor",
+    monthly: 3,
+    annual: 30,
+    products: "Hasta 30 productos",
+    commission: "1,5 % sobre ventas",
+    features: [
+      "Activación y configuración inicial de la tienda",
+      "Panel de autogestión para productos y precios",
+      "Recepción organizada de pedidos",
+      "Vinculación directa con Instagram y WhatsApp",
+      "Capacitación rápida de uso y soporte técnico",
+    ],
+  },
+  pro: {
+    label: "Pro",
+    monthly: 7,
+    annual: 70,
+    products: "Hasta 100 productos",
+    commission: "1 % sobre ventas",
+    recommended: true,
+    intro: "Todo lo del Plan Emprendedor, más:",
+    features: [
+      "Dominio personalizado (ej. tutienda.com.ve)",
+      "Reportes y estadísticas básicas de visitas y ventas",
+      "Soporte técnico prioritario",
+    ],
+  },
+  business: {
+    label: "Business",
+    monthly: 15,
+    annual: 150,
+    products: "Productos ilimitados",
+    commission: "0,5 % sobre ventas",
+    intro: "Todo lo del Plan Pro, más:",
+    features: [
+      "Catálogo e inventario ilimitado",
+      "Accesos para varios administradores del equipo",
+      "Asesoría personalizada para optimizar tu tienda",
+      "La comisión por venta más baja de la plataforma",
+    ],
+  },
+};
+export const PLAN_KEYS = Object.keys(PLANS) as PlanKey[];
+export const isPlan = (v: unknown): v is PlanKey => typeof v === "string" && v in PLANS;
+export const isPlanCycle = (v: unknown): v is PlanCycle => v === "mensual" || v === "anual";
+export const planPrice = (plan: PlanKey, cycle: PlanCycle) => (cycle === "anual" ? PLANS[plan].annual : PLANS[plan].monthly);
+
+/** Métodos con los que las tiendas pagan su plan a Linki App (los datos se editan en Superadmin → Planes y cobros). */
+export const PLAN_PAYMENT_METHOD_KEYS: PlanPaymentMethodKey[] = ["pago_movil", "paypal", "binance"];
+
+export type PaymentField = { key: string; label: string; placeholder?: string; type?: string };
 
 export const PAYMENT_METHODS: Record<PaymentMethodKey, { label: string; fields: PaymentField[] }> = {
   zelle: {
