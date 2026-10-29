@@ -5,10 +5,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarClock, Check, CheckCircle2, MapPin, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart";
+import { Money, RateNote, type Rate } from "@/components/money";
 import { PaymentDetailsView } from "@/components/payment-details-view";
 import { PAYMENT_METHODS, PAYMENT_METHOD_KEYS } from "@/lib/constants";
 import type { PaymentMethodConfig, PaymentMethodKey } from "@/lib/types";
-import { cn, formatMoney } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { placeOrder } from "../actions";
 
 const STEPS = ["Carrito", "Dirección", "Envío", "Facturación", "Pago"];
@@ -19,11 +20,13 @@ export function Checkout({
   storeId,
   slug,
   paymentMethods,
+  rate,
   profile,
 }: {
   storeId: string;
   slug: string;
   paymentMethods: Partial<Record<PaymentMethodKey, PaymentMethodConfig>>;
+  rate: Rate;
   profile: Profile;
 }) {
   const cart = useCart()!;
@@ -165,7 +168,7 @@ export function Checkout({
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{i.name}</p>
-                      <p className="text-sm text-slate-500">{formatMoney(i.price)}</p>
+                      <Money usd={i.price} rate={rate} className="text-sm text-slate-500" bsClassName="text-[11px]" />
                       <div className="mt-1 flex items-center gap-2">
                         <button type="button" className="rounded-lg border p-1" aria-label="Menos" onClick={() => cart.setQty(i.product_id, i.quantity - 1)}>
                           <Minus className="size-3.5" />
@@ -177,7 +180,7 @@ export function Checkout({
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">{formatMoney(i.price * i.quantity)}</p>
+                      <Money usd={i.price * i.quantity} rate={rate} className="items-end font-bold" />
                       <button type="button" className="mt-1 text-rose-500" aria-label="Quitar" onClick={() => cart.remove(i.product_id)}>
                         <Trash2 className="size-4" />
                       </button>
@@ -337,9 +340,13 @@ export function Checkout({
         {step === 4 && (
           <>
             <h2 className="font-brand text-xl font-bold">5. Registrar pago</h2>
-            <p className="text-sm text-slate-600">
-              Total a pagar: <span className="text-lg font-extrabold text-slate-900">{formatMoney(cart.total)}</span>
-            </p>
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm text-slate-600">Total a pagar</span>
+                <Money usd={cart.total} rate={rate} className="items-end text-lg font-extrabold text-slate-900" bsClassName="text-base font-bold text-brand" />
+              </div>
+              <RateNote rate={rate} className="mt-1" />
+            </div>
             {enabledMethods.length === 0 ? (
               <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
                 Esta tienda aún no configuró métodos de pago. Escríbele por Mensajes.
@@ -383,8 +390,8 @@ export function Checkout({
                 Atrás
               </button>
             ) : (
-              <span className="text-sm text-slate-600">
-                Total: <span className="text-lg font-extrabold text-slate-900">{formatMoney(cart.total)}</span>
+              <span className="flex items-start gap-1.5 text-sm text-slate-600">
+                Total: <Money usd={cart.total} rate={rate} className="text-lg font-extrabold text-slate-900" />
               </span>
             )}
             {step < 4 ? (

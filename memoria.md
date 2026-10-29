@@ -151,3 +151,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - **Métodos de pago editables** (tiendas y Superadmin): cada método guarda `{ enabled, details: [{label, value}], image_url }`.
   Las configuraciones viejas (claves fijas) se leen igual y pasan al formato nuevo al guardarse (`src/lib/payment-details.ts`).
 - Pendiente: decidir si se bloquea la tienda al vencer la prueba/plan y si se aplican los límites de productos (30/100).
+- **$ y Bs en las pasarelas** (planes y checkout de tiendas): tasa BCV de dolarapi.com en `src/lib/exchange-rate.ts`
+  (misma lógica que La Mejor Llave: lunes en fin de semana, caché 1 h). Solo se muestra; guardar el monto en Bs es la
+  Fase 2 de `planTasaBcv.md`. Plan de validación automática con API del banco y OCR propios: `planValidacionAutomatica.md`.
+- Quitado de la sección de planes el aviso de «15 días de prueba gratis».

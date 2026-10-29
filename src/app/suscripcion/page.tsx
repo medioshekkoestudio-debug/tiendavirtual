@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { PaymentStatusBadge } from "@/components/ui";
 import { getOwnerStore, getSession } from "@/lib/auth";
+import { getBcvRate } from "@/lib/exchange-rate";
 import { PAYMENT_METHODS, PLANS, isPlan, isPlanCycle } from "@/lib/constants";
 import type { PaymentMethodConfig, PlanPaymentMethodKey, SubscriptionPayment } from "@/lib/types";
 import { formatDate, formatMoney } from "@/lib/utils";
@@ -18,7 +19,10 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
   const sp = await searchParams;
   if (profile?.role === "store_owner") return <OwnerSubscription sp={sp} />;
 
-  const { data: settings } = await supabase.from("platform_settings").select("payment_methods").eq("id", 1).maybeSingle();
+  const [{ data: settings }, rate] = await Promise.all([
+    supabase.from("platform_settings").select("payment_methods").eq("id", 1).maybeSingle(),
+    getBcvRate(),
+  ]);
   return (
     <div className="min-h-dvh bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -35,6 +39,7 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
           <p className="mt-1 text-sm text-slate-600">Elige tu plan, crea tu cuenta y adjunta tu pago en un solo paso.</p>
         </div>
         <SubscriptionCheckout
+          rate={rate}
           methods={(settings?.payment_methods ?? {}) as Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>}
           initialPlan={isPlan(sp.plan) ? sp.plan : "pro"}
           initialCycle={isPlanCycle(sp.ciclo) ? sp.ciclo : "mensual"}
@@ -46,9 +51,10 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
 
 async function OwnerSubscription({ sp }: { sp: Awaited<Search> }) {
   const { supabase, user, store } = await getOwnerStore(true);
-  const [{ data: settings }, { data: payments }] = await Promise.all([
+  const [{ data: settings }, { data: payments }, rate] = await Promise.all([
     supabase.from("platform_settings").select("payment_methods").eq("id", 1).maybeSingle(),
     supabase.from("subscription_payments").select("*").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10),
+    getBcvRate(),
   ]);
   const methods = (settings?.payment_methods ?? {}) as Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
   const history = (payments ?? []) as SubscriptionPayment[];
@@ -98,6 +104,7 @@ async function OwnerSubscription({ sp }: { sp: Awaited<Search> }) {
           </section>
         ) : (
           <SubscriptionCheckout
+          rate={rate}
             userId={user.id}
             methods={methods}
             initialPlan={isPlan(sp.plan) ? sp.plan : (store.plan ?? "pro")}

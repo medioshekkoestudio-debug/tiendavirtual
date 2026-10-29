@@ -11,6 +11,16 @@ export function formatMoney(value: number | string | null | undefined) {
   return `${n < 0 ? "-" : ""}$${money.format(Math.abs(n))}`;
 }
 
+/** Equivalente en bolívares de un monto en dólares, redondeado a céntimos. */
+export function toBs(usd: number | string, rate: number) {
+  return Math.round(Number(usd) * rate * 100) / 100;
+}
+
+/** Montos en bolívares: Bs. 1.234,50 */
+export function formatBs(value: number) {
+  return `Bs. ${money.format(value)}`;
+}
+
 export function formatDate(value: string | null | undefined, withTime = true) {
   if (!value) return "—";
   return new Date(value).toLocaleString("es-VE", {

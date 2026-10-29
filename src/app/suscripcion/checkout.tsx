@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, CheckCircle2, FileCheck2, Loader2, Paperclip } from "lucide-react";
 import { RegistrationFields } from "@/app/registro/register-form";
+import { Money, RateNote, type Rate } from "@/components/money";
 import { PaymentDetailsView } from "@/components/payment-details-view";
 import { createClient } from "@/lib/supabase/client";
 import { PAYMENT_METHODS, PLAN_KEYS, PLAN_PAYMENT_METHOD_KEYS, PLANS, planPrice } from "@/lib/constants";
 import type { PaymentMethodConfig, PlanCycle, PlanKey, PlanPaymentMethodKey } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatBs, toBs } from "@/lib/utils";
 import { createPlanSignup, createSubscriptionPayment, getNewReceiptUploadUrl } from "./actions";
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -26,8 +27,10 @@ export function SubscriptionCheckout({
   methods,
   initialPlan,
   initialCycle,
+  rate,
 }: {
   userId?: string;
+  rate: Rate;
   methods: Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
   initialPlan: PlanKey;
   initialCycle: PlanCycle;
@@ -180,12 +183,14 @@ export function SubscriptionCheckout({
                 ${planPrice(k, cycle)}
                 <span className="text-sm font-medium text-slate-500"> / {cycle === "anual" ? "año" : "mes"}</span>
               </p>
+              {rate && <p className="text-xs font-semibold text-slate-500">{formatBs(toBs(planPrice(k, cycle), rate.rate))}</p>}
               <p className="mt-1 text-xs text-slate-500">
                 {PLANS[k].products} · {PLANS[k].commission}
               </p>
             </button>
           ))}
         </div>
+        <RateNote rate={rate} />
         <button type="button" className="btn-primary w-full py-3 text-base" onClick={() => go(steps[1])}>
           Continuar con el Plan {PLANS[plan].label} (${price})
         </button>
@@ -224,10 +229,20 @@ export function SubscriptionCheckout({
       {/* Paso: Pago */}
       <section hidden={step !== "pago"} className="card space-y-4 p-5">
         <div>
-          <h2 className="text-lg font-bold">Paga ${price} y adjunta el comprobante</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Plan {PLANS[plan].label} · {cycle}
-          </p>
+          <h2 className="text-lg font-bold">Paga y adjunta el comprobante</h2>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <div className="flex items-start justify-between gap-3 text-sm">
+            <span>
+              Plan {PLANS[plan].label} <span className="text-slate-500">· {cycle}</span>
+            </span>
+            <Money usd={price} rate={rate} className="items-end font-semibold" />
+          </div>
+          <div className="mt-3 flex items-start justify-between gap-3 border-t pt-3">
+            <span className="font-bold">Total a pagar</span>
+            <Money usd={price} rate={rate} className="items-end text-lg font-extrabold" bsClassName="text-base font-bold text-brand" />
+          </div>
+          <RateNote rate={rate} className="mt-1" />
         </div>
         {!available.length ? (
           <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -260,7 +275,7 @@ export function SubscriptionCheckout({
                     <div className="rounded-xl bg-white px-3 py-2">
                       <dt className="text-[11px] text-slate-500">Monto</dt>
                       <dd className="text-sm font-semibold">
-                        ${price} USD{method === "pago_movil" && " (en bolívares a la tasa BCV del día)"}
+                        {method === "pago_movil" && rate ? `${formatBs(toBs(price, rate.rate))} (${price})` : `${price} USD`}
                       </dd>
                     </div>
                   }

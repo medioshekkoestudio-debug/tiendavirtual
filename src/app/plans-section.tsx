@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Check, Gift } from "lucide-react";
-import { PLAN_KEYS, PLANS, TRIAL_DAYS } from "@/lib/constants";
+import { Check } from "lucide-react";
+import { PLAN_KEYS, PLANS } from "@/lib/constants";
 import type { PlanCycle } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -18,13 +18,6 @@ export function PlansSection() {
         <p className="mx-auto mt-3 max-w-2xl text-center text-slate-600">
           Un esquema flexible por suscripción, sin grandes inversiones para empezar. Ganamos cuando tú ganas.
         </p>
-
-        <Link
-          href="/registro"
-          className="mx-auto mt-6 flex w-fit items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-accent/30"
-        >
-          <Gift className="size-4" /> Crea tu tienda con {TRIAL_DAYS} días de prueba gratis (con las funciones del Plan Emprendedor)
-        </Link>
 
         <div className="mx-auto mt-8 flex w-fit rounded-xl bg-slate-200/70 p-1" role="group" aria-label="Forma de pago">
           {(
