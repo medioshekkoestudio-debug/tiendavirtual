@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { StorefrontHome } from "@/components/storefront-home";
+import { getBcvRate } from "@/lib/exchange-rate";
 import { createClient } from "@/lib/supabase/server";
 import { getStoreBySlug } from "@/lib/storefront";
 import type { Category, Product } from "@/lib/types";
@@ -10,9 +11,10 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   if (!store) notFound();
 
   const supabase = await createClient();
-  const [{ data: products }, { data: categories }] = await Promise.all([
+  const [{ data: products }, { data: categories }, rate] = await Promise.all([
     supabase.from("products").select("*").eq("store_id", store.id).eq("is_active", true).order("created_at", { ascending: false }),
     supabase.from("categories").select("*").eq("store_id", store.id).order("position").order("name"),
+    store.show_bs !== false ? getBcvRate() : null,
   ]);
 
   return (
@@ -21,6 +23,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
       products={(products ?? []) as Product[]}
       categories={(categories ?? []) as Category[]}
       linkBase={`/${store.slug}`}
+      bsRate={rate?.rate}
     />
   );
 }

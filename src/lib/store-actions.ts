@@ -73,6 +73,14 @@ export async function saveIndustry(industry: string): Promise<ActionResult> {
   return done();
 }
 
+export async function saveShowBs(show: boolean): Promise<ActionResult> {
+  const { supabase, store } = await getOwnerStore();
+  const { error } = await supabase.from("stores").update({ show_bs: Boolean(show) }).eq("id", store.id);
+  if (error) return { error: "No se pudo guardar" };
+  revalidatePath(`/${store.slug}`, "layout");
+  return done();
+}
+
 // ------------------------------------------------------------ Métodos de pago
 export async function savePaymentMethods(
   input: Partial<Record<PaymentMethodKey, PaymentMethodConfig>>,

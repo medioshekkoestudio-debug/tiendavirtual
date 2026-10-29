@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import type { Category, Product, Store } from "@/lib/types";
-import { cn, formatMoney } from "@/lib/utils";
+import { cn, formatBs, formatMoney, toBs } from "@/lib/utils";
 import { useCart } from "./cart";
 import { StoreSlider } from "./store-slider";
 
-export function ProductCard({ product, href, compact }: { product: Product; href?: string; compact?: boolean }) {
+export function ProductCard({ product, href, compact, bsRate }: { product: Product; href?: string; compact?: boolean; bsRate?: number | null }) {
   const cart = useCart();
   const out = product.stock <= 0;
   const body = (
@@ -25,6 +25,7 @@ export function ProductCard({ product, href, compact }: { product: Product; href
       <div className="p-2.5">
         <p className={cn("font-brand line-clamp-2 font-semibold leading-snug", compact ? "text-sm" : "text-[15px]")}>{product.name}</p>
         <p className="mt-1 font-bold text-brand">{formatMoney(product.price)}</p>
+        {bsRate ? <p className="pr-9 text-[11px] font-medium text-slate-500">{formatBs(toBs(product.price, bsRate))}</p> : null}
       </div>
     </>
   );
@@ -52,12 +53,15 @@ export function StorefrontHome({
   products,
   categories,
   linkBase,
+  bsRate,
 }: {
   store: Pick<Store, "name" | "description" | "slider_images">;
   products: Product[];
   categories: Category[];
   /** Base de links a la ficha de producto, p. ej. "/empresax". Sin valor = no navega (vista previa). */
   linkBase?: string;
+  /** Tasa BCV para mostrar el precio en Bs; null si la tienda lo desactivó o no hay tasa */
+  bsRate?: number | null;
 }) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string | null>(null);
@@ -119,7 +123,7 @@ export function StorefrontHome({
             <div className="no-scrollbar mt-2 flex snap-x gap-3 overflow-x-auto px-4 pb-1">
               {items.slice(0, 10).map((p) => (
                 <div key={p.id} className="w-40 shrink-0 snap-start">
-                  <ProductCard product={p} href={href(p)} compact />
+                  <ProductCard product={p} href={href(p)} compact bsRate={bsRate} />
                 </div>
               ))}
             </div>
@@ -133,7 +137,7 @@ export function StorefrontHome({
         {filtered.length ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} href={href(p)} />
+              <ProductCard key={p.id} product={p} href={href(p)} bsRate={bsRate} />
             ))}
           </div>
         ) : (

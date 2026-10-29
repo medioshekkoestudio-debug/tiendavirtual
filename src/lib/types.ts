@@ -31,6 +31,8 @@ export type Store = {
   slug: string;
   /** Rubro (clave de RUBROS en constants.ts); null en tiendas creadas antes de existir el campo. */
   industry: string | null;
+  /** Mostrar el equivalente en Bs debajo del precio de cada producto */
+  show_bs: boolean;
   description: string;
   logo_url: string | null;
   primary_color: string;

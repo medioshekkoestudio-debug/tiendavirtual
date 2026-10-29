@@ -155,3 +155,5 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   (misma lógica que La Mejor Llave: lunes en fin de semana, caché 1 h). Solo se muestra; guardar el monto en Bs es la
   Fase 2 de `planTasaBcv.md`. Plan de validación automática con API del banco y OCR propios: `planValidacionAutomatica.md`.
 - Quitado de la sección de planes el aviso de «15 días de prueba gratis».
+- **Precio en Bs en los productos**: tarjetas, ficha y vista previa muestran el equivalente en Bs debajo del precio.
+  Interruptor en Ajustes (`stores.show_bs`, migración `20261030130000_mostrar_bs.sql`, encendido por defecto).

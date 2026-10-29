@@ -16,6 +16,7 @@ import { cn, formatMoney } from "@/lib/utils";
 export function StoreManager({
   store,
   userId,
+  bsRate,
   products,
   categories,
   openNew,
@@ -23,6 +24,7 @@ export function StoreManager({
 }: {
   store: Store;
   userId: string;
+  bsRate: number | null;
   products: Product[];
   categories: Category[];
   openNew?: boolean;
@@ -119,7 +121,7 @@ export function StoreManager({
             <span className="font-brand font-bold">{store.name}</span>
           </div>
           <div className="max-h-[70dvh] overflow-y-auto">
-            <StorefrontHome store={store} products={products.filter((p) => p.is_active)} categories={categories} />
+            <StorefrontHome store={store} products={products.filter((p) => p.is_active)} categories={categories} bsRate={bsRate} />
           </div>
         </div>
       ) : (

@@ -6,6 +6,7 @@ import { PaymentMethodsForm } from "@/components/payment-methods-form";
 import { getOwnerStore } from "@/lib/auth";
 import type { Category } from "@/lib/types";
 import { IndustryForm } from "./industry-form";
+import { ShowBsToggle } from "./show-bs-toggle";
 import { SlugForm } from "./slug-form";
 
 export const metadata = { title: "Ajustes" };
@@ -30,6 +31,9 @@ export default async function SettingsPage() {
         <h2 className="mb-1 text-lg font-bold">Link de tu tienda</h2>
         <p className="mb-4 text-sm text-slate-600">Es la dirección que compartes con tus clientes.</p>
         <SlugForm slug={store.slug} />
+      </section>
+      <section className="card p-5">
+        <ShowBsToggle initial={store.show_bs ?? true} />
       </section>
       <section className="card p-5">
         <h2 className="mb-1 text-lg font-bold">Rubro</h2>

@@ -4,7 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getStoreBySlug } from "@/lib/storefront";
 import type { Product } from "@/lib/types";
-import { formatMoney } from "@/lib/utils";
+import { getBcvRate } from "@/lib/exchange-rate";
+import { formatBs, formatMoney, toBs } from "@/lib/utils";
 import { AddToCart } from "./add-to-cart";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string; id: string }> }) {
@@ -21,6 +22,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .eq("is_active", true)
     .maybeSingle<Product>();
   if (!product) notFound();
+  const rate = store.show_bs !== false ? await getBcvRate() : null;
 
   return (
     <div className="pb-6">
@@ -37,7 +39,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </div>
       <div className="space-y-3 px-4 pt-4">
         <h1 className="font-brand text-2xl font-bold">{product.name}</h1>
-        <p className="text-2xl font-extrabold text-brand">{formatMoney(product.price)}</p>
+        <div>
+          <p className="text-2xl font-extrabold text-brand">{formatMoney(product.price)}</p>
+          {rate && <p className="text-sm font-medium text-slate-500">{formatBs(toBs(product.price, rate.rate))}</p>}
+        </div>
         <p className={product.stock > 0 ? "text-sm text-emerald-600" : "text-sm text-rose-600"}>
           {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
         </p>
