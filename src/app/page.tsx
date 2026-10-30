@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, CreditCard, MessageCircle, Palette, Smartphone } from "lucide-react";
+import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
 import { SITE_DOMAIN } from "@/lib/constants";
@@ -24,10 +25,7 @@ export default async function LandingPage() {
             <a href="#como-funciona" className="hover:text-slate-900">Cómo funciona</a>
             <a href="#planes" className="hover:text-slate-900">Planes</a>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="btn-ghost">Iniciar sesión</Link>
-            <Link href="/registro" className="btn-primary hidden sm:inline-flex">Crear tienda</Link>
-          </div>
+          <LandingAuthButtons />
         </nav>
       </header>
 
@@ -53,6 +51,20 @@ export default async function LandingPage() {
             </span>
             <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">{c.hero_title}</h1>
             <p className="mt-4 text-lg text-white/85">{c.hero_subtitle}</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/suscripcion"
+                className="btn w-full bg-accent px-7 py-3.5 text-base font-bold text-[#004d40] shadow-lg shadow-black/20 transition hover:scale-[1.02] hover:brightness-110 sm:w-auto md:text-lg"
+              >
+                Crea tu tienda <ArrowRight className="size-5" />
+              </Link>
+              <a
+                href="#planes"
+                className="btn w-full border border-white/40 px-7 py-3.5 text-base font-semibold text-white hover:bg-white/10 sm:w-auto md:text-lg"
+              >
+                Ver planes
+              </a>
+            </div>
             <p className="mt-6 text-sm text-white/75">
               Tu link: <span className="rounded-md bg-white/15 px-2 py-0.5 font-mono">{SITE_DOMAIN}/tuempresa</span>
             </p>
@@ -122,7 +134,7 @@ export default async function LandingPage() {
           <Smartphone className="mx-auto size-10 text-brand" />
           <h2 className="mt-4 text-2xl font-bold md:text-3xl">Tu tienda, como app, lista hoy</h2>
           <Link
-            href="/registro"
+            href="/suscripcion"
             className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-5 text-lg font-bold text-white shadow-lg shadow-brand/40 transition hover:scale-[1.02] md:text-xl"
           >
             {c.cta_text} <ArrowRight className="size-6" />

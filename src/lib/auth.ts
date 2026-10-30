@@ -2,6 +2,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "./supabase/server";
+import { hasAccess, hasPendingPlanPayment } from "./access";
 import type { Profile, Store } from "./types";
 
 export const getSession = cache(async () => {
@@ -35,4 +36,11 @@ export function homeForRole(role: Profile["role"] | undefined) {
   if (role === "superadmin") return "/superadmin";
   if (role === "store_owner") return "/panel";
   return "/";
+}
+
+/** Como getOwnerStore, pero sin plan ni cupón vigente manda a comprar un plan (para lo que cambia datos). */
+export async function getActiveOwnerStore(allowIncomplete: boolean = false) {
+  const ctx = await getOwnerStore(allowIncomplete);
+  if (!hasAccess(ctx.store) && !(await hasPendingPlanPayment(ctx.supabase, ctx.store.id))) redirect("/suscripcion?vencido=1");
+  return ctx;
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import { ReferenceInput } from "@/components/reference-input";
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, CheckCircle2, FileCheck2, Loader2, Paperclip } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Copy, FileCheck2, Loader2, Paperclip, PartyPopper } from "lucide-react";
 import { RegistrationFields } from "@/app/registro/register-form";
 import { Money, RateNote, type Rate } from "@/components/money";
 import { PaymentDetailsView } from "@/components/payment-details-view";
@@ -45,7 +46,7 @@ export function SubscriptionCheckout({
   const [receipt, setReceipt] = useState<{ path: string; name: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
+  const [credentials, setCredentials] = useState<{ email: string; password: string; store: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const registroRef = useRef<HTMLFieldSetElement>(null);
@@ -117,7 +118,11 @@ export function SubscriptionCheckout({
           if (res.step === "registro") setStep("registro");
           return setError(res.error);
         }
-        setEmail(String(fd.get("email") ?? ""));
+        setCredentials({
+          email: String(fd.get("email") ?? "").trim().toLowerCase(),
+          password: String(fd.get("password") ?? ""),
+          store: String(fd.get("company_name") ?? "").trim(),
+        });
       }
       go("listo");
     });
@@ -282,10 +287,7 @@ export function SubscriptionCheckout({
                 />
               </div>
             )}
-            <div>
-              <label className="label" htmlFor="sub-ref">Número de referencia o ID de la transacción</label>
-              <input id="sub-ref" name="reference" className="input" maxLength={100} />
-            </div>
+            <ReferenceInput method={method} id="sub-ref" name="reference" />
             <div>
               <span className="label">Comprobante del pago (captura o PDF)</span>
               <button
@@ -333,23 +335,73 @@ export function SubscriptionCheckout({
       {/* Paso: Listo */}
       {step === "listo" && (
         <section className="card p-6 text-center">
-          <CheckCircle2 className="mx-auto size-12 text-emerald-600" />
-          <h2 className="mt-3 text-xl font-bold">¡Recibimos tu pago!</h2>
           {userId ? (
-            <p className="mt-1 text-sm text-slate-600">Lo verificaremos y activaremos tu Plan {PLANS[plan].label} lo antes posible.</p>
-          ) : (
             <>
-              <p className="mt-1 text-sm text-slate-600">
-                Tu cuenta y tu tienda ya están creadas. Verificaremos tu pago del Plan {PLANS[plan].label} y, apenas lo aprobemos, podrás iniciar
-                sesión con <strong>{email}</strong> y la contraseña que elegiste.
-              </p>
-              <Link href="/" className="btn-outline mt-5">
-                Volver al inicio
-              </Link>
+            <CheckCircle2 className="mx-auto size-12 text-emerald-600" />
+            <h2 className="mt-3 text-xl font-bold">¡Recibimos tu pago!</h2>
+            <p className="mt-1 text-sm text-slate-600">Lo verificaremos y activaremos tu Plan {PLANS[plan].label} lo antes posible.</p>
             </>
+          ) : (
+            credentials && <StoreCreated {...credentials} planLabel={PLANS[plan].label} />
           )}
         </section>
       )}
     </form>
+  );
+}
+
+/** Final de la pasarela sin sesión: felicita y muestra en grande los datos para iniciar sesión */
+function StoreCreated({ email, password, store, planLabel }: { email: string; password: string; store: string; planLabel: string }) {
+  const [copied, setCopied] = useState<string | null>(null);
+  const copy = async (key: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      // Está a la vista para copiarlo a mano
+    }
+  };
+  const rows = [
+    { key: "usuario", label: "Usuario (tu email)", value: email },
+    { key: "clave", label: "Contraseña", value: password },
+  ];
+  return (
+    <div className="space-y-5">
+      <div>
+        <PartyPopper className="mx-auto size-12 text-brand" />
+        <h2 className="mt-3 text-2xl font-extrabold">¡Felicidades, creaste tu tienda!</h2>
+        {store && <p className="mt-1 text-lg font-semibold text-brand">{store}</p>}
+      </div>
+      <div className="rounded-2xl border-2 border-brand/30 bg-brand/5 p-4 text-left">
+        <p className="text-center font-semibold">Recuerda guardar los datos de inicio de sesión de tu tienda:</p>
+        <dl className="mt-4 space-y-3">
+          {rows.map((r) => (
+            <div key={r.key} className="rounded-xl bg-white p-3 shadow-sm">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{r.label}</dt>
+              <dd className="mt-1 flex items-center gap-2">
+                <span className="min-w-0 flex-1 break-all font-mono text-xl font-bold sm:text-2xl">{r.value}</span>
+                <button
+                  type="button"
+                  onClick={() => copy(r.key, r.value)}
+                  className="grid size-10 shrink-0 place-items-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  aria-label={`Copiar ${r.label.toLowerCase()}`}
+                >
+                  {copied === r.key ? <Check className="size-5 text-emerald-600" /> : <Copy className="size-5" />}
+                </button>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-3 text-center text-xs text-slate-500">Haz una captura de pantalla o anótalos en un lugar seguro.</p>
+      </div>
+      <p className="text-sm text-slate-600">
+        Ya puedes iniciar sesión con estos datos y preparar tu tienda. Verificaremos tu pago del Plan {planLabel} y{" "}
+        <strong>te avisaremos apenas sea aprobado</strong> para que uses tu app sin restricciones.
+      </p>
+      <Link href="/login" className="btn-primary w-full py-3 text-base">
+        Ir a iniciar sesión
+      </Link>
+    </div>
   );
 }

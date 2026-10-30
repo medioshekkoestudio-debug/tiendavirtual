@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 export function Modal({
@@ -28,7 +29,8 @@ export function Modal({
   if (!open) return null;
   // Sin cierre al hacer clic en el fondo: un toque accidental (o seleccionar texto y soltar fuera)
   // cerraba el formulario a medio llenar. Se cierra con la X o con Escape.
-  return (
+  // En el body: dentro de una barra con backdrop-blur el «fixed» quedaba encerrado en la barra.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4">
       <div
         role="dialog"
@@ -44,6 +46,7 @@ export function Modal({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

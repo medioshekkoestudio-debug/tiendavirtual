@@ -50,6 +50,8 @@ export type Store = {
   plan_cycle: PlanCycle | null;
   plan_expires_at: string | null;
   trial_ends_at: string | null;
+  /** Último cupón canjeado; trial_ends_at es hasta cuándo dura su acceso */
+  coupon_code: string | null;
   created_at: string;
 };
 
@@ -184,4 +186,13 @@ export type LandingContent = {
   cta_text: string;
   features: { title: string; text: string }[];
   footer_text: string;
+};
+
+export type Notification = {
+  id: string;
+  title: string;
+  body: string;
+  link: string | null;
+  read_at: string | null;
+  created_at: string;
 };

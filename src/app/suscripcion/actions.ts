@@ -5,6 +5,7 @@ import { getOwnerStore } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
 import { PAYMENT_METHODS, PLAN_PAYMENT_METHOD_KEYS, isPlan, isPlanCycle } from "@/lib/constants";
+import { cleanReference, referenceError } from "@/lib/payment-reference";
 import type { PaymentMethodConfig, PlanCycle, PlanKey, PlanPaymentMethodKey } from "@/lib/types";
 
 /** Registra el pago de un plan con su comprobante. Queda pendiente hasta que el Superadmin lo apruebe. */
@@ -23,8 +24,9 @@ export async function createSubscriptionPayment(input: {
   const methods = (settings?.payment_methods ?? {}) as Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
   if (!methods[input.method]?.enabled) return { error: `${PAYMENT_METHODS[input.method].label} no está disponible en este momento` };
 
-  const reference = String(input.reference ?? "").trim().slice(0, 100);
-  if (!reference) return { error: "Escribe el número de referencia o ID de la transacción" };
+  const refError = referenceError(input.method, input.reference);
+  if (refError) return { error: refError };
+  const reference = cleanReference(input.method, input.reference);
   const receipt = String(input.receipt_path ?? "");
   if (!receipt.startsWith(`${user.id}/`)) return { error: "Adjunta el comprobante del pago" };
 
@@ -74,11 +76,12 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
   const plan = String(fd.get("plan") ?? "");
   const cycle = String(fd.get("cycle") ?? "");
   const method = String(fd.get("method") ?? "") as PlanPaymentMethodKey;
-  const reference = String(fd.get("reference") ?? "").trim().slice(0, 100);
+  const reference = cleanReference(method, fd.get("reference"));
   const receipt = String(fd.get("receipt_path") ?? "");
   if (!isPlan(plan) || !isPlanCycle(cycle)) return { error: "Elige un plan" };
   if (!PLAN_PAYMENT_METHOD_KEYS.includes(method)) return { error: "Elige un método de pago" };
-  if (!reference) return { error: "Escribe el número de referencia o ID de la transacción" };
+  const refError = referenceError(method, fd.get("reference"));
+  if (refError) return { error: refError };
   if (!NEW_RECEIPT_RE.test(receipt)) return { error: "Adjunta el comprobante del pago" };
 
   const admin = createAdminClient();
@@ -90,7 +93,6 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
     email: parsed.data.email,
     password: parsed.data.password,
     email_confirm: true,
-    ban_duration: "876000h",
     user_metadata: registrationMetadata(parsed.data),
   });
   if (createError || !created.user) {

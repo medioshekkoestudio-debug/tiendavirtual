@@ -3,6 +3,12 @@ import type { Metadata, Viewport } from "next";
 import { ExternalLink, LogOut, Percent, Settings } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { BottomNav } from "@/components/bottom-nav";
+import { AccessGate } from "@/components/access-gate";
+import { MarkHasAccount } from "@/components/account-flag";
+import { InstallAppButton } from "@/components/install-app";
+import { NotificationBell, PendingPlanNotice } from "@/components/notifications";
+import { hasAccess, hasPendingPlanPayment } from "@/lib/access";
+import type { Notification } from "@/lib/types";
 import { themeStyle } from "@/components/theme-vars";
 import { getOwnerStore } from "@/lib/auth";
 import { SITE_DOMAIN } from "@/lib/constants";
@@ -28,6 +34,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         .is("read_at", null)
         .neq("sender_id", user.id)
     : { count: 0 };
+  const [planPending, { data: notifs }] = await Promise.all([
+    hasPendingPlanPayment(supabase, store.id),
+    supabase.from("notifications").select("id, title, body, link, read_at, created_at").order("created_at", { ascending: false }).limit(15),
+  ]);
+  const access = hasAccess(store);
   const { count: pendingPayments } = await supabase
     .from("payments")
     .select("id", { count: "exact", head: true })
@@ -50,6 +61,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               {SITE_DOMAIN}/{store.slug} <ExternalLink className="size-3" />
             </Link>
           </div>
+          <NotificationBell items={(notifs ?? []) as Notification[]} />
+          <InstallAppButton appName="Mi tienda" iconOnly />
           <Link href="/panel/comisiones" className="rounded-xl p-2 text-slate-600 hover:bg-slate-100" aria-label="Comisiones y plan" title="Comisiones y plan">
             <Percent className="size-5" />
           </Link>
@@ -64,7 +77,10 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           </form>
         </div>
       </header>
+      {!access && planPending && <PendingPlanNotice />}
       <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
+      <MarkHasAccount />
+      <AccessGate blocked={!access && !planPending} hadCoupon={!!store.coupon_code} />
       <BottomNav
         items={[
           { href: "/panel", label: "Inicio", icon: "home", exact: true },

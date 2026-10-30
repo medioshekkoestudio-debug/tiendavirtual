@@ -219,3 +219,14 @@ dice el banco. Meta: ≥ 99 % en referencia y monto.
 2. Decidir dónde se aloja `linki-bank` (Railway es lo más simple).
 3. Una cuenta de Anthropic con `ANTHROPIC_API_KEY` para el OCR, o elegir la alternativa con Tesseract.
 4. Juntar capturas reales de pagos para probar el OCR.
+
+---
+
+## 9. Estado (29-10-2026)
+
+- **Escrito**: `services/pagos-api` (conciliación, banco y OCR) y la migración `20261031120000_validacion_pagos.sql`.
+  Listo para subir a Railway: los pasos están en `services/pagos-api/README.md`.
+- **Decidido**: sin OCR por ahora, para no pagar por comprobante. En Pago Móvil el usuario escribe los últimos 6 dígitos
+  de la referencia y con eso, el monto y la fecha se concilia.
+- **Falta (lunes 2-11)**: crear con Bancamiga el usuario de solo consulta (o conseguir su API), cargarlo en el servicio,
+  mapear el portal y probar. Detalle en «Pendiente» del README del servicio.

@@ -162,3 +162,31 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   (resumen generado/pagado/en revisión/por pagar, filtro por periodo, pasarela por pasos y su suscripción). El Superadmin
   aprueba o rechaza en `/superadmin/comisiones` (rechazar devuelve las comisiones a «por pagar») y ve la relación por tienda
   (RPC `superadmin_billing`).
+- **pagos-api** (`services/pagos-api`, para Railway; migración `20261031120000_validacion_pagos.sql`): OCR de comprobantes
+  con Claude, movimientos del banco (scraper de Bancamiga sin mapear: `not_configured`; se pueden importar a mano) y
+  conciliación cada minuto de planes y comisiones por Pago Móvil. Arranca en modo sombra (`AUTO_APPROVE=false`); aprueba
+  con el RPC `auto_approve_payment` (solo service_role), que reclama el movimiento en la misma transacción. Nunca rechaza.
+  Falta conectarlo a Linki App (checkout y Superadmin).
+- **Compartir y descargar la app**: botón «Compartir por WhatsApp» en Inicio del panel y en Ajustes (wa.me en el teléfono,
+  WhatsApp Web en la computadora, como Formula Taller). Botón «Descargar app» en la barra de la tienda y del panel
+  (`src/lib/pwa.ts` + `install-app.tsx`, como AvisoApp de La Mejor Llave): Android con un toque → «¡App descargada!»;
+  iPhone → aviso con Compartir → «Añadir a pantalla de inicio». El `Modal` ahora se dibuja en el body (portal).
+  Ajustes → «Mi perfil»: el dueño edita su teléfono de registro (`saveOwnerPhone`).
+- **Sin OCR por ahora**: en Pago Móvil se piden los últimos 6 dígitos de la referencia (`ReferenceInput`,
+  `lib/payment-reference.ts`, validado también en el servidor) en planes, comisiones y compras en tiendas.
+- **Cupones y nada gratis** (migración `20261031130000_cupones.sql`): `coupons` (código, días, activo) y
+  `coupon_redemptions` (una vez por tienda). Por defecto `linkicupon1` (15 días) y `linkicupon2` (60). Se canjean en
+  `/cupon` (iniciar sesión, crear cuenta o con la sesión abierta; RPC `redeem_coupon`, que suma días a `trial_ends_at`).
+  Acceso = plan aprobado vigente o cupón vigente (`lib/access.ts`). Sin acceso: aviso que no se cierra en el panel y el
+  asistente (`AccessGate`, salvo `/panel/comisiones`) y las acciones de `store-actions` mandan a `/suscripcion`.
+  Registrarse ya no da días: sin cupón va directo a elegir plan. Superadmin → Cupones para crear y editar.
+  La tienda pública de los clientes sigue funcionando aunque el dueño no tenga acceso.
+- **Sin registro sin pagar**: «Crea tu tienda» (barra y banner de la landing, login) lleva a `/suscripcion`; `/registro`
+  redirige ahí. La cuenta se crea en la pasarela (o con cupón en `/cupon`). Contraseña dos veces con ojo
+  (`PasswordInput`, validado también en `parseRegistration`). Al final: «¡Felicidades, creaste tu tienda!» con el
+  usuario y la contraseña en grande y botones para copiar.
+- **Pago en revisión ya no bloquea**: la pasarela crea la cuenta sin bloquearla; con un pago de plan pendiente se entra
+  al panel sin el aviso de comprar, con la franja «Tu pago está en revisión…». Campana de notificaciones en el header del
+  panel (`notifications`, migración `20261031140000_notificaciones.sql`): la base avisa sola al aprobar o rechazar un
+  pago de plan o de comisiones. El login acepta un usuario sin @ (se completa con @linkiapp.com).
+- Superadmin adicional: `hekkotienda@linkiapp.com` (entra escribiendo solo «hekkotienda»).

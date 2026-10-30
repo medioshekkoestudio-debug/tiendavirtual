@@ -297,7 +297,7 @@ export const DEFAULT_LANDING: LandingContent = {
   description_title: "¿Qué es Linki App?",
   description:
     "Linki App es un marketplace de tiendas: cada empresa obtiene su propia tienda instalable en el teléfono, con su marca, sus colores y su link (linkiapp.com/tuempresa). Administra productos, stock, pagos (Zelle, PayPal, Pago móvil, Binance, transferencias) y pedidos desde un solo panel.",
-  cta_text: "Crear mi tienda gratis",
+  cta_text: "Crear mi tienda",
   features: [
     { title: "Tu marca, tu app", text: "Logo, colores, tipografía y slider propios. Tus clientes la instalan como app." },
     { title: "Pagos locales", text: "Zelle, PayPal, Pago móvil, Binance y transferencias. Aprueba cada pago con un toque." },

@@ -19,7 +19,9 @@ function safeNext(next: string) {
 
 /** Login para dueños de tienda y superadmin (y clientes desde /login). */
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
-  const email = str(fd, "email").toLowerCase();
+  const raw = str(fd, "email").toLowerCase();
+  // Las cuentas internas entran con su usuario solo (p. ej. «hekkotienda» = hekkotienda@linkiapp.com)
+  const email = raw && !raw.includes("@") ? `${raw}@linkiapp.com` : raw;
   const password = String(fd.get("password") ?? "");
   const next = safeNext(str(fd, "next"));
   if (!email || !password) return { error: "Ingresa tu email y contraseña" };
@@ -65,8 +67,8 @@ export async function registerStore(_: FormState, fd: FormData): Promise<FormSta
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Cuenta creada, pero no se pudo iniciar sesión. Intenta desde Iniciar sesión." };
-  // Si venía de elegir un plan en la landing, sigue a la pasarela de pago; si no, al asistente
-  redirect(safeNext(str(fd, "next")) || "/onboarding");
+  // Nada es gratis: sin cupón, al registrarse sigue a elegir y pagar su plan
+  redirect(safeNext(str(fd, "next")) || "/suscripcion");
 }
 
 export async function signOut(fd: FormData) {

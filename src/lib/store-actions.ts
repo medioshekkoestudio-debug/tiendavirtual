@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getOwnerStore } from "./auth";
+import { getActiveOwnerStore } from "./auth";
 import { FONT_OPTIONS } from "./font-options";
 import { PAYMENT_METHOD_KEYS, isRubro } from "./constants";
 import { cleanMethodConfig } from "./payment-details";
@@ -28,7 +28,7 @@ export async function saveBranding(input: {
   font_key: string;
   slider_images: (string | null)[];
 }): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const name = input.name.trim().slice(0, 80);
   if (name.length < 2) return { error: "Escribe el nombre de tu empresa" };
   for (const c of [input.primary_color, input.secondary_color, input.accent_color]) {
@@ -55,7 +55,7 @@ export async function saveBranding(input: {
 }
 
 export async function saveSlug(raw: string): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   const slug = raw.trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug)) {
     return { error: "Usa de 3 a 40 letras minúsculas, números o guiones (sin espacios ni acentos)" };
@@ -66,7 +66,7 @@ export async function saveSlug(raw: string): Promise<ActionResult> {
 }
 
 export async function saveIndustry(industry: string): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   if (!isRubro(industry)) return { error: "Elige un rubro de la lista" };
   const { error } = await supabase.from("stores").update({ industry }).eq("id", store.id);
   if (error) return { error: "No se pudo guardar el rubro" };
@@ -74,7 +74,7 @@ export async function saveIndustry(industry: string): Promise<ActionResult> {
 }
 
 export async function saveShowBs(show: boolean): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   const { error } = await supabase.from("stores").update({ show_bs: Boolean(show) }).eq("id", store.id);
   if (error) return { error: "No se pudo guardar" };
   revalidatePath(`/${store.slug}`, "layout");
@@ -85,7 +85,7 @@ export async function saveShowBs(show: boolean): Promise<ActionResult> {
 export async function savePaymentMethods(
   input: Partial<Record<PaymentMethodKey, PaymentMethodConfig>>,
 ): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const clean: Partial<Record<PaymentMethodKey, PaymentMethodConfig>> = {};
   for (const key of PAYMENT_METHOD_KEYS) {
     const src = input[key];
@@ -101,7 +101,7 @@ export async function savePaymentMethods(
 }
 
 export async function completeOnboarding(): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const { error } = await supabase.from("stores").update({ onboarding_completed: true, onboarding_step: 4 }).eq("id", store.id);
   if (error) return { error: error.message };
   return done();
@@ -109,7 +109,7 @@ export async function completeOnboarding(): Promise<ActionResult> {
 
 // ---------------------------------------------------------------- Categorías
 export async function addCategoryTree(tree: { name: string; subcategories: string[] }[]): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const { data: existing } = await supabase.from("categories").select("id,name,parent_id").eq("store_id", store.id);
   const all = existing ?? [];
 
@@ -142,7 +142,7 @@ export async function addCategoryTree(tree: { name: string; subcategories: strin
 }
 
 export async function createCategory(name: string, parentId: string | null): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const clean = name.trim().slice(0, 60);
   if (!clean) return { error: "Escribe un nombre" };
   const { data, error } = await supabase
@@ -155,7 +155,7 @@ export async function createCategory(name: string, parentId: string | null): Pro
 }
 
 export async function renameCategory(id: string, name: string): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const clean = name.trim().slice(0, 60);
   if (!clean) return { error: "Escribe un nombre" };
   const { error } = await supabase.from("categories").update({ name: clean }).eq("id", id).eq("store_id", store.id);
@@ -164,7 +164,7 @@ export async function renameCategory(id: string, name: string): Promise<ActionRe
 }
 
 export async function deleteCategory(id: string): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const { error } = await supabase.from("categories").delete().eq("id", id).eq("store_id", store.id);
   if (error) return { error: error.message };
   return done();
@@ -184,7 +184,7 @@ export type ProductInput = {
 };
 
 export async function saveProduct(input: ProductInput): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore(true);
+  const { supabase, store } = await getActiveOwnerStore(true);
   const name = input.name.trim().slice(0, 120);
   const price = Number(input.price);
   const stock = Math.trunc(Number(input.stock));
@@ -213,7 +213,7 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
 }
 
 export async function setProductStock(id: string, stock: number): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   const value = Math.max(0, Math.trunc(Number(stock) || 0));
   const { error } = await supabase.from("products").update({ stock: value }).eq("id", id).eq("store_id", store.id);
   if (error) return { error: error.message };
@@ -221,7 +221,7 @@ export async function setProductStock(id: string, stock: number): Promise<Action
 }
 
 export async function deleteProduct(id: string): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   const { error } = await supabase.from("products").delete().eq("id", id).eq("store_id", store.id);
   if (error) return { error: error.message };
   revalidatePath(`/${store.slug}`, "layout");
@@ -230,7 +230,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
 // ------------------------------------------------------- Pagos y pedidos
 export async function reviewPayment(paymentId: string, approve: boolean): Promise<ActionResult> {
-  const { supabase } = await getOwnerStore();
+  const { supabase } = await getActiveOwnerStore();
   const { error } = await supabase.rpc("review_payment", { p_payment: paymentId, p_approve: approve });
   if (error) return { error: error.message };
   return done();
@@ -239,9 +239,21 @@ export async function reviewPayment(paymentId: string, approve: boolean): Promis
 const ORDER_STATUSES: OrderStatus[] = ["pendiente", "pagado", "enviado", "entregado", "cancelado"];
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<ActionResult> {
-  const { supabase, store } = await getOwnerStore();
+  const { supabase, store } = await getActiveOwnerStore();
   if (!ORDER_STATUSES.includes(status)) return { error: "Estado inválido" };
   const { error } = await supabase.from("orders").update({ status }).eq("id", orderId).eq("store_id", store.id);
   if (error) return { error: error.message };
+  return done();
+}
+
+// ------------------------------------------------------------ Perfil del dueño
+/** Teléfono de registro del dueño de la tienda (el que ve el Superadmin para contactarlo) */
+export async function saveOwnerPhone(phone: string): Promise<ActionResult> {
+  const { supabase, user } = await getActiveOwnerStore();
+  const value = String(phone ?? "").trim().slice(0, 30);
+  const digits = value.replace(/\D/g, "");
+  if (digits.length < 10 || digits.length > 15) return { error: "Escribe un teléfono válido, por ejemplo 0414-1234567" };
+  const { error } = await supabase.from("profiles").update({ phone: value }).eq("id", user.id);
+  if (error) return { error: "No se pudo guardar" };
   return done();
 }

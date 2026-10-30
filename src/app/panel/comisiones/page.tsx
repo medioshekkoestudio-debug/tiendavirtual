@@ -154,7 +154,7 @@ export default async function CommissionsPage({ searchParams }: { searchParams: 
               {planActive
                 ? `Plan ${PLANS[store.plan!].label} (${store.plan_cycle}) activo hasta el ${formatDate(store.plan_expires_at!, false)}.`
                 : inTrial
-                  ? `Prueba gratis hasta el ${formatDate(store.trial_ends_at!, false)}.`
+                  ? `Acceso con cupón${store.coupon_code ? ` ${store.coupon_code}` : ""} hasta el ${formatDate(store.trial_ends_at!, false)}.`
                   : "Tu tienda no tiene un plan activo."}
             </p>
           </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Ticket } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
 import { getSession, homeForRole } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
@@ -20,10 +21,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       subtitle={safeNext?.startsWith("/suscripcion") ? "Entra con tu tienda para elegir tu plan" : "Accede al panel de tu tienda"}
     >
       <LoginForm next={safeNext} />
+      <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
+        <span className="h-px flex-1 bg-slate-200" /> o <span className="h-px flex-1 bg-slate-200" />
+      </div>
+      <Link href="/cupon" className="btn-outline w-full">
+        <Ticket className="size-4" /> Iniciar sesión con un cupón
+      </Link>
       <p className="mt-6 text-center text-sm text-slate-600">
         ¿Aún no tienes tienda?{" "}
-        <Link href={safeNext ? `/registro?next=${encodeURIComponent(safeNext)}` : "/registro"} className="font-semibold text-brand">
-          Créala gratis
+        <Link href="/suscripcion" className="font-semibold text-brand">
+          Créala aquí
         </Link>
       </p>
     </AuthShell>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "@/lib/auth";
 import { PAYMENT_METHODS, PLAN_PAYMENT_METHOD_KEYS } from "@/lib/constants";
+import { cleanReference, referenceError } from "@/lib/payment-reference";
 import type { PaymentMethodConfig, PlanPaymentMethodKey } from "@/lib/types";
 
 /**
@@ -24,8 +25,9 @@ export async function createCommissionPayment(input: {
   const methods = (settings?.payment_methods ?? {}) as Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
   if (!methods[input.method]?.enabled) return { error: `${PAYMENT_METHODS[input.method].label} no está disponible en este momento` };
 
-  const reference = String(input.reference ?? "").trim().slice(0, 100);
-  if (!reference) return { error: "Escribe el número de referencia o ID de la transacción" };
+  const refError = referenceError(input.method, input.reference);
+  if (refError) return { error: refError };
+  const reference = cleanReference(input.method, input.reference);
   const receipt = String(input.receipt_path ?? "");
   if (!receipt.startsWith(`${user.id}/`)) return { error: "Adjunta el comprobante del pago" };
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { ReferenceInput } from "@/components/reference-input";
+import { referenceError } from "@/lib/payment-reference";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -74,7 +76,8 @@ export function Checkout({
     }
     if (s === 4) {
       if (!method) return "Selecciona un método de pago";
-      if (!reference.trim()) return "Escribe el número de referencia de tu pago";
+      const refError = referenceError(method, reference);
+      if (refError) return refError;
     }
     return null;
   }
@@ -374,8 +377,7 @@ export function Checkout({
                 <p className="text-sm font-semibold">Datos para pagar con {PAYMENT_METHODS[method].label}</p>
                 <PaymentDetailsView method={method} cfg={paymentMethods[method]} />
                 <div className="pt-2">
-                  <label className="label" htmlFor="ref">Número de referencia / ID de la transacción</label>
-                  <input id="ref" className="input font-mono" value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Ej.: 00123456" />
+                  <ReferenceInput method={method} id="ref" value={reference} onChange={setReference} />
                 </div>
               </div>
             )}

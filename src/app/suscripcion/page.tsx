@@ -35,8 +35,13 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
       </header>
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-6">
         <div>
-          <h1 className="text-2xl font-bold">Activa tu plan</h1>
-          <p className="mt-1 text-sm text-slate-600">Elige tu plan, crea tu cuenta y adjunta tu pago en un solo paso.</p>
+          <h1 className="text-2xl font-bold">Crea tu tienda</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Elige tu plan, crea tu cuenta y adjunta tu pago en un solo paso. ¿Tienes un cupón?{" "}
+            <Link href="/cupon" className="font-semibold text-brand">
+              Entra con tu cupón
+            </Link>
+          </p>
         </div>
         <SubscriptionCheckout
           rate={rate}
@@ -86,10 +91,16 @@ async function OwnerSubscription({ sp }: { sp: Awaited<Search> }) {
               </>
             ) : inTrial ? (
               <>
-                Estás en tu prueba gratis hasta el <strong>{formatDate(store.trial_ends_at!, false)}</strong>.
+                Tienes acceso con cupón{store.coupon_code ? ` (${store.coupon_code})` : ""} hasta el <strong>{formatDate(store.trial_ends_at!, false)}</strong>.
               </>
             ) : (
-              <>Tu tienda no tiene un plan activo.</>
+              <>
+                Tu tienda no tiene un plan activo. Elige uno para seguir usando tu app, o{" "}
+                <Link href="/cupon" className="font-semibold text-brand">
+                  activa un cupón
+                </Link>
+                .
+              </>
             )}
           </p>
         </div>

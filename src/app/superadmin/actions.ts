@@ -96,3 +96,22 @@ export async function setStoreActive(storeId: string, active: boolean): Promise<
   revalidatePath(`/${data.slug}`, "layout");
   return {};
 }
+
+// ------------------------------------------------------------------ Cupones
+const COUPON_RE = /^[A-Za-z0-9_-]{3,40}$/;
+
+/** Crea (sin id) o edita un cupón: código, días de acceso y si está activo. Los días nuevos no cambian a quien ya lo canjeó. */
+export async function saveCoupon(input: { id?: string; code: string; free_days: number; active: boolean }): Promise<{ error?: string; ok?: boolean }> {
+  const supabase = await requireSuperadmin();
+  const code = String(input.code ?? "").trim();
+  const days = Math.trunc(Number(input.free_days));
+  if (!COUPON_RE.test(code)) return { error: "El código debe tener de 3 a 40 letras, números, guiones o _ (sin espacios)" };
+  if (!Number.isFinite(days) || days < 1 || days > 3650) return { error: "Los días deben ser entre 1 y 3650" };
+  const row = { code, free_days: days, active: Boolean(input.active), updated_at: new Date().toISOString() };
+  const { error } = input.id
+    ? await supabase.from("coupons").update(row).eq("id", input.id)
+    : await supabase.from("coupons").insert(row);
+  if (error) return { error: error.code === "23505" ? "Ya existe un cupón con ese código" : error.message };
+  revalidatePath("/superadmin/cupones");
+  return { ok: true };
+}

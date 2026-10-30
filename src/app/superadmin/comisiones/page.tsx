@@ -41,7 +41,7 @@ function planText(b: Billing) {
     return { label: `${PLANS[b.plan].label} · ${b.plan_cycle}`, hint: `vence ${formatDate(b.plan_expires_at, false)}`, ok: true };
   }
   if (b.trial_ends_at && new Date(b.trial_ends_at).getTime() > now) {
-    return { label: "Prueba gratis", hint: `hasta ${formatDate(b.trial_ends_at, false)}`, ok: true };
+    return { label: "Cupón", hint: `hasta ${formatDate(b.trial_ends_at, false)}`, ok: true };
   }
   return { label: "Sin plan activo", hint: b.plan_expires_at ? `venció ${formatDate(b.plan_expires_at, false)}` : "", ok: false };
 }

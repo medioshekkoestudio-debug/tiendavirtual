@@ -30,6 +30,7 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
   if (data.phone.replace(/\D/g, "").length < 10) return { error: "Teléfono inválido. Ejemplo: 0414-1234567" };
   if (!/^\S+@\S+\.\S+$/.test(data.email)) return { error: "Email inválido" };
   if (data.password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };
+  if (String(fd.get("password_confirm") ?? "") !== data.password) return { error: "Las contraseñas no coinciden" };
   return { data };
 }
 

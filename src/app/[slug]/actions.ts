@@ -1,4 +1,5 @@
 "use server";
+import { cleanReference, referenceError } from "@/lib/payment-reference";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -39,6 +40,10 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const refError = referenceError(input.payment?.method, input.payment?.reference);
+  if (refError) return { error: refError };
+  input.payment = { ...input.payment, reference: cleanReference(input.payment.method, input.payment.reference) };
 
   let accountCreated = false;
   if (!user && input.account) {

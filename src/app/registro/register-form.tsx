@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { registerStore } from "@/app/auth-actions";
 import { FormError } from "@/components/auth-shell";
 import { CedulaInput } from "@/components/cedula-input";
+import { PasswordInput } from "@/components/password-input";
 import { RUBRO_KEYS, RUBROS, SITE_DOMAIN } from "@/lib/constants";
 
 function previewSlug(name: string) {
@@ -78,11 +79,51 @@ export function RegistrationFields() {
       <label className="label" htmlFor="email">Email</label>
       <input id="email" name="email" type="email" required className="input" autoComplete="email" />
     </div>
-    <div>
-      <label className="label" htmlFor="password">Contraseña</label>
-      <input id="password" name="password" type="password" required minLength={8} className="input" autoComplete="new-password" />
-      <p className="mt-1 text-xs text-slate-500">Mínimo 8 caracteres.</p>
-    </div>
+    <PasswordPair />
+    </>
+  );
+}
+
+/** Contraseña dos veces (con el ojo para verla): el segundo campo avisa si no coincide */
+function PasswordPair() {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const mismatch = confirm.length > 0 && confirm !== password;
+  const confirmRef = useRef<HTMLInputElement>(null);
+  // También si cambia la primera después de escribir la segunda
+  useEffect(() => {
+    confirmRef.current?.setCustomValidity(mismatch ? "Las contraseñas no coinciden" : "");
+  }, [mismatch]);
+  return (
+    <>
+      <div>
+        <label className="label" htmlFor="password">Contraseña</label>
+        <PasswordInput
+          id="password"
+          name="password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <p className="mt-1 text-xs text-slate-500">Mínimo 8 caracteres. Con ella iniciarás sesión en tu tienda.</p>
+      </div>
+      <div>
+        <label className="label" htmlFor="password_confirm">Repite la contraseña</label>
+        <PasswordInput
+          id="password_confirm"
+          name="password_confirm"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={confirm}
+          ref={confirmRef}
+          onChange={(e) => setConfirm(e.target.value)}
+          aria-invalid={mismatch}
+        />
+        {mismatch && <p className="mt-1 text-xs font-medium text-rose-600">Las contraseñas no coinciden.</p>}
+      </div>
     </>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { ReferenceInput } from "@/components/reference-input";
+import { referenceError } from "@/lib/payment-reference";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, CheckCircle2, FileCheck2, Loader2, Paperclip, X } from "lucide-react";
@@ -199,7 +201,8 @@ function CommissionCheckout({
   function submit() {
     setError(null);
     if (!method) return setError("Elige un método de pago");
-    if (!reference.trim()) return setError("Escribe el número de referencia o ID de la transacción");
+    const refError = referenceError(method, reference);
+    if (refError) return setError(refError);
     if (!receipt) return setError("Adjunta el comprobante del pago");
     startTransition(async () => {
       const res = await createCommissionPayment({ orderIds: selection.orderIds, method, reference, receipt_path: receipt.path });
@@ -299,10 +302,7 @@ function CommissionCheckout({
                     />
                   </div>
                 )}
-                <div>
-                  <label className="label" htmlFor="com-ref">Número de referencia o ID de la transacción</label>
-                  <input id="com-ref" className="input" maxLength={100} value={reference} onChange={(e) => setReference(e.target.value)} />
-                </div>
+                <ReferenceInput method={method} id="com-ref" value={reference} onChange={setReference} />
                 <div>
                   <span className="label">Comprobante del pago (captura o PDF)</span>
                   <button

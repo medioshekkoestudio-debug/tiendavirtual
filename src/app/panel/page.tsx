@@ -4,7 +4,8 @@ import { EmptyState, OrderStatusBadge, SectionHeader, StatCard } from "@/compone
 import { getOwnerStore } from "@/lib/auth";
 import { ORDER_STATUS, PAID_STATUSES } from "@/lib/constants";
 import type { Order, OrderStatus, Product } from "@/lib/types";
-import { formatDate, formatMoney } from "@/lib/utils";
+import { ShareStoreWhatsApp } from "@/components/share-whatsapp";
+import { formatDate, formatMoney, storeUrl } from "@/lib/utils";
 
 export default async function PanelHome() {
   const { supabase, user, store } = await getOwnerStore();
@@ -40,6 +41,14 @@ export default async function PanelHome() {
 
   return (
     <div className="space-y-8">
+      <section className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1">
+          <h2 className="font-bold">Comparte tu tienda</h2>
+          <p className="text-sm text-slate-600">Envía a tus contactos el link para comprar y descargar la app de {store.name}.</p>
+        </div>
+        <ShareStoreWhatsApp storeName={store.name} url={storeUrl(store.slug)} className="shrink-0" />
+      </section>
+
       <section>
         <SectionHeader title="Resumen del negocio" action={<span className="text-xs text-slate-500">Últimos 30 días</span>} />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
