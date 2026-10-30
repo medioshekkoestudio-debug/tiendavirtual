@@ -34,6 +34,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         .is("read_at", null)
         .neq("sender_id", user.id)
     : { count: 0 };
+  // Avisa si el plan o el cupón está por vencer o venció (una vez por fecha; también lo hace un cron diario)
+  await supabase.rpc("notify_my_access");
   const [planPending, { data: notifs }] = await Promise.all([
     hasPendingPlanPayment(supabase, store.id),
     supabase.from("notifications").select("id, title, body, link, read_at, created_at").order("created_at", { ascending: false }).limit(15),

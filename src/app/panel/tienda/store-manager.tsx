@@ -65,9 +65,14 @@ export function StoreManager({
   const totalStock = products.reduce((a, p) => a + p.stock, 0);
   const lowStock = products.filter((p) => p.stock <= 3).length;
 
+  function openEditor(p: Product | "new") {
+    setEditing(p);
+    window.history.replaceState(null, "", p === "new" ? "/panel/tienda?nuevo=1" : `/panel/tienda?editar=${p.id}`);
+  }
+
   function closeEditor() {
     setEditing(null);
-    if (openNew || editId) router.replace("/panel/tienda");
+    window.history.replaceState(null, "", "/panel/tienda");
   }
 
   function commitStock(p: Product) {
@@ -161,7 +166,7 @@ export function StoreManager({
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <input className="input pl-9" placeholder="Buscar por nombre" value={query} onChange={(e) => setQuery(e.target.value)} />
               </label>
-              <button type="button" className="btn-primary" aria-label="Nuevo producto" onClick={() => setEditing("new")}>
+              <button type="button" className="btn-primary" aria-label="Nuevo producto" onClick={() => openEditor("new")}>
                 <Plus className="size-4" /> <span className="hidden sm:inline">Nuevo producto</span>
               </button>
             </div>
@@ -248,7 +253,7 @@ export function StoreManager({
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <button type="button" className="rounded-lg p-1.5 text-slate-600 hover:bg-slate-100" aria-label="Editar" onClick={() => setEditing(p)}>
+                    <button type="button" className="rounded-lg p-1.5 text-slate-600 hover:bg-slate-100" aria-label="Editar" onClick={() => openEditor(p)}>
                       <Pencil className="size-4" />
                     </button>
                     <button

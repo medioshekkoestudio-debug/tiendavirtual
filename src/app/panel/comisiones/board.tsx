@@ -1,8 +1,9 @@
 "use client";
 
+import { clearDraft, useDraftState } from "@/lib/draft";
 import { ReferenceInput } from "@/components/reference-input";
 import { referenceError } from "@/lib/payment-reference";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, CheckCircle2, FileCheck2, Loader2, Paperclip, X } from "lucide-react";
 import { Money, RateNote, type Rate } from "@/components/money";
@@ -48,7 +49,7 @@ export function CommissionsBoard({
   methods: Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
 }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const [paying, setPaying] = useState<Selection | null>(null);
+  const [paying, setPaying] = useDraftState<Selection | null>(`linki:comisiones:${userId}:pago`, null);
   const due = rows.filter((r) => r.state === "por_pagar");
   const picked = due.filter((r) => checked.has(r.id));
   const pickedAmount = Math.round(picked.reduce((a, r) => a + r.commission, 0) * 100) / 100;
@@ -143,6 +144,7 @@ export function CommissionsBoard({
           rate={rate}
           methods={methods}
           onClose={(done) => {
+            clearDraft(`linki:comisiones:${userId}`);
             setPaying(null);
             if (done) setChecked(new Set());
           }}
@@ -173,14 +175,18 @@ function CommissionCheckout({
 }) {
   const router = useRouter();
   const available = PLAN_PAYMENT_METHOD_KEYS.filter((k) => methods[k]?.enabled);
-  const [step, setStep] = useState<Step>("resumen");
-  const [method, setMethod] = useState<PlanPaymentMethodKey | null>(available[0] ?? null);
-  const [reference, setReference] = useState("");
-  const [receipt, setReceipt] = useState<{ path: string; name: string } | null>(null);
+  const draft = `linki:comisiones:${userId}:datos`;
+  const [step, setStep] = useDraftState<Step>(`${draft}:paso`, "resumen");
+  const [method, setMethod] = useDraftState<PlanPaymentMethodKey | null>(`${draft}:metodo`, available[0] ?? null);
+  const [reference, setReference] = useDraftState(`${draft}:referencia`, "");
+  const [receipt, setReceipt] = useDraftState<{ path: string; name: string } | null>(`${draft}:comprobante`, null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (step === "listo") clearDraft(draft);
+  }, [step, draft]);
   const index = STEPS.indexOf(step);
   const amount = selection.amount;
   const label = selection.orderIds === null ? "Todas tus comisiones por pagar" : selection.count === 1 ? "1 comisión" : `${selection.count} comisiones`;
@@ -207,6 +213,7 @@ function CommissionCheckout({
     startTransition(async () => {
       const res = await createCommissionPayment({ orderIds: selection.orderIds, method, reference, receipt_path: receipt.path });
       if (res.error) return setError(res.error);
+      clearDraft(draft);
       setStep("listo");
       router.refresh();
     });

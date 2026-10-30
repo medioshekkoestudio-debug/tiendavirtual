@@ -1,5 +1,6 @@
 "use client";
 
+import { clearDraft, useDraftState } from "@/lib/draft";
 import { ReferenceInput } from "@/components/reference-input";
 import { referenceError } from "@/lib/payment-reference";
 import Link from "next/link";
@@ -34,16 +35,18 @@ export function Checkout({
 }) {
   const cart = useCart()!;
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  // Borrador: si va a WhatsApp o a su banco a pagar y el teléfono recarga la página, sigue donde estaba
+  const draft = `linki:compra:${slug}`;
+  const [step, setStep] = useDraftState(`${draft}:paso`, 0);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [done, setDone] = useState<{ orderNumber?: number; accountCreated?: boolean } | null>(null);
 
-  const [address, setAddress] = useState("");
-  const [delivery, setDelivery] = useState<"envio" | "retiro">("envio");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [customer, setCustomer] = useState({
+  const [address, setAddress] = useDraftState(`${draft}:direccion`, "");
+  const [delivery, setDelivery] = useDraftState<"envio" | "retiro">(`${draft}:entrega`, "envio");
+  const [date, setDate] = useDraftState(`${draft}:fecha`, "");
+  const [time, setTime] = useDraftState(`${draft}:hora`, "");
+  const [customer, setCustomer] = useDraftState(`${draft}:cliente`, {
     name: profile?.name ?? "",
     cedula: profile?.cedula ?? "",
     phone: profile?.phone ?? "",
@@ -53,8 +56,8 @@ export function Checkout({
   const [addressOk, setAddressOk] = useState(false);
   const [createAccount, setCreateAccount] = useState(false);
   const [password, setPassword] = useState("");
-  const [method, setMethod] = useState<PaymentMethodKey | null>(null);
-  const [reference, setReference] = useState("");
+  const [method, setMethod] = useDraftState<PaymentMethodKey | null>(`${draft}:metodo`, null);
+  const [reference, setReference] = useDraftState(`${draft}:referencia`, "");
 
   const enabledMethods = PAYMENT_METHOD_KEYS.filter((k) => paymentMethods?.[k]?.enabled);
   const today = new Date().toISOString().slice(0, 10);
@@ -108,6 +111,7 @@ export function Checkout({
       });
       if (res.error) return setError(res.error);
       cart.clear();
+      clearDraft(draft);
       setDone(res);
       router.refresh();
     });

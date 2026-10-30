@@ -1,7 +1,8 @@
 "use client";
 
+import { clearDraft, useDraftState, useFormDraft } from "@/lib/draft";
 import { ReferenceInput } from "@/components/reference-input";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, CheckCircle2, Copy, FileCheck2, Loader2, Paperclip, PartyPopper } from "lucide-react";
@@ -39,16 +40,22 @@ export function SubscriptionCheckout({
   const router = useRouter();
   const steps: Step[] = userId ? ["plan", "pago", "listo"] : ["plan", "registro", "pago", "listo"];
   const available = PLAN_PAYMENT_METHOD_KEYS.filter((k) => methods[k]?.enabled);
-  const [step, setStep] = useState<Step>("plan");
-  const [plan, setPlan] = useState<PlanKey>(initialPlan);
-  const [cycle, setCycle] = useState<PlanCycle>(initialCycle);
-  const [method, setMethod] = useState<PlanPaymentMethodKey | null>(available[0] ?? null);
-  const [receipt, setReceipt] = useState<{ path: string; name: string } | null>(null);
+  const draft = `linki:plan:${userId ?? "nuevo"}`;
+  const [step, setStep] = useDraftState<Step>(`${draft}:paso`, "plan");
+  const [plan, setPlan] = useDraftState<PlanKey>(`${draft}:plan`, initialPlan);
+  const [cycle, setCycle] = useDraftState<PlanCycle>(`${draft}:ciclo`, initialCycle);
+  const [method, setMethod] = useDraftState<PlanPaymentMethodKey | null>(`${draft}:metodo`, available[0] ?? null);
+  const [receipt, setReceipt] = useDraftState<{ path: string; name: string } | null>(`${draft}:comprobante`, null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [credentials, setCredentials] = useState<{ email: string; password: string; store: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  useFormDraft(`${draft}:campos`, formRef);
+  // La pantalla final no queda como borrador (se borra después de que el paso se guarde)
+  useEffect(() => {
+    if (step === "listo") clearDraft(draft);
+  }, [step, draft]);
   const registroRef = useRef<HTMLFieldSetElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const price = planPrice(plan, cycle);
@@ -124,6 +131,7 @@ export function SubscriptionCheckout({
           store: String(fd.get("company_name") ?? "").trim(),
         });
       }
+      clearDraft(draft);
       go("listo");
     });
   }

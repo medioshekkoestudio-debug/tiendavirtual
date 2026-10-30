@@ -1,5 +1,6 @@
 "use client";
 
+import { useDraftState } from "@/lib/draft";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SendHorizontal } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -25,7 +26,7 @@ export function Chat({
 }) {
   const supabase = useMemo(() => createClient(), []);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [text, setText] = useState("");
+  const [text, setText] = useDraftState(`linki:chat:${conversationId}`, "");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);

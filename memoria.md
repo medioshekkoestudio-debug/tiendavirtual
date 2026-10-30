@@ -190,3 +190,10 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   panel (`notifications`, migración `20261031140000_notificaciones.sql`): la base avisa sola al aprobar o rechazar un
   pago de plan o de comisiones. El login acepta un usuario sin @ (se completa con @linkiapp.com).
 - Superadmin adicional: `hekkotienda@linkiapp.com` (entra escribiendo solo «hekkotienda»).
+- **Avisos de vencimiento** (migración `20261031150000_aviso_vencimiento.sql`): 3 días antes y al vencer el plan o el
+  cupón llega una notificación a la campana (una vez por fecha; no si hay un pago de plan en revisión). pg_cron diario
+  a las 8:00 VET (`notify_access_all`) y además al abrir el panel (`notify_my_access`).
+- **No perder lo que se estaba haciendo** (`lib/draft.ts`): al ir a WhatsApp u otra app el teléfono puede recargar la
+  página. Se guardan borradores de 24 h en el navegador: pasarela de planes (paso, plan, datos de registro sin la
+  contraseña, comprobante), compra en la tienda, pago de comisiones, mensaje del chat; el editor de productos queda
+  en la URL (`?editar=` / `?nuevo=1`) y reabre con su borrador. Se borran al terminar.
