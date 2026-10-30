@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   applicationName: "Linki App",
   appleWebApp: { capable: true, title: "Linki App", statusBarStyle: "default" },
   icons: { icon: "/brand/linkiapp-icon-48.png", apple: "/brand/linkiapp-icon-180.png" },
+  // Vista previa al compartir el link (WhatsApp, Facebook): el logo sobre fondo blanco
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://linkiapp.com"),
+  openGraph: { siteName: "Linki App", images: [{ url: "/brand/linkiapp-og.png", width: 1200, height: 630, alt: "Linki App" }] },
 };
 
 export const viewport: Viewport = {
