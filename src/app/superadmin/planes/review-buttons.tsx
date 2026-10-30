@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { reviewSubscriptionPayment } from "../actions";
+import { reviewCommissionPayment, reviewSubscriptionPayment } from "../actions";
 
-export function ReviewButtons({ id }: { id: string }) {
+/** Aprobar o rechazar un pago de plan (por defecto) o de comisiones. */
+export function ReviewButtons({ id, kind = "plan" }: { id: string; kind?: "plan" | "comision" }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +14,7 @@ export function ReviewButtons({ id }: { id: string }) {
     if (!approve && !window.confirm("¿Rechazar este pago?")) return;
     setError(null);
     startTransition(async () => {
-      const res = await reviewSubscriptionPayment(id, approve);
+      const res = await (kind === "comision" ? reviewCommissionPayment : reviewSubscriptionPayment)(id, approve);
       if (res.error) return setError(res.error);
       router.refresh();
     });

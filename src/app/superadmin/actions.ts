@@ -78,6 +78,15 @@ export async function reviewSubscriptionPayment(id: string, approve: boolean): P
   return {};
 }
 
+/** Aprobar o rechazar un pago de comisiones. Al rechazarlo, sus comisiones vuelven a «por pagar». */
+export async function reviewCommissionPayment(id: string, approve: boolean): Promise<{ error?: string }> {
+  const supabase = await requireSuperadmin();
+  const { error } = await supabase.rpc("review_commission_payment", { p_id: id, p_approve: approve });
+  if (error) return { error: error.message };
+  revalidatePath("/superadmin/comisiones");
+  return {};
+}
+
 export async function setStoreActive(storeId: string, active: boolean): Promise<{ error?: string }> {
   await requireSuperadmin();
   const admin = createAdminClient();

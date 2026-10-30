@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata, Viewport } from "next";
-import { ExternalLink, LogOut, Settings } from "lucide-react";
+import { ExternalLink, LogOut, Percent, Settings } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { BottomNav } from "@/components/bottom-nav";
 import { themeStyle } from "@/components/theme-vars";
@@ -50,6 +50,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               {SITE_DOMAIN}/{store.slug} <ExternalLink className="size-3" />
             </Link>
           </div>
+          <Link href="/panel/comisiones" className="rounded-xl p-2 text-slate-600 hover:bg-slate-100" aria-label="Comisiones y plan" title="Comisiones y plan">
+            <Percent className="size-5" />
+          </Link>
           <Link href="/panel/ajustes" className="rounded-xl p-2 text-slate-600 hover:bg-slate-100" aria-label="Ajustes">
             <Settings className="size-5" />
           </Link>

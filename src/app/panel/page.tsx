@@ -45,11 +45,13 @@ export default async function PanelHome() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <StatCard label="Total ventas del último mes" value={`${sales} ventas`} tone="brand" />
           <StatCard label="Monto facturado" value={formatMoney(revenue)} />
-          <StatCard
-            label="Comisión del mes"
-            value={formatMoney(commission)}
-            hint={`${(Number(store.commission_rate) * 100).toFixed(1)} % Linki App`}
-          />
+          <Link href="/panel/comisiones" className="block transition hover:opacity-90">
+            <StatCard
+              label="Comisión del mes"
+              value={formatMoney(commission)}
+              hint={`${(Number(store.commission_rate) * 100).toFixed(1)} % Linki App · Ver y pagar`}
+            />
+          </Link>
         </div>
       </section>
 

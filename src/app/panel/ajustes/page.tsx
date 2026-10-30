@@ -22,10 +22,13 @@ export default async function SettingsPage() {
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold">Mi plan</h2>
           <p className="text-sm text-slate-600">
-            {store.plan ? `Plan ${PLANS[store.plan].label}` : "Prueba gratis"} · elige o renueva tu plan y paga desde aquí.
+            {store.plan ? `Plan ${PLANS[store.plan].label}` : "Prueba gratis"} · elige o renueva tu plan, y paga tus comisiones por venta.
           </p>
         </div>
-        <Link href="/suscripcion" className="btn-primary shrink-0">Ver planes</Link>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Link href="/panel/comisiones" className="btn-outline">Comisiones</Link>
+          <Link href="/suscripcion" className="btn-primary">Ver planes</Link>
+        </div>
       </section>
       <section className="card p-5">
         <h2 className="mb-1 text-lg font-bold">Link de tu tienda</h2>

@@ -157,3 +157,8 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - Quitado de la sección de planes el aviso de «15 días de prueba gratis».
 - **Precio en Bs en los productos**: tarjetas, ficha y vista previa muestran el equivalente en Bs debajo del precio.
   Interruptor en Ajustes (`stores.show_bs`, migración `20261030130000_mostrar_bs.sql`, encendido por defecto).
+- **Pago de comisiones** (migración `20261030140000_comisiones.sql`): `commission_payments` + `commission_payment_items`;
+  la tienda paga una, varias o todas (RPC `create_commission_payment`, el monto lo calcula la base) desde `/panel/comisiones`
+  (resumen generado/pagado/en revisión/por pagar, filtro por periodo, pasarela por pasos y su suscripción). El Superadmin
+  aprueba o rechaza en `/superadmin/comisiones` (rechazar devuelve las comisiones a «por pagar») y ve la relación por tienda
+  (RPC `superadmin_billing`).

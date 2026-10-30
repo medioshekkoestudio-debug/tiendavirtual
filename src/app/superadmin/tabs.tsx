@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { href: "/superadmin", label: "Estadísticas y tiendas" },
   { href: "/superadmin/planes", label: "Planes y cobros" },
+  { href: "/superadmin/comisiones", label: "Comisiones" },
   { href: "/superadmin/landing", label: "Editar landing" },
 ];
 

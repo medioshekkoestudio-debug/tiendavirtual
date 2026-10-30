@@ -71,6 +71,24 @@ export type SubscriptionPayment = {
   reviewed_at: string | null;
 };
 
+/** Pago de comisiones de una tienda a Linki App (una, varias o todas sus comisiones por pagar). */
+export type CommissionPayment = {
+  id: string;
+  store_id: string;
+  amount_usd: number;
+  method: PlanPaymentMethodKey;
+  reference: string;
+  receipt_path: string | null;
+  status: PaymentStatus;
+  created_at: string;
+  reviewed_at: string | null;
+};
+
+/** Estado de la comisión de un pedido pagado. */
+export type CommissionState = "por_pagar" | "en_revision" | "pagada";
+
+export type CommissionSummary = { generated: number; paid: number; in_review: number; due: number; due_count: number };
+
 export type Category = {
   id: string;
   store_id: string;

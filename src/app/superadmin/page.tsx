@@ -36,7 +36,7 @@ export default async function SuperadminHome() {
         <StatCard label="Ventas (pagadas)" value={total("sales")} />
         <StatCard label="Monto vendido" value={formatMoney(total("revenue"))} />
         <StatCard label="Productos cargados" value={total("products")} />
-        <StatCard label="Comisión por cobrar" value={formatMoney(total("commission"))} hint="1 % por venta" />
+        <StatCard label="Comisión generada" value={formatMoney(total("commission"))} hint="Lo cobrado y lo adeudado, en Comisiones" />
       </div>
 
       <section className="card overflow-hidden p-0">
@@ -50,7 +50,7 @@ export default async function SuperadminHome() {
                 <th className="px-4 py-2 text-right">Productos</th>
                 <th className="px-4 py-2 text-right">Ventas</th>
                 <th className="px-4 py-2 text-right">Vendido</th>
-                <th className="px-4 py-2 text-right">Comisión adeudada</th>
+                <th className="px-4 py-2 text-right">Comisión generada</th>
                 <th className="px-4 py-2">Creada</th>
                 <th className="px-4 py-2">Estado</th>
               </tr>
