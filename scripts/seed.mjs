@@ -22,7 +22,7 @@ function check(res, label) {
 }
 
 async function ensureUser({ email, password, meta }) {
-  const created = await db.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: meta });
+  const created = await db.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: meta, app_metadata: { origen: "linki", role: meta.role ?? "customer" } });
   if (!created.error) return created.data.user.id;
   const list = check(await db.auth.admin.listUsers({ page: 1, perPage: 1000 }), "listUsers");
   const user = list.users.find((u) => u.email === email);

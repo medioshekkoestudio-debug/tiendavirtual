@@ -1,5 +1,6 @@
 "use server";
 
+import { accountOrigin, allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
 import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -59,6 +60,7 @@ const NEW_RECEIPT_RE = /^nuevos\/[0-9a-f-]{36}\.(jpg|jpeg|png|webp|heic|pdf)$/;
 export async function getNewReceiptUploadUrl(ext: string): Promise<{ error?: string; path?: string; token?: string }> {
   const clean = String(ext ?? "").toLowerCase();
   if (!RECEIPT_EXTS.includes(clean)) return { error: "El comprobante debe ser una imagen o un PDF" };
+  if (!(await allowAttempt("comprobante", 10, 3600))) return { error: TOO_MANY };
   const path = `nuevos/${crypto.randomUUID()}.${clean}`;
   const { data, error } = await createAdminClient().storage.from("payment-receipts").createSignedUploadUrl(path);
   if (error || !data) return { error: "No se pudo preparar la subida del comprobante" };
@@ -70,8 +72,10 @@ export async function getNewReceiptUploadUrl(ext: string): Promise<{ error?: str
  * registra el pago. La cuenta queda bloqueada hasta que el Superadmin apruebe el pago.
  */
 export async function createPlanSignup(fd: FormData): Promise<{ error?: string; step?: "registro"; ok?: boolean }> {
+  if (isBot(fd)) return { error: "No se pudo crear la cuenta", step: "registro" };
   const parsed = parseRegistration(fd);
   if ("error" in parsed) return { error: parsed.error, step: "registro" };
+  if (!(await allowAttempt("registro", 5, 3600))) return { error: TOO_MANY, step: "registro" };
 
   const plan = String(fd.get("plan") ?? "");
   const cycle = String(fd.get("cycle") ?? "");
@@ -94,6 +98,7 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
     password: parsed.data.password,
     email_confirm: true,
     user_metadata: registrationMetadata(parsed.data),
+    app_metadata: accountOrigin("store_owner"),
   });
   if (createError || !created.user) {
     return createError && isDuplicateEmailError(createError.message)

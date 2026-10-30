@@ -1,10 +1,9 @@
 "use server";
 
+import { allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
 import type { Profile } from "@/lib/types";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
@@ -25,6 +24,8 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const password = String(fd.get("password") ?? "");
   const next = safeNext(str(fd, "next"));
   if (!email || !password) return { error: "Ingresa tu email y contraseña" };
+  if (isBot(fd)) return { error: "Email o contraseña incorrectos" };
+  if (!(await allowAttempt("login", 15, 600))) return { error: TOO_MANY };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -42,34 +43,6 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
     redirect(store?.onboarding_completed ? "/panel" : "/onboarding");
   }
   redirect("/");
-}
-
-/** Registro de una empresa: crea usuario + tienda (trigger) con su link linkiapp.com/<slug>. */
-export async function registerStore(_: FormState, fd: FormData): Promise<FormState> {
-  const parsed = parseRegistration(fd);
-  if ("error" in parsed) return { error: parsed.error };
-  const { email, password } = parsed.data;
-
-  const admin = createAdminClient();
-  const { error: createError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: registrationMetadata(parsed.data),
-  });
-  if (createError) {
-    return {
-      error: isDuplicateEmailError(createError.message)
-        ? "Ese email ya está registrado. Inicia sesión."
-        : "No se pudo crear la cuenta: " + createError.message,
-    };
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: "Cuenta creada, pero no se pudo iniciar sesión. Intenta desde Iniciar sesión." };
-  // Nada es gratis: sin cupón, al registrarse sigue a elegir y pagar su plan
-  redirect(safeNext(str(fd, "next")) || "/suscripcion");
 }
 
 export async function signOut(fd: FormData) {

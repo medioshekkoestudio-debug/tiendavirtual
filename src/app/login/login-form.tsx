@@ -1,5 +1,6 @@
 "use client";
 
+import { Honeypot } from "@/components/honeypot";
 import { useActionState } from "react";
 import { login } from "@/app/auth-actions";
 import { FormError } from "@/components/auth-shell";
@@ -8,6 +9,7 @@ export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(login, undefined);
   return (
     <form action={action} className="space-y-4">
+          <Honeypot />
       <input type="hidden" name="next" value={next ?? ""} />
       <div>
         <label className="label" htmlFor="email">Email</label>

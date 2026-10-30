@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { registerStore } from "@/app/auth-actions";
-import { FormError } from "@/components/auth-shell";
+import { useEffect, useRef, useState } from "react";
+import { Honeypot } from "@/components/honeypot";
 import { CedulaInput } from "@/components/cedula-input";
 import { PasswordInput } from "@/components/password-input";
 import { RUBRO_KEYS, RUBROS, SITE_DOMAIN } from "@/lib/constants";
@@ -16,26 +15,13 @@ function previewSlug(name: string) {
     .slice(0, 34);
 }
 
-export function RegisterForm({ next }: { next?: string }) {
-  const [state, action, pending] = useActionState(registerStore, undefined);
-  return (
-    <form action={action} className="space-y-4">
-      <input type="hidden" name="next" value={next ?? ""} />
-      <RegistrationFields />
-      <FormError message={state?.error} />
-      <button className="btn-primary w-full py-3 text-base" disabled={pending}>
-        {pending ? "Creando tu tienda…" : "Registrarme y crear mi tienda"}
-      </button>
-    </form>
-  );
-}
-
 /** Campos del registro de una empresa. Se usan en /registro y en el paso «Datos de registro» de la pasarela de planes. */
 export function RegistrationFields() {
   const [company, setCompany] = useState("");
   const slug = previewSlug(company);
   return (
     <>
+    <Honeypot />
     <div>
       <label className="label" htmlFor="company_name">Nombre de tu empresa</label>
       <input

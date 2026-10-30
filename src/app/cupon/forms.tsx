@@ -1,5 +1,6 @@
 "use client";
 
+import { Honeypot } from "@/components/honeypot";
 import { useActionState, useState } from "react";
 import { Ticket } from "lucide-react";
 import { FormError } from "@/components/auth-shell";
@@ -73,6 +74,7 @@ export function CouponForms({ initial }: { initial: string }) {
 
       {mode === "login" ? (
         <form action={loginAction} className="space-y-4">
+          <Honeypot />
           <CouponField initial={initial} />
           <div>
             <label className="label" htmlFor="email">Email</label>

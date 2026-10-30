@@ -1,5 +1,6 @@
 "use server";
 
+import { accountOrigin, allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { FormState } from "@/app/auth-actions";
@@ -26,8 +27,9 @@ async function redeemAndGo(coupon: string): Promise<FormState> {
 
 async function couponIsValid(coupon: string) {
   if (!coupon) return false;
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("coupon_is_valid", { p_code: coupon });
+  // Probar cupones tiene límite: así no se pueden adivinar a fuerza de intentos
+  if (!(await allowAttempt("cupon", 10, 600))) return false;
+  const { data } = await createAdminClient().rpc("coupon_is_valid", { p_code: coupon });
   return data === true;
 }
 
@@ -35,6 +37,7 @@ async function couponIsValid(coupon: string) {
 export async function redeemCoupon(_: FormState, fd: FormData): Promise<FormState> {
   const { profile } = await getSession();
   if (profile?.role !== "store_owner") return { error: "Inicia sesión con tu tienda" };
+  if (!(await allowAttempt("cupon", 10, 600))) return { error: TOO_MANY };
   return redeemAndGo(code(fd));
 }
 
@@ -45,6 +48,8 @@ export async function loginWithCoupon(_: FormState, fd: FormData): Promise<FormS
   const password = String(fd.get("password") ?? "");
   if (!coupon) return { error: "Escribe tu cupón" };
   if (!email || !password) return { error: "Ingresa tu email y contraseña" };
+  if (isBot(fd)) return { error: "Email o contraseña incorrectos" };
+  if (!(await allowAttempt("login", 15, 600))) return { error: TOO_MANY };
   if (!(await couponIsValid(coupon))) return { error: "Cupón inválido o vencido" };
 
   const supabase = await createClient();
@@ -63,9 +68,11 @@ export async function loginWithCoupon(_: FormState, fd: FormData): Promise<FormS
 export async function registerWithCoupon(_: FormState, fd: FormData): Promise<FormState> {
   const coupon = code(fd);
   if (!coupon) return { error: "Escribe tu cupón" };
+  if (isBot(fd)) return { error: "No se pudo crear la cuenta" };
   if (!(await couponIsValid(coupon))) return { error: "Cupón inválido o vencido" };
   const parsed = parseRegistration(fd);
   if ("error" in parsed) return { error: parsed.error };
+  if (!(await allowAttempt("registro", 5, 3600))) return { error: TOO_MANY };
   const { email, password } = parsed.data;
 
   const admin = createAdminClient();
@@ -74,6 +81,7 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
     password,
     email_confirm: true,
     user_metadata: registrationMetadata(parsed.data),
+    app_metadata: accountOrigin("store_owner"),
   });
   if (createError) {
     return {

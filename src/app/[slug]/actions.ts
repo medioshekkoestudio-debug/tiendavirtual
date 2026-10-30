@@ -1,4 +1,5 @@
 "use server";
+import { accountOrigin, allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
 import { cleanReference, referenceError } from "@/lib/payment-reference";
 
 import { redirect } from "next/navigation";
@@ -25,7 +26,8 @@ async function createCustomerAccount(email: string, password: string, meta: { fu
     email,
     password,
     email_confirm: true,
-    user_metadata: { role: "customer", ...meta },
+    user_metadata: meta,
+    app_metadata: accountOrigin("customer"),
   });
   if (error) {
     return /already|registered|exists/i.test(error.message)
@@ -47,6 +49,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
 
   let accountCreated = false;
   if (!user && input.account) {
+    if (!(await allowAttempt("registro-cliente", 5, 3600))) return { error: TOO_MANY };
     const email = input.account.email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "Email inválido" };
     if (input.account.password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };
@@ -86,6 +89,8 @@ export async function customerLogin(_: AuthState, fd: FormData): Promise<AuthSta
   const slug = String(fd.get("slug") ?? "");
   const email = String(fd.get("email") ?? "").trim().toLowerCase();
   const password = String(fd.get("password") ?? "");
+  if (isBot(fd)) return { error: "Email o contraseña incorrectos" };
+  if (!(await allowAttempt("login", 15, 600))) return { error: TOO_MANY };
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Email o contraseña incorrectos" };
@@ -101,6 +106,8 @@ export async function customerRegister(_: AuthState, fd: FormData): Promise<Auth
   if (!name) return { error: "Escribe tu nombre" };
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "Email inválido" };
   if (password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };
+  if (isBot(fd)) return { error: "No se pudo crear la cuenta" };
+  if (!(await allowAttempt("registro-cliente", 5, 3600))) return { error: TOO_MANY };
 
   const err = await createCustomerAccount(email, password, { full_name: name, phone: String(fd.get("phone") ?? "").trim() });
   if (err) return { error: err };

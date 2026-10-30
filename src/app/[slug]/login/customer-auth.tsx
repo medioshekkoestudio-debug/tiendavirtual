@@ -1,5 +1,6 @@
 "use client";
 
+import { Honeypot } from "@/components/honeypot";
 import { useActionState, useState } from "react";
 import { FormError } from "@/components/auth-shell";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export function CustomerAuth({
 
       {mode === "login" ? (
         <form action={loginAction} className="mt-5 space-y-4">
+          <Honeypot />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="next" value={next} />
           <div>
@@ -56,6 +58,7 @@ export function CustomerAuth({
         </form>
       ) : (
         <form action={regAction} className="mt-5 space-y-4">
+          <Honeypot />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="next" value={next} />
           <div>

@@ -204,3 +204,10 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   (`log_my_activity`, `ActivityTracker`). Inicio del Superadmin dividido en Suscripción / Cupón / Sin plan
   (`superadmin_store_stats` con `segment`), ficha `/superadmin/usuarios/[id]` con datos de registro, actividad y botón de
   WhatsApp (`whatsAppNumber`: 0414… → 58414…).
+- **Seguridad contra bots** (migración `20261031180000_seguridad_registro.sql`): el registro público de Supabase estaba
+  abierto y el disparador confiaba en `user_metadata.role` (así entraron «Ggwmuh LLC» e «Ivihqrcmuc LLC»). Ahora
+  `handle_new_user` rechaza toda cuenta sin `app_metadata.origen = 'linki'` (solo la pone el servidor con
+  `accountOrigin()` en `admin.createUser`) y toma el rol de `app_metadata`. Límite de intentos por IP en la base
+  (`hit_rate_limit`, `lib/guard.ts`) para login, registro, cupones y subida de comprobantes; campo trampa `Honeypot`;
+  `coupon_is_valid` ya no es público; se quitó `registerStore`. Cabeceras de seguridad en `next.config.ts`.
+  Las tiendas de bots y de prueba E2E se borraron (31-10); 3 «Prueba E2E» esperan la migración `20261031170000`.
