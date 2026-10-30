@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/superadmin", label: "Estadísticas y tiendas" },
+  { href: "/superadmin", label: "Tiendas y usuarios" },
   { href: "/superadmin/planes", label: "Planes y cobros" },
   { href: "/superadmin/comisiones", label: "Comisiones" },
   { href: "/superadmin/cupones", label: "Cupones" },
@@ -22,7 +22,7 @@ export function SuperadminTabs() {
           href={t.href}
           className={cn(
             "border-b-2 px-3 py-2 text-sm font-medium transition",
-            pathname === t.href ? "border-brand text-slate-900" : "border-transparent text-slate-500 hover:text-slate-900",
+            (t.href === "/superadmin" ? pathname === t.href || pathname.startsWith("/superadmin/usuarios") : pathname.startsWith(t.href)) ? "border-brand text-slate-900" : "border-transparent text-slate-500 hover:text-slate-900",
           )}
         >
           {t.label}

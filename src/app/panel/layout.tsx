@@ -4,6 +4,7 @@ import { ExternalLink, LogOut, Percent, Settings } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { BottomNav } from "@/components/bottom-nav";
 import { AccessGate } from "@/components/access-gate";
+import { ActivityTracker } from "@/components/activity-tracker";
 import { MarkHasAccount } from "@/components/account-flag";
 import { InstallAppButton } from "@/components/install-app";
 import { NotificationBell, PendingPlanNotice } from "@/components/notifications";
@@ -82,6 +83,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       {!access && planPending && <PendingPlanNotice />}
       <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
       <MarkHasAccount />
+      <ActivityTracker />
       <AccessGate blocked={!access && !planPending} hadCoupon={!!store.coupon_code} />
       <BottomNav
         items={[

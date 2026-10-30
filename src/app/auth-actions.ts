@@ -37,6 +37,7 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   if (next) redirect(next);
   if (profile?.role === "superadmin") redirect("/superadmin");
   if (profile?.role === "store_owner") {
+    await supabase.rpc("log_my_activity", { p_action: "inicio_sesion" });
     const { data: store } = await supabase.from("stores").select("onboarding_completed").eq("owner_id", data.user.id).single();
     redirect(store?.onboarding_completed ? "/panel" : "/onboarding");
   }

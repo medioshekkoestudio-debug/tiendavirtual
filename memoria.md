@@ -197,3 +197,10 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   página. Se guardan borradores de 24 h en el navegador: pasarela de planes (paso, plan, datos de registro sin la
   contraseña, comprobante), compra en la tienda, pago de comisiones, mensaje del chat; el editor de productos queda
   en la URL (`?editar=` / `?nuevo=1`) y reabre con su borrador. Se borran al terminar.
+- **Datos de prueba borrados** (31-10, pedido explícito): los 15 pedidos con sus pagos y los 26 productos. Las fotos de
+  los productos siguen en el storage.
+- **Superadmin por usuario** (migración `20261031160000_actividad_usuarios.sql`): `activity_log` con disparadores
+  (productos, categorías, ajustes, pedidos, pagos, cupones) + inicios de sesión y pantallas visitadas
+  (`log_my_activity`, `ActivityTracker`). Inicio del Superadmin dividido en Suscripción / Cupón / Sin plan
+  (`superadmin_store_stats` con `segment`), ficha `/superadmin/usuarios/[id]` con datos de registro, actividad y botón de
+  WhatsApp (`whatsAppNumber`: 0414… → 58414…).
