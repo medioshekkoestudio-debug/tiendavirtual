@@ -11,7 +11,8 @@ import { themeStyle } from "@/components/theme-vars";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { completeOnboarding } from "@/lib/store-actions";
 import type { Category, Store } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { StoreQr } from "@/components/store-qr";
+import { cn, storeUrl } from "@/lib/utils";
 
 const STEPS = [
   { title: "Imagen de marca", optional: false },
@@ -148,8 +149,9 @@ export function OnboardingWizard({ store, userId, categories }: { store: Store; 
             <CheckCircle2 className="mx-auto size-16 text-emerald-500" />
             <h1 className="mt-4 text-2xl font-bold">¡Tu tienda está lista!</h1>
             <p className="mt-2 text-slate-600">
-              Comparte <span className="font-mono font-semibold text-brand">{link}</span> con tus clientes.
+              Comparte <span className="font-mono font-semibold text-brand">{link}</span> con tus clientes, o descarga tu QR.
             </p>
+            <StoreQr url={storeUrl(store.slug)} name={store.name} slug={store.slug} logoUrl={store.logo_url} color={store.primary_color} className="mt-6" />
             {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
             <button type="button" className="btn-primary mt-6 px-8 py-3 text-base" onClick={finish} disabled={pending}>
               {pending ? "Abriendo…" : "Entrar a mi app"}

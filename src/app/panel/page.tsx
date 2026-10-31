@@ -5,6 +5,7 @@ import { getOwnerStore } from "@/lib/auth";
 import { ORDER_STATUS, PAID_STATUSES } from "@/lib/constants";
 import type { Order, OrderStatus, Product } from "@/lib/types";
 import { ShareStoreWhatsApp } from "@/components/share-whatsapp";
+import { StoreQr } from "@/components/store-qr";
 import { formatDate, formatMoney, storeUrl } from "@/lib/utils";
 
 export default async function PanelHome() {
@@ -41,12 +42,17 @@ export default async function PanelHome() {
 
   return (
     <div className="space-y-8">
-      <section className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-        <div className="min-w-0 flex-1">
-          <h2 className="font-bold">Comparte tu tienda</h2>
-          <p className="text-sm text-slate-600">Envía a tus contactos el link para comprar y descargar la app de {store.name}.</p>
+      <section className="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div>
+            <h2 className="font-bold">Comparte tu tienda</h2>
+            <p className="text-sm text-slate-600">
+              Envía a tus contactos el link para comprar y descargar la app de {store.name}, o descarga tu QR para imprimirlo o subirlo a tus redes.
+            </p>
+          </div>
+          <ShareStoreWhatsApp storeName={store.name} url={storeUrl(store.slug)} />
         </div>
-        <ShareStoreWhatsApp storeName={store.name} url={storeUrl(store.slug)} className="shrink-0" />
+        <StoreQr url={storeUrl(store.slug)} name={store.name} slug={store.slug} logoUrl={store.logo_url} color={store.primary_color} className="shrink-0 sm:w-64" />
       </section>
 
       <section>

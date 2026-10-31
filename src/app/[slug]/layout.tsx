@@ -67,6 +67,7 @@ export default async function StoreLayout({ children, params }: Params & { child
           slug={store.slug}
           name={store.name}
           logoUrl={store.logo_url}
+          color={store.primary_color}
           user={profile ? { name: profile.full_name || profile.email || "Mi cuenta" } : null}
         />
         <main className="mx-auto max-w-3xl">{children}</main>

@@ -2,25 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { LogOut, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { LogOut, QrCode, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { useCart } from "@/components/cart";
 import { InstallAppButton } from "@/components/install-app";
-import { initials } from "@/lib/utils";
+import { Modal } from "@/components/modal";
+import { StoreQr } from "@/components/store-qr";
+import { initials, storeUrl } from "@/lib/utils";
 
 export function StoreTopBar({
   slug,
   name,
   logoUrl,
+  color,
   user,
 }: {
   slug: string;
   name: string;
   logoUrl: string | null;
+  color: string;
   user: { name: string } | null;
 }) {
   const cart = useCart();
   const [menu, setMenu] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const base = `/${slug}`;
 
   return (
@@ -40,6 +45,9 @@ export function StoreTopBar({
         </Link>
 
         <div className="flex items-center justify-end gap-1 sm:gap-2">
+        <button type="button" onClick={() => setQrOpen(true)} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100" aria-label="Compartir tienda" title="Compartir tienda">
+          <QrCode className="size-5" />
+        </button>
         <InstallAppButton appName={name} iconOnly className="text-slate-700" />
 
         <Link href={`${base}/checkout`} className="relative rounded-xl p-2 text-slate-700 hover:bg-slate-100" aria-label="Carrito">
@@ -85,6 +93,10 @@ export function StoreTopBar({
         )}
         </div>
       </div>
+      <Modal open={qrOpen} onClose={() => setQrOpen(false)} title={`Comparte ${name}`}>
+        <p className="mb-4 text-center text-sm text-slate-600">Escanea el código o compártelo con tus amigos.</p>
+        <StoreQr url={storeUrl(slug)} name={name} slug={slug} logoUrl={logoUrl} color={color} />
+      </Modal>
     </header>
   );
 }
