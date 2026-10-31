@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BottomNav } from "@/components/bottom-nav";
 import { CartProvider } from "@/components/cart";
@@ -53,6 +54,15 @@ export default async function StoreLayout({ children, params }: Params & { child
   return (
     <CartProvider storeSlug={store.slug}>
       <div className="min-h-dvh bg-slate-50 pb-24" style={themeStyle(store)}>
+        {/* El dueño que abre su tienda pública la ve como cliente: el aviso lo lleva al panel para administrarla */}
+        {profile?.id === store.owner_id && (
+          <div className="flex items-center justify-center gap-3 bg-slate-900 px-4 py-2 text-sm text-white">
+            <span>Así ven tu tienda tus clientes.</span>
+            <Link href="/panel/tienda" className="shrink-0 rounded-lg bg-white px-3 py-1 font-semibold text-slate-900">
+              Cargar productos
+            </Link>
+          </div>
+        )}
         <StoreTopBar
           slug={store.slug}
           name={store.name}
