@@ -31,6 +31,31 @@ export type StatRow = {
 };
 
 const ORDER: Segment[] = ["suscripcion", "cupon", "sin_plan"];
+
+/** Fecha de calendario en Venezuela (YYYY-MM-DD) desplazada `days` días; el servidor corre en UTC */
+const caracasDay = (d: Date, days = 0) =>
+  new Date(d.getTime() + days * 86_400_000).toLocaleDateString("en-CA", { timeZone: "America/Caracas" });
+
+/** Cuenta registros de hoy, esta semana (desde el lunes) y este mes, y los del período anterior */
+function signupPeriods(dates: string[]) {
+  const now = new Date();
+  const today = caracasDay(now);
+  const weekday = (new Date(today + "T12:00:00Z").getUTCDay() + 6) % 7; // lunes = 0
+  const weekStart = caracasDay(now, -weekday);
+  const prevWeekStart = caracasDay(now, -weekday - 7);
+  const monthStart = today.slice(0, 8) + "01";
+  const prevMonth = new Date(today.slice(0, 8) + "01T12:00:00Z");
+  prevMonth.setUTCMonth(prevMonth.getUTCMonth() - 1);
+  const prevMonthStart = prevMonth.toISOString().slice(0, 10);
+  const days = dates.map((d) => caracasDay(new Date(d)));
+  const count = (from: string, to: string) => days.filter((d) => d >= from && d < to).length;
+  const tomorrow = caracasDay(now, 1);
+  return [
+    { label: "hoy", now: count(today, tomorrow), prevLabel: "Ayer", prev: count(caracasDay(now, -1), today) },
+    { label: "esta semana", now: count(weekStart, tomorrow), prevLabel: "Semana pasada", prev: count(prevWeekStart, weekStart) },
+    { label: "este mes", now: count(monthStart, tomorrow), prevLabel: "Mes pasado", prev: count(prevMonthStart, monthStart) },
+  ];
+}
 type Key = "products" | "sales" | "revenue" | "commission";
 
 export default async function SuperadminHome({ searchParams }: { searchParams: Promise<{ tipo?: string }> }) {
@@ -62,6 +87,13 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
         <StatCard label="Productos cargados" value={sum(all, "products")} />
         <StatCard label="Comisión generada" value={formatMoney(sum(all, "commission"))} hint="Lo cobrado y lo adeudado, en Comisiones" />
       </div>
+
+      {/* Registros de tiendas por día, semana y mes (hora de Venezuela), contra el período anterior */}
+      <section className="grid grid-cols-3 gap-3">
+        {signupPeriods(all.map((r) => r.created_at)).map((p) => (
+          <StatCard key={p.label} label={`Registros ${p.label}`} value={p.now} hint={`${p.prevLabel}: ${p.prev}`} />
+        ))}
+      </section>
 
       {/* Las mismas cifras divididas por tipo de usuario */}
       <section className="grid gap-3 md:grid-cols-3">

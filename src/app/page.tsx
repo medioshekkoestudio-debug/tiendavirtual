@@ -8,6 +8,25 @@ import { PlansSection } from "./plans-section";
 
 const FEATURE_ICONS = ["/landing/icono-marca.png", "/landing/icono-pagos.png", "/landing/icono-pedidos.png"];
 
+// Redes de Linki App (iconos de marca como trazos SVG; lucide no los trae)
+const SOCIAL_LINKS = [
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/linki.app",
+    icon: "M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 2c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.2.8-.4.4-.6.7-.8 1.2-.2.4-.3 1-.4 2.1-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.2.4.4.7.6 1.2.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.2-.8.4-.4.6-.7.8-1.2.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.2-.4-.4-.7-.6-1.2-.8-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 7.4a2.9 2.9 0 1 0 0-5.8 2.9 2.9 0 0 0 0 5.8zm5.7-7.6a1 1 0 1 1-2.1 0 1 1 0 0 1 2.1 0z",
+  },
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/share/1e36PsjfJ2/",
+    icon: "M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z",
+  },
+  {
+    name: "TikTok",
+    href: "https://www.tiktok.com/@linkiapp.com",
+    icon: "M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.8 5.8 0 0 0-.8-.1 5.8 5.8 0 1 0 5.8 5.8V9.1a7.4 7.4 0 0 0 4.3 1.4V7.4s-1.9.1-3.3-1.6z",
+  },
+];
+
 export default async function LandingPage() {
   const c = await getLandingContent();
 
@@ -174,6 +193,23 @@ export default async function LandingPage() {
 
       <footer className="flex flex-col items-center gap-3 border-t py-8 text-center text-sm text-slate-500">
         <Logo className="h-7" />
+        <ul className="flex gap-3">
+          {SOCIAL_LINKS.map((s) => (
+            <li key={s.name}>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${s.name} de Linki App`}
+                className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-brand hover:text-white"
+              >
+                <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden="true">
+                  <path d={s.icon} />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
         {c.footer_text}
       </footer>
     </div>
