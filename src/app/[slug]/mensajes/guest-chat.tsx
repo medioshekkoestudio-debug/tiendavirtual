@@ -5,11 +5,11 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { SendHorizontal } from "lucide-react";
 import { Honeypot } from "@/components/honeypot";
 import type { Message } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { TIME_ZONE, cn } from "@/lib/utils";
 import { getGuestMessages, sendGuestMessage, startGuestChat } from "./guest-actions";
 
 const POLL_MS = 5000;
-const time = (iso: string) => new Date(iso).toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" });
+const time = (iso: string) => new Date(iso).toLocaleTimeString("es-VE", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" });
 
 /** Chat para quien no inició sesión: pide su nombre en el primer mensaje y luego consulta las respuestas cada pocos segundos. */
 export function GuestChat({ storeId, slug, storeName, initialMessages }: { storeId: string; slug: string; storeName: string; initialMessages: Message[] | null }) {

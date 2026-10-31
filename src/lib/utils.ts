@@ -21,9 +21,14 @@ export function formatBs(value: number) {
   return `Bs. ${money.format(value)}`;
 }
 
+/** Las fechas se muestran en hora de Venezuela: el servidor (Vercel) corre en UTC */
+export const TIME_ZONE = "America/Caracas";
+const VE_OFFSET_MS = 4 * 3_600_000; // Venezuela es UTC-4 todo el año (sin horario de verano)
+
 export function formatDate(value: string | null | undefined, withTime = true) {
   if (!value) return "—";
   return new Date(value).toLocaleString("es-VE", {
+    timeZone: TIME_ZONE,
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -33,20 +38,19 @@ export function formatDate(value: string | null | undefined, withTime = true) {
 
 /** Inicio del periodo (día, semana, mes, año) o null para "todo". */
 export function periodStart(period: PeriodKey): Date | null {
-  const now = new Date();
+  // Se calcula sobre el reloj de Venezuela y se devuelve el instante real (medianoche de Caracas)
+  const ve = new Date(Date.now() - VE_OFFSET_MS);
+  const [y, m, d] = [ve.getUTCFullYear(), ve.getUTCMonth(), ve.getUTCDate()];
+  const at = (yy: number, mm: number, dd: number) => new Date(Date.UTC(yy, mm, dd) + VE_OFFSET_MS);
   switch (period) {
     case "dia":
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    case "semana": {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const day = (d.getDay() + 6) % 7; // lunes = 0
-      d.setDate(d.getDate() - day);
-      return d;
-    }
+      return at(y, m, d);
+    case "semana":
+      return at(y, m, d - ((ve.getUTCDay() + 6) % 7)); // lunes = 0
     case "mes":
-      return new Date(now.getFullYear(), now.getMonth(), 1);
+      return at(y, m, 1);
     case "anio":
-      return new Date(now.getFullYear(), 0, 1);
+      return at(y, 0, 1);
     default:
       return null;
   }

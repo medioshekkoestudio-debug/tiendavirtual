@@ -5,10 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SendHorizontal } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Message } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { TIME_ZONE, cn } from "@/lib/utils";
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" });
-const day = (iso: string) => new Date(iso).toLocaleDateString("es-VE", { weekday: "short", day: "numeric", month: "short" });
+const time = (iso: string) => new Date(iso).toLocaleTimeString("es-VE", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" });
+const day = (iso: string) => new Date(iso).toLocaleDateString("es-VE", { timeZone: TIME_ZONE, weekday: "short", day: "numeric", month: "short" });
 
 /** Chat en tiempo real (Supabase Realtime) entre cliente y tienda. */
 export function Chat({

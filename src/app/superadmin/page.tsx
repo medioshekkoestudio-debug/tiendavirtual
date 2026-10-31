@@ -4,7 +4,7 @@ import { StatCard } from "@/components/ui";
 import { getSession } from "@/lib/auth";
 import { SEGMENTS, type Segment } from "@/lib/activity";
 import { RUBROS, SITE_DOMAIN, isRubro } from "@/lib/constants";
-import { cn, formatDate, formatMoney } from "@/lib/utils";
+import { cn, formatDate, formatMoney, periodStart } from "@/lib/utils";
 import { StoreToggle } from "./store-toggle";
 import { WhatsAppUserButton } from "./whatsapp-button";
 
@@ -74,7 +74,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
   const rows = filter ? all.filter((r) => r.segment === filter) : all;
 
   const sum = (list: typeof all, k: Key) => list.reduce((a, r) => a + r[k], 0);
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const monthStart = periodStart("mes")!;
   const newThisMonth = all.filter((r) => new Date(r.created_at) >= monthStart).length;
 
   return (
