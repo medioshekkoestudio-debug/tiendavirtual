@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
-import { PAYMENT_METHODS, PLAN_PAYMENT_METHOD_KEYS, isPlan, isPlanCycle } from "@/lib/constants";
+import { adminLink, notifyAdmin, signupLines } from "@/lib/admin-whatsapp";
+import { PAYMENT_METHODS, PLANS, PLAN_PAYMENT_METHOD_KEYS, isPlan, isPlanCycle, planPrice } from "@/lib/constants";
+import { formatMoney } from "@/lib/utils";
 import { cleanReference, referenceError } from "@/lib/payment-reference";
 import type { PaymentMethodConfig, PlanCycle, PlanKey, PlanPaymentMethodKey } from "@/lib/types";
 
@@ -48,6 +50,13 @@ export async function createSubscriptionPayment(input: {
     receipt_path: receipt,
   });
   if (error) return { error: "No se pudo registrar el pago: " + error.message };
+  notifyAdmin([
+    "💰 *Pago de plan por aprobar*",
+    `Tienda: ${store.name}`,
+    `Plan: ${PLANS[input.plan].label} ${input.cycle} · ${formatMoney(planPrice(input.plan, input.cycle))}`,
+    `Método: ${PAYMENT_METHODS[input.method].label} · Ref. ${reference}`,
+    adminLink("/superadmin/planes"),
+  ]);
   revalidatePath("/suscripcion");
   revalidatePath("/superadmin/planes");
   return { ok: true };
@@ -116,6 +125,14 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
     await admin.auth.admin.deleteUser(userId);
     return { error: "No se pudo registrar el pago: " + error.message };
   }
+  notifyAdmin([
+    ...signupLines(parsed.data, `pasarela de planes`),
+    "",
+    "💰 *Pago de plan por aprobar*",
+    `Plan: ${PLANS[plan].label} ${cycle} · ${formatMoney(planPrice(plan, cycle))}`,
+    `Método: ${PAYMENT_METHODS[method].label} · Ref. ${reference}`,
+    adminLink("/superadmin/planes"),
+  ]);
   revalidatePath("/superadmin/planes");
   return { ok: true };
 }

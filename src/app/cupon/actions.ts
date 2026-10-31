@@ -4,6 +4,7 @@ import { accountOrigin, allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { FormState } from "@/app/auth-actions";
+import { adminLink, notifyAdmin, signupLines } from "@/lib/admin-whatsapp";
 import { getSession } from "@/lib/auth";
 import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -92,6 +93,7 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
   }
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
+  notifyAdmin([...signupLines(parsed.data, `cupón ${coupon}`), adminLink("/superadmin")]);
   if (error) return { error: "Cuenta creada, pero no se pudo iniciar sesión. Intenta desde Iniciar sesión." };
   return redeemAndGo(coupon);
 }
