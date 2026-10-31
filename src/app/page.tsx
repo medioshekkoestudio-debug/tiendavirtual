@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, CreditCard, MessageCircle, Palette, Smartphone } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { PlansSection } from "./plans-section";
 
-const FEATURE_ICONS = [Palette, CreditCard, MessageCircle];
+const FEATURE_ICONS = ["/landing/icono-marca.png", "/landing/icono-pagos.png", "/landing/icono-pedidos.png"];
 
 export default async function LandingPage() {
   const c = await getLandingContent();
@@ -89,15 +89,18 @@ export default async function LandingPage() {
       </section>
 
       {/* Beneficios */}
-      <section id="beneficios" className="bg-slate-50 py-16">
+      <section
+        id="beneficios"
+        className="bg-[#8dc21f] bg-cover bg-center py-16"
+        style={{ backgroundImage: "url(/landing/beneficios-fondo.png)" }}
+      >
         <div className="mx-auto grid max-w-6xl gap-6 px-4 md:grid-cols-3">
           {c.features.map((f, i) => {
-            const Icon = FEATURE_ICONS[i % FEATURE_ICONS.length]!;
+            const icon = FEATURE_ICONS[i % FEATURE_ICONS.length]!;
             return (
-              <div key={i} className="card p-6">
-                <span className="grid size-11 place-items-center rounded-xl bg-brand/10 text-brand">
-                  <Icon className="size-6" />
-                </span>
+              <div key={i} className="rounded-2xl bg-white p-6 shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={icon} alt="" className="size-16" />
                 <h3 className="mt-4 text-lg font-bold">{f.title}</h3>
                 <p className="mt-2 text-slate-600">{f.text}</p>
               </div>
@@ -130,16 +133,40 @@ export default async function LandingPage() {
 
       {/* Botón grande */}
       <section className="px-4 pb-20">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-slate-900 px-6 py-12 text-center text-white">
-          <Smartphone className="mx-auto size-10 text-brand" />
-          <h2 className="mt-4 text-2xl font-bold md:text-3xl">Tu tienda, como app, lista hoy</h2>
+        <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-brand-2 px-6 pb-12 pt-8 text-center text-white">
+          {/* Patrón de links detrás de Linkito, desvanecido hacia los bordes */}
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[70%] w-full text-white/10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"
+          >
+            <defs>
+              <pattern id="cta-links" width="200" height="90" patternUnits="userSpaceOnUse">
+                <g fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round">
+                  <path d="M60 15H45a30 30 0 0 0 0 60h15M140 15h15a30 30 0 0 1 0 60h-15" />
+                  <path d="M70 45h40m-14-14 14 14-14 14" />
+                </g>
+                <g fill="currentColor">
+                  <circle cx="125" cy="45" r="6" />
+                  <circle cx="142" cy="45" r="6" />
+                </g>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#cta-links)" />
+          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/landing/linkito-telefono.png"
+            alt="Linkito mostrando una tienda en el teléfono"
+            className="relative mx-auto w-full max-w-sm"
+          />
+          <h2 className="relative mt-4 text-2xl font-bold md:text-3xl">Tu tienda, como app, lista hoy</h2>
           <Link
             href="/suscripcion"
-            className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-5 text-lg font-bold text-white shadow-lg shadow-brand/40 transition hover:scale-[1.02] md:text-xl"
+            className="relative mt-8 inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-5 text-lg font-bold text-white shadow-lg shadow-brand/40 transition hover:scale-[1.02] md:text-xl"
           >
             {c.cta_text} <ArrowRight className="size-6" />
           </Link>
-          <p className="mt-4 text-sm text-white/60">
+          <p className="relative mt-4 text-sm text-white/60">
             ¿Ya tienes tienda? <Link href="/login" className="underline">Inicia sesión</Link>
           </p>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { COLOR_PRESETS, SLIDER_HINT, SLIDER_SLOTS } from "@/lib/constants";
+import { paletteFromLogo } from "@/lib/logo-colors";
 import { saveBranding } from "@/lib/store-actions";
 import type { Store } from "@/lib/types";
 import { FontPicker } from "./font-picker";
@@ -40,6 +41,20 @@ export function BrandingForm({
     setForm((f) => ({ ...f, [k]: v }));
   };
 
+  const [fromLogo, setFromLogo] = useState<"ok" | "error" | null>(null);
+
+  async function applyLogoColors(url: string) {
+    try {
+      const p = await paletteFromLogo(url);
+      if (!p) return setFromLogo("error");
+      setSaved(false);
+      setForm((f) => ({ ...f, primary_color: p.primary, secondary_color: p.secondary, accent_color: p.accent }));
+      setFromLogo("ok");
+    } catch {
+      setFromLogo("error");
+    }
+  }
+
   function submit() {
     setError(null);
     startTransition(async () => {
@@ -58,7 +73,10 @@ export function BrandingForm({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           <ImageUpload
             value={form.logo_url}
-            onChange={(u) => set("logo_url", u)}
+            onChange={(u) => {
+              set("logo_url", u);
+              if (u) void applyLogoColors(u);
+            }}
             userId={userId}
             folder="logo"
             className="size-28 shrink-0"
@@ -74,7 +92,28 @@ export function BrandingForm({
 
       <section className="space-y-3">
         <h3 className="text-lg font-bold">Colores de tu app</h3>
+        {fromLogo === "ok" && (
+          <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            Tomamos los colores de tu logo. Puedes cambiarlos abajo antes de guardar.
+          </p>
+        )}
+        {fromLogo === "error" && (
+          <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-700">
+            No pudimos leer los colores de tu logo. Elige una paleta o tus colores abajo.
+          </p>
+        )}
         <div className="flex flex-wrap gap-2">
+          {form.logo_url && (
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-full border border-brand bg-white py-1 pl-1 pr-3 text-xs font-medium text-brand hover:bg-brand/5"
+              onClick={() => applyLogoColors(form.logo_url!)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={form.logo_url} alt="" className="size-5 rounded-full object-contain" />
+              Colores de mi logo
+            </button>
+          )}
           {COLOR_PRESETS.map((p) => (
             <button
               key={p.name}

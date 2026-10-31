@@ -211,3 +211,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   (`hit_rate_limit`, `lib/guard.ts`) para login, registro, cupones y subida de comprobantes; campo trampa `Honeypot`;
   `coupon_is_valid` ya no es público; se quitó `registerStore`. Cabeceras de seguridad en `next.config.ts`.
   Las tiendas de bots y de prueba E2E se borraron (31-10); 3 «Prueba E2E» esperan la migración `20261031170000`.
+- **Pendiente de seguridad (seguir el 30-10)**:
+  - migración `20261031200000_anti_inyeccion.sql` escrita, SIN probar ni subir: limpia URLs de imágenes y colores al
+    guardar y quita SVG del bucket público; antes de subir, revisar que los datos actuales cumplan las reglas;
+  - CSP con nonce en `middleware.ts` (script-src con nonce, forzar render dinámico) y probarla con un build en otra
+    carpeta (no pisar el `.next` del dev);
+  - Cloudflare Turnstile en pasarela, cupón, login y registro de clientes (faltan las claves; la secreta va en Vercel);
+  - escribir `seguridad.md` con todo lo hecho y lo pendiente;
+  - Cloudflare: registros en DNS only y cambiar los nameservers (hoy siguen los de Vercel). www.linkiapp.com ya redirige.
+  - Ya hecho: `NEXT_PUBLIC_SITE_URL` = https://linkiapp.com en Production; registro público de Supabase apagado.

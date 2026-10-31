@@ -49,8 +49,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     .eq("status", "pendiente");
 
   return (
-    <div className="font-brand min-h-dvh bg-slate-50 pb-24" style={themeStyle(store)}>
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div className="font-brand min-h-dvh bg-slate-50 pb-24 lg:pb-10" style={themeStyle(store)}>
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur lg:pl-56">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2.5">
           {store.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -81,11 +81,14 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         </div>
       </header>
       {!access && planPending && <PendingPlanNotice />}
-      <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
+      <div className="lg:pl-56">
+        <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
+      </div>
       <MarkHasAccount />
       <ActivityTracker />
       <AccessGate blocked={!access && !planPending} hadCoupon={!!store.coupon_code} />
       <BottomNav
+        side
         items={[
           { href: "/panel", label: "Inicio", icon: "home", exact: true },
           { href: "/panel/tienda", label: "Tienda", icon: "store" },

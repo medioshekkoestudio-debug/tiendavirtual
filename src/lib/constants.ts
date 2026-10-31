@@ -178,7 +178,7 @@ export const PLANS: Record<
     recommended: true,
     intro: "Todo lo del Plan Emprendedor, más:",
     features: [
-      "Dominio personalizado (ej. tutienda.com.ve)",
+      "Link personalizado con el nombre de tu tienda (ej. linkiapp.com/tutienda)",
       "Reportes y estadísticas básicas de visitas y ventas",
       "Soporte técnico prioritario",
     ],
