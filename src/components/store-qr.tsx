@@ -73,7 +73,10 @@ export function StoreQr({
   logoUrl,
   color,
   className,
+  shareText,
 }: {
+  /** Texto al compartir; por defecto invita a comprar en la tienda */
+  shareText?: string;
   url: string;
   name: string;
   slug: string;
@@ -113,7 +116,7 @@ export function StoreQr({
 
   async function share() {
     setNote(null);
-    const text = `Conoce ${name}: compra desde tu teléfono y descarga su app aquí`;
+    const text = shareText ?? `Conoce ${name}: compra desde tu teléfono y descarga su app aquí`;
     const blob = await toBlob();
     const file = blob ? new File([blob], `qr-${slug}.png`, { type: "image/png" }) : null;
     try {

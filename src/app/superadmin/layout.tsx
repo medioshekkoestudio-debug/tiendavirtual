@@ -4,6 +4,7 @@ import { LogOut, ShieldCheck } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { Logo } from "@/components/logo";
 import { getSession } from "@/lib/auth";
+import { LinkiQr } from "./linki-qr";
 import { SuperadminTabs } from "./tabs";
 
 export const metadata = { title: "Superadmin" };
@@ -24,7 +25,8 @@ export default async function SuperadminLayout({ children }: { children: React.R
             </p>
             <p className="truncate text-xs text-slate-500">{profile.email}</p>
           </div>
-          <Link href="/" target="_blank" className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100">Ver landing</Link>
+          <LinkiQr />
+          <Link href="/" target="_blank" className="hidden whitespace-nowrap rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 sm:block">Ver landing</Link>
           <form action={signOut}>
             <input type="hidden" name="next" value="/login" />
             <button className="rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Cerrar sesión">
