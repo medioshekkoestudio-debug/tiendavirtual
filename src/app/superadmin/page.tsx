@@ -3,10 +3,13 @@ import { ChevronRight } from "lucide-react";
 import { StatCard } from "@/components/ui";
 import { getSession } from "@/lib/auth";
 import { SEGMENTS, type Segment } from "@/lib/activity";
-import { RUBROS, SITE_DOMAIN, isRubro } from "@/lib/constants";
+import { RUBROS, SITE_DOMAIN, isPlan, isRubro } from "@/lib/constants";
 import { cn, formatDate, formatMoney, periodStart } from "@/lib/utils";
 import { INACTIVE_FILTERS, STAGES, daysInactive, inactiveTone, stageDates, stageIndex, type Journey } from "@/lib/journey";
+import { SitePlanSelect } from "./site-plan-select";
 import { StoreToggle } from "./store-toggle";
+import { siteTier } from "@/lib/site";
+import type { PlanKey } from "@/lib/types";
 import { WhatsAppUserButton } from "./whatsapp-button";
 
 export type StatRow = {
@@ -65,10 +68,12 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
   const filter = ORDER.find((s) => s === sp.tipo);
   const stageFilter = STAGES.findIndex((s) => s.key === sp.etapa);
   const inactiveFilter = INACTIVE_FILTERS.find((d) => String(d) === sp.inactivas);
-  const [{ data, error }, { data: journeyData, error: journeyError }] = await Promise.all([
+  const [{ data, error }, { data: journeyData, error: journeyError }, { data: sitePlans }] = await Promise.all([
     supabase.rpc("superadmin_store_stats"),
     supabase.rpc("superadmin_user_journey"),
+    supabase.from("stores").select("id, site_plan"),
   ]);
+  const sitePlanById = new Map(((sitePlans ?? []) as { id: string; site_plan: PlanKey | null }[]).map((s) => [s.id, s.site_plan]));
   const journeys = new Map(((journeyData ?? []) as Journey[]).map((j) => [j.store_id, { ...j, orders: Number(j.orders) }]));
   const all = ((data ?? []) as StatRow[]).map((r) => {
     const products = Number(r.products);
@@ -80,6 +85,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
       sales: Number(r.sales),
       revenue: Number(r.revenue),
       commission: Number(r.commission),
+      sitePlan: siteTier({ plan: isPlan(r.plan) ? r.plan : null, plan_expires_at: r.plan_expires_at, site_plan: sitePlanById.get(r.store_id) ?? null }),
       stage: stageIndex(journey, products),
       stageDates: stageDates(journey, r.created_at),
       inactive: daysInactive(r.last_activity, r.created_at),
@@ -259,6 +265,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
                   <td className="px-4 py-3">
                     <span className={cn("chip whitespace-nowrap", SEGMENTS[r.segment].className)}>{SEGMENTS[r.segment].label}</span>
                     {r.segment === "cupon" && r.coupon_code && <p className="mt-1 font-mono text-xs text-slate-500">{r.coupon_code}</p>}
+                    <SitePlanSelect storeId={r.store_id} value={r.sitePlan} />
                   </td>
                   <td className="px-4 py-3">
                     <span className={cn("chip whitespace-nowrap", STAGES[r.stage]!.className)}>{STAGES[r.stage]!.stuck}</span>

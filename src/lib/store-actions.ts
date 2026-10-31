@@ -5,6 +5,7 @@ import { getActiveOwnerStore } from "./auth";
 import { FONT_OPTIONS } from "./font-options";
 import { PAYMENT_METHOD_KEYS, isRubro } from "./constants";
 import { cleanMethodConfig } from "./payment-details";
+import { GALLERY_SLOTS, HIGHLIGHT_SLOTS, TESTIMONIAL_SLOTS, VALUE_SLOTS, safeImage, type SiteContent } from "./site";
 import type { OrderStatus, PaymentMethodConfig, PaymentMethodKey } from "./types";
 
 export type ActionResult = { error?: string; ok?: boolean; id?: string };
@@ -255,5 +256,37 @@ export async function saveOwnerPhone(phone: string): Promise<ActionResult> {
   if (digits.length < 10 || digits.length > 15) return { error: "Escribe un teléfono válido, por ejemplo 0414-1234567" };
   const { error } = await supabase.from("profiles").update({ phone: value }).eq("id", user.id);
   if (error) return { error: "No se pudo guardar" };
+  return done();
+}
+
+// ------------------------------------------------------------------ Página web (planes Pro y Business)
+export async function saveSiteContent(input: SiteContent): Promise<ActionResult> {
+  const { supabase, store } = await getActiveOwnerStore();
+  const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const pairs = (list: unknown, slots: number) =>
+    (Array.isArray(list) ? list : []).slice(0, slots).map((x) => ({ title: text(x?.title, 60), text: text(x?.text, 240) }));
+  const content: SiteContent = {
+    hero_title: text(input.hero_title, 80),
+    hero_subtitle: text(input.hero_subtitle, 220),
+    hero_image: safeImage(input.hero_image),
+    highlights: pairs(input.highlights, HIGHLIGHT_SLOTS),
+    about_title: text(input.about_title, 60),
+    about_text: text(input.about_text, 3000),
+    about_image: safeImage(input.about_image),
+    mission: text(input.mission, 400),
+    vision: text(input.vision, 400),
+    values: pairs(input.values, VALUE_SLOTS),
+    gallery: (Array.isArray(input.gallery) ? input.gallery : []).map(safeImage).filter((u): u is string => !!u).slice(0, GALLERY_SLOTS),
+    testimonials: (Array.isArray(input.testimonials) ? input.testimonials : [])
+      .slice(0, TESTIMONIAL_SLOTS)
+      .map((t) => ({ name: text(t?.name, 60), text: text(t?.text, 400) })),
+    whatsapp: text(input.whatsapp, 30),
+    instagram: text(input.instagram, 80),
+    address: text(input.address, 200),
+    hours: text(input.hours, 120),
+  };
+  const { error } = await supabase.from("stores").update({ site_content: content }).eq("id", store.id);
+  if (error) return { error: error.message };
+  revalidatePath(`/${store.slug}`, "layout");
   return done();
 }

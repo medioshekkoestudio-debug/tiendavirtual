@@ -54,6 +54,8 @@ export function StorefrontHome({
   categories,
   linkBase,
   bsRate,
+  hideIntro,
+  title,
 }: {
   store: Pick<Store, "name" | "description" | "slider_images">;
   products: Product[];
@@ -62,6 +64,10 @@ export function StorefrontHome({
   linkBase?: string;
   /** Tasa BCV para mostrar el precio en Bs; null si la tienda lo desactivó o no hay tasa */
   bsRate?: number | null;
+  /** Sin slider ni descripción: la página ya tiene su propia presentación (planes Pro y Business) */
+  hideIntro?: boolean;
+  /** Título de la página para lectores de pantalla (Business: el catálogo es una página aparte) */
+  title?: string;
 }) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string | null>(null);
@@ -78,10 +84,11 @@ export function StorefrontHome({
     .filter((g) => g.items.length > 0);
 
   return (
-    <div className="pb-4">
-      <StoreSlider images={store.slider_images} storeName={store.name} />
+    <div id="catalogo" className="scroll-mt-14 pb-4">
+      {title && <h1 className="sr-only">{title}</h1>}
+      {!hideIntro && <StoreSlider images={store.slider_images} storeName={store.name} />}
 
-      {store.description && (
+      {!hideIntro && store.description && (
         <section className="px-4 pt-5">
           {/* El nombre ya se ve en la barra superior: aquí solo queda para lectores de pantalla */}
           <h1 className="sr-only">{store.name}</h1>

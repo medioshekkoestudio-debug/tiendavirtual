@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Home, MessageCircle, Package, ShoppingBag, Store } from "lucide-react";
+import { CreditCard, Home, MessageCircle, Package, ShoppingBag, Store, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ICONS = { home: Home, store: Store, payments: CreditCard, orders: Package, messages: MessageCircle, bag: ShoppingBag };
+const ICONS = { home: Home, store: Store, payments: CreditCard, orders: Package, messages: MessageCircle, bag: ShoppingBag, info: Info };
 export type NavIcon = keyof typeof ICONS;
 
 type NavItem = { href: string; label: string; icon: NavIcon; badge?: number; exact?: boolean };

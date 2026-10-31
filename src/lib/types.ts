@@ -40,6 +40,8 @@ export type Store = {
   accent_color: string;
   font_key: string;
   slider_images: string[];
+  /** Textos e imágenes de la página web (Pro y Business); lo vacío usa lo sugerido, ver lib/site.ts */
+  site_content: import("./site").SiteContent;
   payment_methods: Partial<Record<PaymentMethodKey, PaymentMethodConfig>>;
   commission_rate: number;
   onboarding_step: number;
@@ -49,6 +51,8 @@ export type Store = {
   plan: PlanKey | null;
   plan_cycle: PlanCycle | null;
   plan_expires_at: string | null;
+  /** Plan con el que se ve su página (pago aprobado, cupón o Superadmin); null = el plan pagado vigente */
+  site_plan: PlanKey | null;
   trial_ends_at: string | null;
   /** Último cupón canjeado; trial_ends_at es hasta cuándo dura su acceso */
   coupon_code: string | null;

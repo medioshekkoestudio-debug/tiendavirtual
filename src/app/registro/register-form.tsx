@@ -49,6 +49,17 @@ export function RegistrationFields() {
       <p className="mt-1.5 text-xs text-slate-500">Te sugeriremos categorías según tu rubro. Puedes cambiarlo luego en Ajustes.</p>
     </div>
     <div>
+      <label className="label" htmlFor="description">Describe tu empresa</label>
+      <textarea
+        id="description"
+        name="description"
+        maxLength={2000}
+        className="input min-h-24"
+        placeholder="Ej.: Somos una panadería familiar en Valencia. Horneamos pan artesanal y tortas por encargo desde 2015."
+      />
+      <p className="mt-1.5 text-xs text-slate-500">Con este texto armamos tu página: la presentación y la sección «Quiénes somos». Podrás editarlo luego.</p>
+    </div>
+    <div>
       <label className="label" htmlFor="full_name">Nombre y apellido del responsable</label>
       <input id="full_name" name="full_name" required className="input" autoComplete="name" />
     </div>

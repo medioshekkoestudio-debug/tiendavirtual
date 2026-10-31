@@ -5,6 +5,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { CartProvider } from "@/components/cart";
 import { themeStyle } from "@/components/theme-vars";
 import { getSession } from "@/lib/auth";
+import { siteTier } from "@/lib/site";
 import { getStoreBySlug } from "@/lib/storefront";
 import { StoreTopBar } from "./top-bar";
 
@@ -51,10 +52,18 @@ export default async function StoreLayout({ children, params }: Params & { child
 
   const { profile } = await getSession();
   const base = `/${store.slug}`;
+  // Business es una página web: Inicio, Tienda y Nosotros además de las compras y los mensajes
+  const business = siteTier(store) === "business";
+  const pages = business
+    ? [
+        { href: `${base}/tienda`, label: "Tienda", icon: "store" as const },
+        { href: `${base}/nosotros`, label: "Nosotros", icon: "info" as const },
+      ]
+    : [];
 
   return (
     <CartProvider storeSlug={store.slug}>
-      <div className="min-h-dvh bg-slate-50 pb-24" style={themeStyle(store)}>
+      <div className="min-h-dvh overflow-x-clip bg-slate-50 pb-24" style={themeStyle(store)}>
         {/* El dueño que abre su tienda pública la ve como cliente: el aviso lo lleva al panel para administrarla */}
         {profile?.id === store.owner_id && (
           <div className="flex items-center justify-center gap-3 bg-slate-900 px-4 py-2 text-sm text-white">
@@ -69,12 +78,14 @@ export default async function StoreLayout({ children, params }: Params & { child
           name={store.name}
           logoUrl={store.logo_url}
           color={store.primary_color}
+          links={business ? [{ href: base, label: "Inicio" }, ...pages] : undefined}
           user={profile ? { name: profile.full_name || profile.email || "Mi cuenta" } : null}
         />
         <main className="mx-auto max-w-3xl">{children}</main>
         <BottomNav
           items={[
             { href: base, label: "Inicio", icon: "home", exact: true },
+            ...pages,
             { href: `${base}/compras`, label: "Mis compras", icon: "bag" },
             { href: `${base}/mensajes`, label: "Mensajes", icon: "messages" },
           ]}

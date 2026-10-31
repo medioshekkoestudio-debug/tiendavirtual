@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { PLAN_PAYMENT_METHOD_KEYS } from "@/lib/constants";
+import { PLAN_PAYMENT_METHOD_KEYS, isPlan } from "@/lib/constants";
 import { cleanMethodConfig } from "@/lib/payment-details";
 import type { LandingContent, PaymentMethodConfig, PlanPaymentMethodKey } from "@/lib/types";
 
@@ -101,17 +101,30 @@ export async function setStoreActive(storeId: string, active: boolean): Promise<
 const COUPON_RE = /^[A-Za-z0-9_-]{3,40}$/;
 
 /** Crea (sin id) o edita un cupón: código, días de acceso y si está activo. Los días nuevos no cambian a quien ya lo canjeó. */
-export async function saveCoupon(input: { id?: string; code: string; free_days: number; active: boolean }): Promise<{ error?: string; ok?: boolean }> {
+export async function saveCoupon(input: { id?: string; code: string; free_days: number; active: boolean; plan: string | null }): Promise<{ error?: string; ok?: boolean }> {
   const supabase = await requireSuperadmin();
   const code = String(input.code ?? "").trim();
   const days = Math.trunc(Number(input.free_days));
   if (!COUPON_RE.test(code)) return { error: "El código debe tener de 3 a 40 letras, números, guiones o _ (sin espacios)" };
   if (!Number.isFinite(days) || days < 1 || days > 3650) return { error: "Los días deben ser entre 1 y 3650" };
-  const row = { code, free_days: days, active: Boolean(input.active), updated_at: new Date().toISOString() };
+  // Plan con el que se verá la página de quien lo canjee (null = no lo cambia)
+  const row = { code, free_days: days, active: Boolean(input.active), plan: isPlan(input.plan) ? input.plan : null, updated_at: new Date().toISOString() };
   const { error } = input.id
     ? await supabase.from("coupons").update(row).eq("id", input.id)
     : await supabase.from("coupons").insert(row);
   if (error) return { error: error.code === "23505" ? "Ya existe un cupón con ese código" : error.message };
   revalidatePath("/superadmin/cupones");
   return { ok: true };
+}
+
+/** Plan con el que se ve la página de la tienda (diseño y secciones), aparte del plan que pagó o del cupón */
+export async function setStoreSitePlan(storeId: string, plan: string): Promise<{ error?: string }> {
+  await requireSuperadmin();
+  if (!isPlan(plan)) return { error: "Plan inválido" };
+  const admin = createAdminClient();
+  const { data, error } = await admin.from("stores").update({ site_plan: plan }).eq("id", storeId).select("slug").single();
+  if (error) return { error: error.message };
+  revalidatePath("/superadmin");
+  revalidatePath(`/${data.slug}`, "layout");
+  return {};
 }

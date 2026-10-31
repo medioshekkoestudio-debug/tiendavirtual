@@ -6,6 +6,7 @@ export type Registration = {
   email: string;
   password: string;
   industry: string;
+  description: string;
   cedula: string;
   phone: string;
 };
@@ -19,6 +20,7 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
     email: str("email").toLowerCase(),
     password: String(fd.get("password") ?? ""),
     industry: str("industry"),
+    description: str("description").slice(0, 2000),
     cedula: str("cedula").toUpperCase().replace(/\s+/g, "").slice(0, 20),
     phone: str("phone").slice(0, 30),
   };
@@ -35,7 +37,7 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
 }
 
 export function registrationMetadata(r: Registration) {
-  return { role: "store_owner", full_name: r.fullName, company_name: r.company, industry: r.industry, cedula: r.cedula, phone: r.phone };
+  return { role: "store_owner", full_name: r.fullName, company_name: r.company, industry: r.industry, description: r.description, cedula: r.cedula, phone: r.phone };
 }
 
 export function isDuplicateEmailError(message: string) {

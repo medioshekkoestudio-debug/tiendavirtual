@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Eye, EyeOff, Minus, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
+import { ChevronRight, ExternalLink, Eye, EyeOff, LayoutTemplate, Minus, Pencil, Plus, Search, Settings2, Trash2 } from "lucide-react";
 import { CategoryManager } from "@/components/category-manager";
 import { Modal } from "@/components/modal";
 import { ProductForm } from "@/components/product-form";
@@ -115,6 +115,17 @@ export function StoreManager({
           <ExternalLink className="size-4" />
         </Link>
       </div>
+
+      <Link href="/panel/pagina" className="flex items-center gap-3 rounded-2xl border border-brand/30 bg-brand/5 p-4 transition hover:bg-brand/10">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand text-on-brand">
+          <LayoutTemplate className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">Mi página web</span>
+          <span className="block text-sm text-slate-600">Portada, «Quiénes somos», contacto y más secciones según tu plan.</span>
+        </span>
+        <ChevronRight className="size-5 text-slate-400" />
+      </Link>
 
       {view === "cliente" ? (
         <div className="mx-auto max-w-sm overflow-hidden rounded-[2rem] border-8 border-slate-800 bg-slate-50 shadow-xl">

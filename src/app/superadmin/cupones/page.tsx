@@ -6,13 +6,13 @@ export const metadata = { title: "Cupones" };
 /** Cupones de acceso: código, días de acceso y cuántas tiendas lo usaron */
 export default async function CouponsPage() {
   const { supabase } = await getSession();
-  const { data, error } = await supabase.from("coupons").select("id, code, free_days, active, created_at").order("created_at");
+  const { data, error } = await supabase.from("coupons").select("*").order("created_at");
   const coupons = (data ?? []) as Omit<CouponRow, "uses">[];
   // Conteo por cupón con head+count (los agregados de PostgREST están apagados)
   const counts = await Promise.all(
     coupons.map((c) => supabase.from("coupon_redemptions").select("store_id", { count: "exact", head: true }).eq("coupon_id", c.id)),
   );
-  const rows: CouponRow[] = coupons.map((c, i) => ({ ...c, uses: counts[i].count ?? 0 }));
+  const rows: CouponRow[] = coupons.map((c, i) => ({ ...c, plan: c.plan ?? null, uses: counts[i].count ?? 0 }));
 
   return (
     <div className="space-y-4">
