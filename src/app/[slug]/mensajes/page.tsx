@@ -1,10 +1,12 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Chat } from "@/components/chat";
 import { getSession } from "@/lib/auth";
 import { getStoreBySlug } from "@/lib/storefront";
 import type { Message } from "@/lib/types";
 import { initials } from "@/lib/utils";
-import { LoginPrompt } from "../login-prompt";
+import { getGuestMessages } from "./guest-actions";
+import { GuestChat } from "./guest-chat";
 
 export const metadata = { title: "Mensajes" };
 
@@ -13,10 +15,40 @@ export default async function CustomerMessagesPage({ params }: { params: Promise
   const store = await getStoreBySlug(slug);
   if (!store) notFound();
   const { supabase, user } = await getSession();
-  if (!user) return <LoginPrompt slug={store.slug} next={`/${store.slug}/mensajes`} text={`Inicia sesión para escribirle a ${store.name}.`} />;
+  const header = (
+    <div className="flex items-center gap-3 border-b bg-white px-4 py-2.5">
+      {store.logo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={store.logo_url} alt="" className="size-9 rounded-full object-contain" />
+      ) : (
+        <span className="grid size-9 place-items-center rounded-full bg-brand text-sm font-bold text-on-brand">{initials(store.name)}</span>
+      )}
+      <div>
+        <p className="font-brand font-semibold leading-tight">{store.name}</p>
+        <p className="text-xs text-slate-500">Normalmente responde en el día</p>
+      </div>
+    </div>
+  );
+
+  if (!user) {
+    return (
+      <div className="flex h-[calc(100dvh-3.5rem-6rem)] flex-col bg-slate-100">
+        {header}
+        <GuestChat storeId={store.id} slug={store.slug} storeName={store.name} initialMessages={await getGuestMessages(store.id)} />
+      </div>
+    );
+  }
 
   if (user.id === store.owner_id) {
-    return <p className="px-4 py-10 text-center text-slate-600">Eres el dueño de esta tienda: responde a tus clientes desde tu panel.</p>;
+    return (
+      <div className="px-4 py-10 text-center">
+        <p className="text-slate-600">Eres el dueño de esta tienda: responde a tus clientes y carga tus productos desde tu panel.</p>
+        <div className="mt-5 flex flex-col gap-2">
+          <Link href="/panel/mensajes" className="btn-primary">Ir a mis mensajes</Link>
+          <Link href="/panel/tienda" className="btn-outline">Cargar productos</Link>
+        </div>
+      </div>
+    );
   }
 
   const { data: conversationId, error } = await supabase.rpc("get_or_create_conversation", { p_store: store.id });
@@ -30,18 +62,7 @@ export default async function CustomerMessagesPage({ params }: { params: Promise
 
   return (
     <div className="flex h-[calc(100dvh-3.5rem-6rem)] flex-col bg-slate-100">
-      <div className="flex items-center gap-3 border-b bg-white px-4 py-2.5">
-        {store.logo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={store.logo_url} alt="" className="size-9 rounded-full object-contain" />
-        ) : (
-          <span className="grid size-9 place-items-center rounded-full bg-brand text-sm font-bold text-on-brand">{initials(store.name)}</span>
-        )}
-        <div>
-          <p className="font-brand font-semibold leading-tight">{store.name}</p>
-          <p className="text-xs text-slate-500">Normalmente responde en el día</p>
-        </div>
-      </div>
+      {header}
       <Chat
         className="min-h-0 flex-1"
         conversationId={conversationId as string}

@@ -58,7 +58,7 @@ export function Chat({
       .from("messages")
       .update({ read_at: new Date().toISOString() })
       .eq("conversation_id", conversationId)
-      .neq("sender_id", currentUserId)
+      .or(`sender_id.is.null,sender_id.neq.${currentUserId}`) // null = mensaje de un invitado
       .is("read_at", null)
       .then(() => {});
   }, [messages, conversationId, currentUserId, supabase]);

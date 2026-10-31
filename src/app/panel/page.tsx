@@ -34,7 +34,7 @@ export default async function PanelHome() {
         .from("messages")
         .select("id,conversation_id,body,created_at,sender_id,read_at")
         .in("conversation_id", [...convNames.keys()])
-        .neq("sender_id", user.id)
+        .or(`sender_id.is.null,sender_id.neq.${user.id}`) // null = mensaje de un invitado
         .order("created_at", { ascending: false })
         .limit(4)
     : { data: [] };

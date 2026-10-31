@@ -36,7 +36,14 @@ export default async function PanelMessagesPage({ searchParams }: { searchParams
             <ArrowLeft className="size-5" />
           </Link>
           <span className="grid size-9 place-items-center rounded-full bg-brand/15 text-sm font-bold text-brand">{initials(active.customer_name)}</span>
-          <p className="font-semibold">{active.customer_name ?? "Cliente"}</p>
+          <div className="min-w-0">
+            <p className="font-semibold leading-tight">{active.customer_name ?? "Cliente"}</p>
+            {!active.customer_id && (
+              <p className="text-xs text-slate-500">
+                Invitado sin cuenta{active.guest_phone ? ` · ${active.guest_phone}` : " · solo te verá si vuelve a abrir el chat"}
+              </p>
+            )}
+          </div>
         </div>
         <Chat
           className="min-h-0 flex-1"
@@ -63,7 +70,10 @@ export default async function PanelMessagesPage({ searchParams }: { searchParams
                 <span className="grid size-11 shrink-0 place-items-center rounded-full bg-brand/15 font-bold text-brand">{initials(conv.customer_name)}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className={cn("truncate", unread ? "font-bold" : "font-semibold")}>{conv.customer_name ?? "Cliente"}</p>
+                    <p className={cn("truncate", unread ? "font-bold" : "font-semibold")}>
+                      {conv.customer_name ?? "Cliente"}
+                      {!conv.customer_id && <span className="chip ml-2 bg-slate-100 text-[10px] text-slate-600">Invitado</span>}
+                    </p>
                     <span className="shrink-0 text-[11px] text-slate-400">{formatDate(conv.last_message_at)}</span>
                   </div>
                   <p className={cn("truncate text-sm", unread ? "text-slate-900" : "text-slate-500")}>

@@ -162,15 +162,16 @@ export type Order = {
 export type Conversation = {
   id: string;
   store_id: string;
-  customer_id: string;
+  customer_id: string | null; // null = invitado sin cuenta
   customer_name: string | null;
+  guest_phone: string | null;
   last_message_at: string;
 };
 
 export type Message = {
   id: string;
   conversation_id: string;
-  sender_id: string;
+  sender_id: string | null; // null = invitado sin cuenta
   body: string;
   read_at: string | null;
   created_at: string;

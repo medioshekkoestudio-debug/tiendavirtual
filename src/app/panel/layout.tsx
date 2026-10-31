@@ -33,7 +33,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         .select("id", { count: "exact", head: true })
         .in("conversation_id", convIds)
         .is("read_at", null)
-        .neq("sender_id", user.id)
+        .or(`sender_id.is.null,sender_id.neq.${user.id}`) // null = mensaje de un invitado
     : { count: 0 };
   // Avisa si el plan o el cupón está por vencer o venció (una vez por fecha; también lo hace un cron diario)
   await supabase.rpc("notify_my_access");
