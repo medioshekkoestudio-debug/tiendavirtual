@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { SEGMENTS, type Segment } from "@/lib/activity";
 import { RUBROS, SITE_DOMAIN, isRubro } from "@/lib/constants";
 import { cn, formatDate, formatMoney, periodStart } from "@/lib/utils";
+import { INACTIVE_FILTERS, STAGES, daysInactive, inactiveTone, stageDates, stageIndex, type Journey } from "@/lib/journey";
 import { StoreToggle } from "./store-toggle";
 import { WhatsAppUserButton } from "./whatsapp-button";
 
@@ -58,20 +59,50 @@ function signupPeriods(dates: string[]) {
 }
 type Key = "products" | "sales" | "revenue" | "commission";
 
-export default async function SuperadminHome({ searchParams }: { searchParams: Promise<{ tipo?: string }> }) {
+export default async function SuperadminHome({ searchParams }: { searchParams: Promise<{ tipo?: string; etapa?: string; inactivas?: string }> }) {
   const { supabase } = await getSession();
-  const tipo = (await searchParams).tipo;
-  const filter = ORDER.find((s) => s === tipo);
-  const { data, error } = await supabase.rpc("superadmin_store_stats");
-  const all = ((data ?? []) as StatRow[]).map((r) => ({
-    ...r,
-    segment: (ORDER.includes(r.segment) ? r.segment : "sin_plan") as Segment,
-    products: Number(r.products),
-    sales: Number(r.sales),
-    revenue: Number(r.revenue),
-    commission: Number(r.commission),
-  }));
-  const rows = filter ? all.filter((r) => r.segment === filter) : all;
+  const sp = await searchParams;
+  const filter = ORDER.find((s) => s === sp.tipo);
+  const stageFilter = STAGES.findIndex((s) => s.key === sp.etapa);
+  const inactiveFilter = INACTIVE_FILTERS.find((d) => String(d) === sp.inactivas);
+  const [{ data, error }, { data: journeyData, error: journeyError }] = await Promise.all([
+    supabase.rpc("superadmin_store_stats"),
+    supabase.rpc("superadmin_user_journey"),
+  ]);
+  const journeys = new Map(((journeyData ?? []) as Journey[]).map((j) => [j.store_id, { ...j, orders: Number(j.orders) }]));
+  const all = ((data ?? []) as StatRow[]).map((r) => {
+    const products = Number(r.products);
+    const journey = journeys.get(r.store_id);
+    return {
+      ...r,
+      segment: (ORDER.includes(r.segment) ? r.segment : "sin_plan") as Segment,
+      products,
+      sales: Number(r.sales),
+      revenue: Number(r.revenue),
+      commission: Number(r.commission),
+      stage: stageIndex(journey, products),
+      stageDates: stageDates(journey, r.created_at),
+      inactive: daysInactive(r.last_activity, r.created_at),
+    };
+  });
+  const rows = all.filter(
+    (r) =>
+      (!filter || r.segment === filter) &&
+      (stageFilter < 0 || r.stage === stageFilter) &&
+      (!inactiveFilter || r.inactive >= inactiveFilter),
+  );
+  const href = (patch: { tipo?: string | null; etapa?: string | null; inactivas?: string | null }) => {
+    const q = new URLSearchParams();
+    const pick = (k: "tipo" | "etapa" | "inactivas", current: string | undefined) => {
+      const v = patch[k] === null ? undefined : (patch[k] ?? current);
+      if (v) q.set(k, v);
+    };
+    pick("tipo", filter);
+    pick("etapa", stageFilter >= 0 ? STAGES[stageFilter]!.key : undefined);
+    pick("inactivas", inactiveFilter ? String(inactiveFilter) : undefined);
+    const s = q.toString();
+    return `/superadmin${s ? `?${s}` : ""}`;
+  };
 
   const sum = (list: typeof all, k: Key) => list.reduce((a, r) => a + r[k], 0);
   const monthStart = periodStart("mes")!;
@@ -79,7 +110,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
 
   return (
     <div className="space-y-6">
-      {error && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">{error.message}</p>}
+      {(error ?? journeyError) && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">{(error ?? journeyError)!.message}</p>}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <StatCard label="Tiendas creadas" value={all.length} hint={`${newThisMonth} este mes`} tone="brand" />
         <StatCard label="Ventas (pagadas)" value={sum(all, "sales")} />
@@ -95,6 +126,40 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
         ))}
       </section>
 
+      {/* Embudo: cuántas tiendas llegaron a cada paso y cuántas se quedaron en él */}
+      <section className="card p-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-bold">Embudo de usuarios</h2>
+          <p className="text-xs text-slate-500">Toca un paso para ver las tiendas que se quedaron ahí</p>
+        </div>
+        <ol className="mt-4 space-y-2">
+          {STAGES.map((s, i) => {
+            const reached = all.filter((r) => r.stage >= i).length;
+            const stuck = all.filter((r) => r.stage === i).length;
+            const pct = all.length ? Math.round((reached / all.length) * 100) : 0;
+            const active = stageFilter === i;
+            return (
+              <li key={s.key}>
+                <Link href={href({ etapa: active ? null : s.key })} className={cn("block rounded-xl p-2 transition hover:bg-slate-50", active && "ring-2 ring-brand")}>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="font-semibold">
+                      {i + 1}. {s.label}
+                    </span>
+                    <span className="text-slate-500">
+                      <b className="text-slate-900">{reached}</b> · {pct} %
+                      {i < STAGES.length - 1 && stuck > 0 && <span className="ml-2 text-rose-600">{stuck} se quedaron aquí</span>}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
       {/* Las mismas cifras divididas por tipo de usuario */}
       <section className="grid gap-3 md:grid-cols-3">
         {ORDER.map((seg) => {
@@ -102,7 +167,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
           return (
             <Link
               key={seg}
-              href={filter === seg ? "/superadmin" : `/superadmin?tipo=${seg}`}
+              href={href({ tipo: filter === seg ? null : seg })}
               className={cn("card block p-4 transition hover:shadow-md", filter === seg && "ring-2 ring-brand")}
             >
               <div className="flex items-center justify-between">
@@ -126,16 +191,43 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
       </section>
 
       <section className="card overflow-hidden p-0">
-        <h2 className="border-b px-4 py-3 text-lg font-bold">
-          {filter ? `Tiendas con ${SEGMENTS[filter].label.toLowerCase()}` : "Tiendas y usuarios"}
-        </h2>
+        <div className="space-y-3 border-b px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold">Tiendas y usuarios</h2>
+            <span className="text-sm text-slate-500">{rows.length} de {all.length}</span>
+            {filter && (
+              <Link href={href({ tipo: null })} className="chip bg-slate-100 text-slate-700">{SEGMENTS[filter].label} ✕</Link>
+            )}
+            {stageFilter >= 0 && (
+              <Link href={href({ etapa: null })} className="chip bg-slate-100 text-slate-700">{STAGES[stageFilter]!.stuck} ✕</Link>
+            )}
+          </div>
+          <nav className="flex flex-wrap gap-1.5" aria-label="Filtrar por inactividad">
+            <Link
+              href={href({ inactivas: null })}
+              className={cn("rounded-full px-3 py-1 text-sm font-medium", !inactiveFilter ? "bg-brand text-on-brand" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+            >
+              Todas
+            </Link>
+            {INACTIVE_FILTERS.map((d) => (
+              <Link
+                key={d}
+                href={href({ inactivas: String(d) })}
+                className={cn("rounded-full px-3 py-1 text-sm font-medium", inactiveFilter === d ? "bg-brand text-on-brand" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+              >
+                Sin usar la app {d}+ días ({all.filter((r) => r.inactive >= d).length})
+              </Link>
+            ))}
+          </nav>
+        </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-sm">
+          <table className="w-full min-w-[1120px] text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-4 py-2">Tienda</th>
                 <th className="px-4 py-2">Usuario</th>
                 <th className="px-4 py-2">Tipo</th>
+                <th className="px-4 py-2">Etapa</th>
                 <th className="px-4 py-2 text-right">Productos</th>
                 <th className="px-4 py-2 text-right">Ventas</th>
                 <th className="px-4 py-2 text-right">Vendido</th>
@@ -168,11 +260,24 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
                     <span className={cn("chip whitespace-nowrap", SEGMENTS[r.segment].className)}>{SEGMENTS[r.segment].label}</span>
                     {r.segment === "cupon" && r.coupon_code && <p className="mt-1 font-mono text-xs text-slate-500">{r.coupon_code}</p>}
                   </td>
+                  <td className="px-4 py-3">
+                    <span className={cn("chip whitespace-nowrap", STAGES[r.stage]!.className)}>{STAGES[r.stage]!.stuck}</span>
+                    {r.stageDates[r.stage] && (
+                      <p className="mt-1 whitespace-nowrap text-xs text-slate-500">
+                        {STAGES[r.stage]!.label.toLowerCase()} el {formatDate(r.stageDates[r.stage], false)}
+                      </p>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-right">{r.products}</td>
                   <td className="px-4 py-3 text-right">{r.sales}</td>
                   <td className="px-4 py-3 text-right">{formatMoney(r.revenue)}</td>
                   <td className="px-4 py-3 text-right font-semibold">{formatMoney(r.commission)}</td>
-                  <td className="px-4 py-3 text-slate-500">{r.last_activity ? formatDate(r.last_activity) : "—"}</td>
+                  <td className="px-4 py-3">
+                    <p className={cn("whitespace-nowrap font-semibold", inactiveTone(r.inactive))}>
+                      {r.inactive === 0 ? "Hoy" : r.inactive === 1 ? "Hace 1 día" : `Hace ${r.inactive} días`}
+                    </p>
+                    <p className="text-xs text-slate-500">{r.last_activity ? formatDate(r.last_activity) : "Sin actividad desde el registro"}</p>
+                  </td>
                   <td className="px-4 py-3">
                     <StoreToggle storeId={r.store_id} active={r.is_active} />
                   </td>
@@ -185,7 +290,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
               ))}
               {!rows.length && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-10 text-center text-slate-500">Aún no hay tiendas en esta lista.</td>
+                  <td colSpan={11} className="px-4 py-10 text-center text-slate-500">Ninguna tienda con estos filtros.</td>
                 </tr>
               )}
             </tbody>
