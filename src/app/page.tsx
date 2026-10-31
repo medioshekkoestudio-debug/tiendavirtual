@@ -6,7 +6,7 @@ import { getLandingContent } from "@/lib/landing";
 import { SITE_DOMAIN } from "@/lib/constants";
 import { PlansSection } from "./plans-section";
 
-const FEATURE_ICONS = ["/landing/icono-marca.png", "/landing/icono-pagos.png", "/landing/icono-pedidos.png"];
+const FEATURE_ICONS = ["/landing/icono-marca-app.png", "/landing/icono-pagos-dinero.png", "/landing/icono-pedidos-chat.png"];
 
 // Redes de Linki App (iconos de marca como trazos SVG; lucide no los trae)
 const SOCIAL_LINKS = [

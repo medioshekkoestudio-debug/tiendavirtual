@@ -8,6 +8,7 @@ const TABS = [
   { href: "/superadmin", label: "Tiendas y usuarios" },
   { href: "/superadmin/planes", label: "Planes y cobros" },
   { href: "/superadmin/comisiones", label: "Comisiones" },
+  { href: "/superadmin/finanzas", label: "Finanzas" },
   { href: "/superadmin/cupones", label: "Cupones" },
   { href: "/superadmin/landing", label: "Editar landing" },
 ];
