@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PaymentStatusBadge, StatCard } from "@/components/ui";
 import { getSession } from "@/lib/auth";
 import { PAYMENT_METHODS, PLAN_KEYS, PLAN_PAYMENT_METHOD_KEYS, PLANS, isPlan } from "@/lib/constants";
-import type { PaymentStatus, PlanPaymentMethodKey } from "@/lib/types";
+import type { PaymentMethodConfig, PaymentStatus, PlanPaymentMethodKey } from "@/lib/types";
 import { cn, formatDate, formatMoney } from "@/lib/utils";
 
 export const metadata = { title: "Finanzas" };
@@ -79,10 +79,12 @@ export default async function SuperadminFinancePage({ searchParams }: { searchPa
   const owing = billing.filter((b) => b.commission_due > 0).sort((a, b) => b.commission_due - a.commission_due);
 
   // Datos de cada cuenta de cobro (para decir a qué banco o usuario entró el dinero)
-  // Los datos de cada método se guardan como texto libre en `details`: se muestra su primera línea
-  const accounts = (settings?.payment_methods ?? {}) as Record<string, { details?: string } | undefined>;
+  // Datos de cobro de cada método (Planes y cobros): se muestra el banco si lo tiene, si no el primer dato
+  const accounts = (settings?.payment_methods ?? {}) as Partial<Record<PlanPaymentMethodKey, PaymentMethodConfig>>;
   const accountName = (m: PlanPaymentMethodKey) => {
-    const line = (accounts[m]?.details ?? "").split("\n").map((l) => l.trim()).find(Boolean) ?? "";
+    const details = (accounts[m]?.details ?? []).filter((d) => d.value?.trim());
+    const d = details.find((x) => /banco|bank/i.test(x.label)) ?? details[0];
+    const line = d ? (/banco|bank/i.test(d.label) ? d.value : `${d.label}: ${d.value}`).trim() : "";
     return line.length > 60 ? `${line.slice(0, 60)}…` : line || "Sin datos configurados";
   };
 
