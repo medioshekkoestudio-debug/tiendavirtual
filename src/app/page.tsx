@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
-import { SITE_DOMAIN } from "@/lib/constants";
+import { PLANS, SITE_DOMAIN } from "@/lib/constants";
+import { siteUrl } from "@/lib/utils";
 import { PlansSection } from "./plans-section";
 
 const FEATURE_ICONS = ["/landing/icono-marca-app.png", "/landing/icono-pagos-dinero.png", "/landing/icono-pedidos-chat.png"];
@@ -27,11 +29,41 @@ const SOCIAL_LINKS = [
   },
 ];
 
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
 export default async function LandingPage() {
   const c = await getLandingContent();
+  const site = siteUrl();
+  // Datos estructurados: Google toma de aquí el nombre, el logo oficial y las redes de Linki App
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${site}/#organizacion`,
+        name: "Linki App",
+        url: site,
+        logo: { "@type": "ImageObject", url: `${site}/brand/linkiapp-icon-512.png`, width: 512, height: 512 },
+        image: `${site}/brand/linkiapp-og.png`,
+        sameAs: SOCIAL_LINKS.map((s) => s.href),
+      },
+      { "@type": "WebSite", "@id": `${site}/#sitio`, name: "Linki App", url: site, inLanguage: "es", publisher: { "@id": `${site}/#organizacion` } },
+      {
+        "@type": "SoftwareApplication",
+        name: "Linki App",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Android, iOS, Windows, macOS (PWA)",
+        url: site,
+        description: c.hero_subtitle,
+        offers: { "@type": "AggregateOffer", priceCurrency: "USD", lowPrice: Math.min(...Object.values(PLANS).map((p) => p.monthly)) },
+        publisher: { "@id": `${site}/#organizacion` },
+      },
+    ],
+  };
 
   return (
     <div className="min-h-dvh bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       {/* Barra de navegación */}
       <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">

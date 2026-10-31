@@ -2,10 +2,15 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Linki App — Marketplace de tiendas",
+    id: "/",
+    name: "Linki App — Crea tu tienda online",
     short_name: "Linki App",
-    description: "Crea y administra tu tienda online como una app.",
+    description: "Crea y administra tu tienda online como una app: catálogo, pedidos, pagos locales y chat.",
+    lang: "es",
+    dir: "ltr",
+    categories: ["business", "shopping", "productivity"],
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#009688",

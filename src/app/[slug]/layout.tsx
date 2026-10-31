@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: { default: store.name, template: `%s · ${store.name}` },
     description: store.description?.slice(0, 160) || `Compra en ${store.name}`,
+    alternates: { canonical: `/${store.slug}` },
     manifest: `/${store.slug}/manifest.webmanifest`,
     appleWebApp: { capable: true, title: store.name },
     icons: store.logo_url ? { icon: store.logo_url, apple: store.logo_url } : undefined,
