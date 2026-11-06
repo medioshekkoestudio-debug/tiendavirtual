@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { adminLink, notifyAdmin } from "@/lib/admin-whatsapp";
+import { adminLink, notifyAdmin, payerLines, receiptLine } from "@/lib/admin-whatsapp";
 import { getOwnerStore } from "@/lib/auth";
 import { formatMoney } from "@/lib/utils";
 import { PAYMENT_METHODS, PLAN_PAYMENT_METHOD_KEYS } from "@/lib/constants";
@@ -41,12 +41,14 @@ export async function createCommissionPayment(input: {
   });
   if (error) return { error: error.message };
   const { data: payment } = await supabase.from("commission_payments").select("amount_usd").eq("id", paymentId).maybeSingle();
-  notifyAdmin([
+  notifyAdmin(async () => [
     "💰 *Pago de comisiones por aprobar*",
     `Tienda: ${store.name}`,
+    ...(await payerLines(user.id)),
     payment && `Monto: ${formatMoney(payment.amount_usd)}`,
     `Método: ${PAYMENT_METHODS[input.method].label} · Ref. ${reference}`,
-    adminLink("/superadmin/comisiones"),
+    await receiptLine(receipt),
+    `Aprobar: ${adminLink("/superadmin/comisiones")}`,
   ]);
   revalidatePath("/panel", "layout");
   revalidatePath("/superadmin/comisiones");

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getOwnerStore } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
-import { adminLink, notifyAdmin, signupLines } from "@/lib/admin-whatsapp";
+import { adminLink, notifyAdmin, payerLines, receiptLine, signupLines } from "@/lib/admin-whatsapp";
 import { PAYMENT_METHODS, PLANS, PLAN_PAYMENT_METHOD_KEYS, isPlan, isPlanCycle, planPrice } from "@/lib/constants";
 import { formatMoney } from "@/lib/utils";
 import { cleanReference, referenceError } from "@/lib/payment-reference";
@@ -50,12 +50,14 @@ export async function createSubscriptionPayment(input: {
     receipt_path: receipt,
   });
   if (error) return { error: "No se pudo registrar el pago: " + error.message };
-  notifyAdmin([
+  notifyAdmin(async () => [
     "💰 *Pago de plan por aprobar*",
     `Tienda: ${store.name}`,
+    ...(await payerLines(user.id)),
     `Plan: ${PLANS[input.plan].label} ${input.cycle} · ${formatMoney(planPrice(input.plan, input.cycle))}`,
     `Método: ${PAYMENT_METHODS[input.method].label} · Ref. ${reference}`,
-    adminLink("/superadmin/planes"),
+    await receiptLine(receipt),
+    `Aprobar: ${adminLink("/superadmin/planes")}`,
   ]);
   revalidatePath("/suscripcion");
   revalidatePath("/superadmin/planes");
@@ -125,13 +127,14 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
     await admin.auth.admin.deleteUser(userId);
     return { error: "No se pudo registrar el pago: " + error.message };
   }
-  notifyAdmin([
+  notifyAdmin(async () => [
     ...signupLines(parsed.data, `pasarela de planes`),
     "",
     "💰 *Pago de plan por aprobar*",
     `Plan: ${PLANS[plan].label} ${cycle} · ${formatMoney(planPrice(plan, cycle))}`,
     `Método: ${PAYMENT_METHODS[method].label} · Ref. ${reference}`,
-    adminLink("/superadmin/planes"),
+    await receiptLine(receipt),
+    `Aprobar: ${adminLink("/superadmin/planes")}`,
   ]);
   revalidatePath("/superadmin/planes");
   return { ok: true };
