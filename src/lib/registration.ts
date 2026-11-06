@@ -1,4 +1,5 @@
 import { isRubro } from "@/lib/constants";
+import { TERMS_VERSION } from "@/lib/terms";
 
 export type Registration = {
   fullName: string;
@@ -33,11 +34,23 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
   if (!/^\S+@\S+\.\S+$/.test(data.email)) return { error: "Email inválido" };
   if (data.password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };
   if (String(fd.get("password_confirm") ?? "") !== data.password) return { error: "Las contraseñas no coinciden" };
+  if (fd.get("accept_terms") !== "on") return { error: "Debes aceptar los Términos y Condiciones para crear tu tienda" };
   return { data };
 }
 
 export function registrationMetadata(r: Registration) {
-  return { role: "store_owner", full_name: r.fullName, company_name: r.company, industry: r.industry, description: r.description, cedula: r.cedula, phone: r.phone };
+  return {
+    role: "store_owner",
+    full_name: r.fullName,
+    company_name: r.company,
+    industry: r.industry,
+    description: r.description,
+    cedula: r.cedula,
+    phone: r.phone,
+    // Constancia de la aceptación (parseRegistration no deja registrar sin la casilla)
+    terms_accepted_at: new Date().toISOString(),
+    terms_version: TERMS_VERSION,
+  };
 }
 
 export function isDuplicateEmailError(message: string) {

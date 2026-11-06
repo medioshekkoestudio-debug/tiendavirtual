@@ -2,9 +2,8 @@ import { after } from "next/server";
 import type { Registration } from "@/lib/registration";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { siteUrl } from "@/lib/utils";
+import { SUPPORT_WHATSAPP } from "@/lib/constants";
 
-/** Atención al cliente de Linki App: +58 422-5465427. Aquí llegan los avisos de registros y pagos. */
-export const SUPPORT_WHATSAPP = "584225465427";
 
 type Lines = (string | false | null | undefined)[];
 

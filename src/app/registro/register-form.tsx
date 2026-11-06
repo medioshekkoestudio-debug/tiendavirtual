@@ -5,6 +5,8 @@ import { Honeypot } from "@/components/honeypot";
 import { CedulaInput } from "@/components/cedula-input";
 import { PasswordInput } from "@/components/password-input";
 import { RUBRO_KEYS, RUBROS, SITE_DOMAIN } from "@/lib/constants";
+import { Modal } from "@/components/modal";
+import { TermsContent } from "@/components/terms-content";
 
 function previewSlug(name: string) {
   return name
@@ -77,7 +79,33 @@ export function RegistrationFields() {
       <input id="email" name="email" type="email" required className="input" autoComplete="email" />
     </div>
     <PasswordPair />
+    <AcceptTerms />
     </>
+  );
+}
+
+/** Casilla obligatoria: los términos se leen en una ventana, sin salir del formulario */
+function AcceptTerms() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl bg-slate-50 p-3">
+      <label className="flex items-start gap-3 text-sm text-slate-700">
+        <input type="checkbox" name="accept_terms" required className="mt-0.5 size-5 shrink-0 accent-[var(--brand)]" />
+        <span>
+          Leí y acepto los{" "}
+          <button type="button" onClick={() => setOpen(true)} className="font-semibold text-brand underline">
+            Términos y Condiciones
+          </button>{" "}
+          de Linki App.
+        </span>
+      </label>
+      <Modal open={open} onClose={() => setOpen(false)} title="Términos y Condiciones">
+        <TermsContent />
+        <button type="button" className="btn-primary mt-6 w-full" onClick={() => setOpen(false)}>
+          Entendido
+        </button>
+      </Modal>
+    </div>
   );
 }
 

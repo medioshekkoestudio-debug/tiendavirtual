@@ -309,3 +309,6 @@ export const DEFAULT_LANDING: LandingContent = {
 /** Cupón de la prueba gratis del banner de la landing (/prueba-gratis); creado por la migración 20261106120000 */
 export const TRIAL_COUPON = "prueba7dias";
 export const FREE_TRIAL_DAYS = 7;
+
+/** Atención al cliente de Linki App: +58 422-5465427 (avisos de registros y pagos, WhatsApp del pie de la landing) */
+export const SUPPORT_WHATSAPP = "584225465427";

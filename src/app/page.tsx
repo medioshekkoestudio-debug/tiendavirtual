@@ -4,8 +4,9 @@ import { ArrowRight, Gift } from "lucide-react";
 import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
-import { PLANS, SITE_DOMAIN, FREE_TRIAL_DAYS } from "@/lib/constants";
+import { PLANS, SITE_DOMAIN, FREE_TRIAL_DAYS, SUPPORT_WHATSAPP } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
+import { TERMS_PATH } from "@/lib/terms";
 import { PlansSection } from "./plans-section";
 
 const FEATURE_ICONS = ["/landing/icono-marca-app.png", "/landing/icono-pagos-dinero.png", "/landing/icono-pedidos-chat.png"];
@@ -28,6 +29,13 @@ const SOCIAL_LINKS = [
     icon: "M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.8 5.8 0 0 0-.8-.1 5.8 5.8 0 1 0 5.8 5.8V9.1a7.4 7.4 0 0 0 4.3 1.4V7.4s-1.9.1-3.3-1.6z",
   },
 ];
+
+// Atención al cliente: abre la conversación con el mensaje ya escrito (no es una red social: va fuera de sameAs)
+const WHATSAPP_LINK = {
+  name: "WhatsApp",
+  href: `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("¡Hola! Quiero información sobre Linki App.")}`,
+  icon: "M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.89 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.41Z",
+};
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -232,7 +240,7 @@ export default async function LandingPage() {
       <footer className="flex flex-col items-center gap-3 border-t py-8 text-center text-sm text-slate-500">
         <Logo className="h-7" />
         <ul className="flex gap-3">
-          {SOCIAL_LINKS.map((s) => (
+          {[...SOCIAL_LINKS, WHATSAPP_LINK].map((s) => (
             <li key={s.name}>
               <a
                 href={s.href}
@@ -248,8 +256,25 @@ export default async function LandingPage() {
             </li>
           ))}
         </ul>
+        <Link href={TERMS_PATH} className="font-medium text-slate-600 underline hover:text-brand">
+          Términos y Condiciones
+        </Link>
         {c.footer_text}
       </footer>
+
+      {/* Soporte por WhatsApp: botón flotante abajo a la derecha, siempre visible al bajar por la landing */}
+      <a
+        href={WHATSAPP_LINK.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Escríbenos por WhatsApp (soporte de Linki App)"
+        title="Soporte por WhatsApp"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-40 grid size-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/25 transition hover:scale-105 hover:brightness-105 md:bottom-6 md:right-6"
+      >
+        <svg viewBox="0 0 24 24" className="size-8" fill="currentColor" aria-hidden="true">
+          <path d={WHATSAPP_LINK.icon} />
+        </svg>
+      </a>
     </div>
   );
 }
