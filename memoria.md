@@ -220,3 +220,16 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   - escribir `seguridad.md` con todo lo hecho y lo pendiente;
   - Cloudflare: registros en DNS only y cambiar los nameservers (hoy siguen los de Vercel). www.linkiapp.com ya redirige.
   - Ya hecho: `NEXT_PUBLIC_SITE_URL` = https://linkiapp.com en Production; registro público de Supabase apagado.
+
+### 2026-11-06 — Sesión 3
+- **Prueba gratis de 7 días** (`8245505`, `8bd482d`): botón «Prueba gratis por 7 días» en el banner de la landing → `/prueba-gratis`
+  (ruta con guion para no tapar una tienda con slug `prueba`). Por dentro es el cupón `prueba7dias` (migración
+  `20261106120000_prueba_gratis.sql`, `TRIAL_COUPON`/`FREE_TRIAL_DAYS` en `constants.ts`; `TRIAL_DAYS = 15` es otra constante vieja sin uso).
+  Reutiliza `CouponForms`/`RedeemForm` con `trial` (cupón oculto, abre en «Soy nuevo»). Una vez por tienda; si ya la usó,
+  la página lo dice y ofrece planes. Al vencer, `AccessGate` muestra «Tu prueba gratis terminó». Probado en producción
+  con cuenta desechable (7 días exactos) y luego borrada.
+- **Atención al cliente: +58 422-5465427** (`e6acd04`): `SUPPORT_WHATSAPP` en `lib/admin-whatsapp.ts` (o `ADMIN_WHATSAPP_PHONE`).
+  Los avisos de pagos de planes y comisiones llevan nombre/email/teléfono de quien paga y un enlace firmado de 7 días al
+  comprobante (CallMeBot no envía imágenes). Falta `CALLMEBOT_APIKEY`, pedida desde el WhatsApp del 0422.
+  El 0412-8364248 de `platform_settings.payment_methods` es el Pago Móvil de cobro: NO es el de atención, no se cambió.
+- La Action de migraciones falló por `SUPABASE_ACCESS_TOKEN` vencido; la usuaria lo renovó el 6-nov. `actions/checkout@v5`.
