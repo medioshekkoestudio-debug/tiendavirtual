@@ -187,11 +187,11 @@ export const PLANS: Record<
     label: "Business",
     monthly: 15,
     annual: 150,
-    products: "Productos ilimitados",
+    products: "Hasta 500 productos",
     commission: "0,5 % sobre ventas",
     intro: "Todo lo del Plan Pro, más:",
     features: [
-      "Catálogo e inventario ilimitado",
+      "Catálogo de hasta 500 productos",
       "Accesos para varios administradores del equipo",
       "Asesoría personalizada para optimizar tu tienda",
       "La comisión por venta más baja de la plataforma",

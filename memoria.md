@@ -150,7 +150,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   (cuentas nuevas suben a `nuevos/` con enlace firmado). Datos de cobro en `platform_settings.payment_methods`.
 - **Métodos de pago editables** (tiendas y Superadmin): cada método guarda `{ enabled, details: [{label, value}], image_url }`.
   Las configuraciones viejas (claves fijas) se leen igual y pasan al formato nuevo al guardarse (`src/lib/payment-details.ts`).
-- Pendiente: decidir si se bloquea la tienda al vencer la prueba/plan y si se aplican los límites de productos (30/100).
+- Pendiente: decidir si se bloquea la tienda al vencer la prueba/plan y si se aplican los límites de productos (30/100/500: Business pasó de ilimitado a 500 el 6-nov).
 - **$ y Bs en las pasarelas** (planes y checkout de tiendas): tasa BCV de dolarapi.com en `src/lib/exchange-rate.ts`
   (misma lógica que La Mejor Llave: lunes en fin de semana, caché 1 h). Solo se muestra; guardar el monto en Bs es la
   Fase 2 de `planTasaBcv.md`. Plan de validación automática con API del banco y OCR propios: `planValidacionAutomatica.md`.
@@ -242,3 +242,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   página `/terminos-y-condiciones` (enlace en el pie y en el sitemap) y casilla obligatoria `accept_terms` en `RegistrationFields`
   (pasarela de planes, prueba gratis y cupón), con ventana para leerlos. `parseRegistration` la exige y `registrationMetadata`
   guarda `terms_accepted_at` y `terms_version` en el user_metadata. Al cambiar el texto, subir `TERMS_VERSION`.
+- **Tiendas solo para mayores de edad** (`5419e07`, migración `20261106140000_mayores_de_edad.sql`): `stores.adults_only`
+  (false = apta). Pregunta obligatoria Sí/No `apta_menores` en `RegistrationFields`; las acciones de registro marcan la tienda
+  con el admin client después de crear el usuario. Interruptor en Ajustes. En la tienda pública, el layout de `[slug]` muestra
+  `AgeGate` (sin nada de la tienda) hasta confirmar; `confirmAdult` guarda en `store_age_confirmations` (nombre/email si hay
+  sesión, IP y user-agent; la IP no se muestra) y pone la cookie `linki_mayor_<id>` 1 año. El dueño no ve la pantalla.
+  Probado en producción con tienda desechable (luego borrada).
+- **Plan Business: hasta 500 productos** (antes ilimitado), solo texto en `PLANS`. Los límites 30/100/500 aún no se aplican.
+- Tiendas con prueba gratis o cupón quedan sin plan: diseño Emprendedor, pero comisión 1 % (default de la columna), no 1,5 %.
+  Se le preguntó a la dueña si las quiere como Emprendedor completo (comisión y límite): sin respuesta aún.

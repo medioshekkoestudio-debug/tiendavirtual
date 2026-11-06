@@ -26,7 +26,9 @@ export async function AgeConfirmations({ supabase, storeId, active }: { supabase
     <div className="mt-5 border-t pt-4">
       <h3 className="font-semibold">Confirmaciones de mayoría de edad</h3>
       <p className="text-sm text-slate-600">
-        {count ? `${count} ${count === 1 ? "persona confirmó" : "personas confirmaron"} que son mayores de edad al entrar a tu tienda.` : "Todavía nadie ha entrado a tu tienda."}
+        {count ? count === 1
+            ? "1 persona confirmó que es mayor de edad al entrar a tu tienda."
+            : `${count} personas confirmaron que son mayores de edad al entrar a tu tienda.` : "Todavía nadie ha entrado a tu tienda."}
         {count && count > 50 ? " Se muestran las 50 más recientes." : ""}
       </p>
       {!!rows?.length && (
