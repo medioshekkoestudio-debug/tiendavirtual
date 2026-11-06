@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
 import { EmptyState, OrderStatusBadge, SectionHeader, StatCard } from "@/components/ui";
 import { getOwnerStore } from "@/lib/auth";
+import { commissionRate, percent } from "@/lib/site";
 import { ORDER_STATUS, PAID_STATUSES } from "@/lib/constants";
 import type { Order, OrderStatus, Product } from "@/lib/types";
 import { ShareStoreWhatsApp } from "@/components/share-whatsapp";
@@ -51,7 +52,7 @@ export default async function PanelHome() {
             <StatCard
               label="Comisión del mes"
               value={formatMoney(commission)}
-              hint={`${(Number(store.commission_rate) * 100).toFixed(1)} % Linki App · Ver y pagar`}
+              hint={`${percent(commissionRate(store))} Linki App · Ver y pagar`}
             />
           </Link>
         </div>

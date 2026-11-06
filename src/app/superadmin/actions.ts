@@ -117,7 +117,7 @@ export async function saveCoupon(input: { id?: string; code: string; free_days: 
   return { ok: true };
 }
 
-/** Plan con el que se ve la página de la tienda (diseño y secciones), aparte del plan que pagó o del cupón */
+/** Plan de la tienda (diseño, límite de productos y comisión), aparte del plan que pagó o del cupón. No cambia sus días de acceso */
 export async function setStoreSitePlan(storeId: string, plan: string): Promise<{ error?: string }> {
   await requireSuperadmin();
   if (!isPlan(plan)) return { error: "Plan inválido" };

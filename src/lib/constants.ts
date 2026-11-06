@@ -153,13 +153,15 @@ export const isRubro = (v: unknown): v is RubroKey => typeof v === "string" && v
 export const TRIAL_DAYS = 15;
 export const PLANS: Record<
   PlanKey,
-  { label: string; monthly: number; annual: number; products: string; commission: string; recommended?: boolean; intro?: string; features: string[] }
+  { label: string; monthly: number; annual: number; products: string; /** Debe coincidir con store_product_limit() (migración 20261106150000) */ maxProducts: number; /** Debe coincidir con store_commission_rate() (migración 20261106160000) */ commissionRate: number; commission: string; recommended?: boolean; intro?: string; features: string[] }
 > = {
   emprendedor: {
     label: "Emprendedor",
     monthly: 3,
     annual: 30,
     products: "Hasta 30 productos",
+    maxProducts: 30,
+    commissionRate: 0.015,
     commission: "1,5 % sobre ventas",
     features: [
       "Activación y configuración inicial de la tienda",
@@ -174,6 +176,8 @@ export const PLANS: Record<
     monthly: 7,
     annual: 70,
     products: "Hasta 100 productos",
+    maxProducts: 100,
+    commissionRate: 0.01,
     commission: "1 % sobre ventas",
     recommended: true,
     intro: "Todo lo del Plan Emprendedor, más:",
@@ -188,6 +192,8 @@ export const PLANS: Record<
     monthly: 15,
     annual: 150,
     products: "Hasta 500 productos",
+    maxProducts: 500,
+    commissionRate: 0.005,
     commission: "0,5 % sobre ventas",
     intro: "Todo lo del Plan Pro, más:",
     features: [

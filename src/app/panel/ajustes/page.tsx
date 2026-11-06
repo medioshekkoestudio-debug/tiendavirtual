@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BrandingForm } from "@/components/branding-form";
-import { PLANS } from "@/lib/constants";
+import { PLANS, TRIAL_COUPON } from "@/lib/constants";
+import { freeUntil, percent, siteTier } from "@/lib/site";
+import { formatDate } from "@/lib/utils";
 import { CategoryManager } from "@/components/category-manager";
 import { PaymentMethodsForm } from "@/components/payment-methods-form";
 import { ShareStoreWhatsApp } from "@/components/share-whatsapp";
@@ -18,6 +20,7 @@ export const metadata = { title: "Ajustes" };
 
 export default async function SettingsPage() {
   const { supabase, user, profile, store } = await getOwnerStore();
+  const free = freeUntil(store);
   const { data: categories } = await supabase.from("categories").select("*").eq("store_id", store.id).order("position").order("name");
 
   return (
@@ -27,7 +30,15 @@ export default async function SettingsPage() {
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold">Mi plan</h2>
           <p className="text-sm text-slate-600">
-            {store.plan ? `Plan ${PLANS[store.plan].label}` : store.coupon_code ? `Cupón ${store.coupon_code}` : "Sin plan"} · elige o renueva tu plan, y paga tus comisiones por venta.
+            <strong>Plan {PLANS[siteTier(store)].label}</strong> · {PLANS[siteTier(store)].products.toLowerCase()} · comisión del{" "}
+            {percent(PLANS[siteTier(store)].commissionRate)} por venta
+            {free && (
+              <>
+                {" "}(sin comisión hasta el {formatDate(free.toISOString(), false)} por tu{" "}
+                {store.coupon_code?.toLowerCase() === TRIAL_COUPON ? "prueba gratis" : "período gratis"})
+              </>
+            )}
+            . Elige o renueva tu plan, y paga tus comisiones por venta.
           </p>
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:flex-row">

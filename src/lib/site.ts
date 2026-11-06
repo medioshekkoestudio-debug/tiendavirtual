@@ -4,7 +4,7 @@
 // - Business: una página web completa: inicio tipo landing, catálogo en /tienda y página /nosotros.
 // Lo que la tienda deja vacío se completa con los textos sugeridos para su rubro y su descripción.
 
-import { isPlan } from "./constants";
+import { isPlan, PLANS } from "./constants";
 import type { PlanKey, Store } from "./types";
 
 export type SiteTier = PlanKey;
@@ -194,6 +194,29 @@ export function siteTier(store: Pick<Store, "plan" | "plan_expires_at" | "site_p
   if (store.plan && store.plan_expires_at && new Date(store.plan_expires_at).getTime() > now) return store.plan;
   return "emprendedor";
 }
+
+/** Cuántos productos puede tener la tienda según su plan (la base lo exige con store_product_limit) */
+export function productLimit(store: Pick<Store, "plan" | "plan_expires_at" | "site_plan">) {
+  return PLANS[siteTier(store)].maxProducts;
+}
+
+type PlanFields = Pick<Store, "plan" | "plan_expires_at" | "site_plan" | "trial_ends_at">;
+
+/** Días gratis (prueba gratis o cupón) sin plan pagado vigente: no se cobra comisión */
+export function freeUntil(store: PlanFields, now = Date.now()): Date | null {
+  const paid = store.plan && store.plan_expires_at && new Date(store.plan_expires_at).getTime() > now;
+  if (paid || !store.trial_ends_at) return null;
+  const end = new Date(store.trial_ends_at);
+  return end.getTime() > now ? end : null;
+}
+
+/** Comisión por venta de hoy: 0 en días gratis, si no la del plan. La base la aplica con store_commission_rate */
+export function commissionRate(store: PlanFields, now = Date.now()) {
+  return freeUntil(store, now) ? 0 : PLANS[siteTier(store, now)].commissionRate;
+}
+
+/** «1,5 %» */
+export const percent = (rate: number) => `${(rate * 100).toLocaleString("es-VE", { maximumFractionDigits: 1 })} %`;
 
 export const tierAtLeast = (tier: SiteTier, min: SiteTier) => TIERS.indexOf(tier) >= TIERS.indexOf(min);
 const TIERS: SiteTier[] = ["emprendedor", "pro", "business"];

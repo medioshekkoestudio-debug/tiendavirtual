@@ -21,6 +21,8 @@ export function StoreManager({
   categories,
   openNew,
   editId,
+  limit,
+  planLabel,
 }: {
   store: Store;
   userId: string;
@@ -29,6 +31,9 @@ export function StoreManager({
   categories: Category[];
   openNew?: boolean;
   editId?: string;
+  /** Máximo de productos del plan (Emprendedor 30, Pro 100, Business 500) */
+  limit: number;
+  planLabel: string;
 }) {
   const router = useRouter();
   const [view, setView] = useState<"admin" | "cliente">("admin");
@@ -37,7 +42,7 @@ export function StoreManager({
   const [sub, setSub] = useState("");
   const [showCats, setShowCats] = useState(false);
   const [editing, setEditing] = useState<Product | null | "new">(
-    openNew ? "new" : editId ? (products.find((p) => p.id === editId) ?? null) : null,
+    openNew && products.length < limit ? "new" : editId ? (products.find((p) => p.id === editId) ?? null) : null,
   );
   const [stockDraft, setStockDraft] = useState<Record<string, number>>({});
   const [pending, startTransition] = useTransition();
@@ -62,6 +67,7 @@ export function StoreManager({
       (!query.trim() || p.name.toLowerCase().includes(query.trim().toLowerCase())),
   );
 
+  const atLimit = products.length >= limit;
   const totalStock = products.reduce((a, p) => a + p.stock, 0);
   const lowStock = products.filter((p) => p.stock <= 3).length;
 
@@ -143,7 +149,7 @@ export function StoreManager({
       ) : (
         <>
           <div className="grid grid-cols-3 gap-3">
-            <StatCard label="Productos" value={products.length} />
+            <StatCard label={`Productos (máx. ${limit})`} value={`${products.length} / ${limit}`} />
             <StatCard label="Unidades en stock" value={totalStock} />
             <StatCard label="Stock bajo (≤3)" value={lowStock} />
           </div>
@@ -177,10 +183,27 @@ export function StoreManager({
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <input className="input pl-9" placeholder="Buscar por nombre" value={query} onChange={(e) => setQuery(e.target.value)} />
               </label>
-              <button type="button" className="btn-primary" aria-label="Nuevo producto" onClick={() => openEditor("new")}>
+              <button
+                type="button"
+                className="btn-primary"
+                aria-label="Nuevo producto"
+                disabled={atLimit}
+                title={atLimit ? `Llegaste al límite de ${limit} productos` : undefined}
+                onClick={() => openEditor("new")}
+              >
                 <Plus className="size-4" /> <span className="hidden sm:inline">Nuevo producto</span>
               </button>
             </div>
+            {atLimit && (
+              <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                  Llegaste al límite de <strong>{limit} productos</strong> del Plan {planLabel}. Para cargar más, sube de plan o elimina productos que ya no vendas.
+                </p>
+                <Link href="/suscripcion" className="btn-primary shrink-0">
+                  Ver planes
+                </Link>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <select
                 className="input"

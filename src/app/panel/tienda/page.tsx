@@ -2,6 +2,8 @@ import { getOwnerStore } from "@/lib/auth";
 import { getBcvRate } from "@/lib/exchange-rate";
 import type { Category, Product } from "@/lib/types";
 import { StoreManager } from "./store-manager";
+import { productLimit, siteTier } from "@/lib/site";
+import { PLANS } from "@/lib/constants";
 
 export const metadata = { title: "Tienda" };
 
@@ -22,6 +24,8 @@ export default async function PanelStorePage({ searchParams }: { searchParams: P
       categories={(categories ?? []) as Category[]}
       openNew={sp.nuevo === "1"}
       editId={sp.editar}
+      limit={productLimit(store)}
+      planLabel={PLANS[siteTier(store)].label}
     />
   );
 }

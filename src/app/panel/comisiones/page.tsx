@@ -13,6 +13,7 @@ import type {
   SubscriptionPayment,
 } from "@/lib/types";
 import { formatDate, formatMoney, parsePeriod, periodStart } from "@/lib/utils";
+import { commissionRate, freeUntil, percent, siteTier } from "@/lib/site";
 import { CommissionsBoard, type CommissionRow } from "./board";
 
 export const metadata = { title: "Comisiones y plan" };
@@ -83,14 +84,17 @@ export default async function CommissionsPage({ searchParams }: { searchParams: 
   const now = Date.now();
   const planActive = store.plan && store.plan_expires_at && new Date(store.plan_expires_at).getTime() > now;
   const inTrial = !planActive && store.trial_ends_at && new Date(store.trial_ends_at).getTime() > now;
+  const free = freeUntil(store, now);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Comisiones y plan</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Linki App cobra el {(Number(store.commission_rate) * 100).toLocaleString("es-VE")} % de cada venta pagada. Aquí ves lo que llevas,
-          lo que pagaste y lo que te queda.
+          {free
+            ? <>Durante tus días gratis (hasta el {formatDate(free.toISOString(), false)}) no pagas comisión. Después, Linki App cobra el {percent(PLANS[siteTier(store)].commissionRate)} de cada venta pagada (Plan {PLANS[siteTier(store)].label}).</>
+            : <>Linki App cobra el {percent(commissionRate(store))} de cada venta pagada (Plan {PLANS[siteTier(store)].label}).</>}{" "}
+          Aquí ves lo que llevas, lo que pagaste y lo que te queda.
         </p>
       </div>
 
