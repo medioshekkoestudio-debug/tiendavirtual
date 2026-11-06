@@ -120,6 +120,7 @@ export async function createPlanSignup(fd: FormData): Promise<{ error?: string; 
   // La tienda la crea el trigger handle_new_user al crear el usuario
   const userId = created.user.id;
   const { data: store } = await admin.from("stores").select("id").eq("owner_id", userId).maybeSingle();
+  if (store && parsed.data.adultsOnly) await admin.from("stores").update({ adults_only: true }).eq("id", store.id);
   const { error } = store
     ? await admin.from("subscription_payments").insert({ store_id: store.id, plan, cycle, method, reference, receipt_path: receipt })
     : { error: { message: "no se creó la tienda" } };

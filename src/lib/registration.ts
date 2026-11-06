@@ -10,6 +10,8 @@ export type Registration = {
   description: string;
   cedula: string;
   phone: string;
+  /** La tienda NO es apta para menores: el cliente confirma su mayoría de edad antes de verla */
+  adultsOnly: boolean;
 };
 
 /** Valida los datos del formulario de registro de una empresa (registro normal y pasarela de planes). */
@@ -24,11 +26,13 @@ export function parseRegistration(fd: FormData): { error: string } | { data: Reg
     description: str("description").slice(0, 2000),
     cedula: str("cedula").toUpperCase().replace(/\s+/g, "").slice(0, 20),
     phone: str("phone").slice(0, 30),
+    adultsOnly: str("apta_menores") === "no",
   };
 
   if (!data.fullName || !data.company || !data.email || !data.cedula || !data.phone) return { error: "Completa todos los campos" };
   if (data.company.length < 3) return { error: "El nombre de la empresa debe tener al menos 3 caracteres" };
   if (!isRubro(data.industry)) return { error: "Elige el rubro de tu empresa" };
+  if (!["si", "no"].includes(str("apta_menores"))) return { error: "Indica si tu tienda es apta para menores de edad" };
   if (!/^[VEJGPR]-?\d{6,9}(-?\d)?$/.test(data.cedula)) return { error: "Cédula o RIF inválido. Ejemplo: V-12345678 o J-12345678-9" };
   if (data.phone.replace(/\D/g, "").length < 10) return { error: "Teléfono inválido. Ejemplo: 0414-1234567" };
   if (!/^\S+@\S+\.\S+$/.test(data.email)) return { error: "Email inválido" };
@@ -47,6 +51,7 @@ export function registrationMetadata(r: Registration) {
     description: r.description,
     cedula: r.cedula,
     phone: r.phone,
+    adults_only: r.adultsOnly,
     // Constancia de la aceptación (parseRegistration no deja registrar sin la casilla)
     terms_accepted_at: new Date().toISOString(),
     terms_version: TERMS_VERSION,

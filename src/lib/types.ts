@@ -33,6 +33,8 @@ export type Store = {
   industry: string | null;
   /** Mostrar el equivalente en Bs debajo del precio de cada producto */
   show_bs: boolean;
+  /** No apta para menores: el cliente confirma que es mayor de edad antes de ver la tienda */
+  adults_only: boolean;
   description: string;
   logo_url: string | null;
   primary_color: string;

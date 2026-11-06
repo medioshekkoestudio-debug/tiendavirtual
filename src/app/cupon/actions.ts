@@ -87,7 +87,7 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
   const { email, password } = parsed.data;
 
   const admin = createAdminClient();
-  const { error: createError } = await admin.auth.admin.createUser({
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
@@ -101,6 +101,8 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
         : "No se pudo crear la cuenta: " + createError.message,
     };
   }
+  // La tienda la crea el trigger handle_new_user; aquí se marca si es solo para mayores de edad
+  if (created.user && parsed.data.adultsOnly) await admin.from("stores").update({ adults_only: true }).eq("owner_id", created.user.id);
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   notifyAdmin([...signupLines(parsed.data, isTrial(coupon) ? "prueba gratis" : `cupón ${coupon}`), adminLink("/superadmin")]);

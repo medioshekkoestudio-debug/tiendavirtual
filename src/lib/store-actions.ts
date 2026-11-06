@@ -74,6 +74,14 @@ export async function saveIndustry(industry: string): Promise<ActionResult> {
   return done();
 }
 
+export async function saveAdultsOnly(on: boolean): Promise<ActionResult> {
+  const { supabase, store } = await getActiveOwnerStore();
+  const { error } = await supabase.from("stores").update({ adults_only: Boolean(on) }).eq("id", store.id);
+  if (error) return { error: "No se pudo guardar" };
+  revalidatePath(`/${store.slug}`, "layout");
+  return done();
+}
+
 export async function saveShowBs(show: boolean): Promise<ActionResult> {
   const { supabase, store } = await getActiveOwnerStore();
   const { error } = await supabase.from("stores").update({ show_bs: Boolean(show) }).eq("id", store.id);

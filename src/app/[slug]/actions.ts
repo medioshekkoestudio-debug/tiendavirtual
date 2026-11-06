@@ -1,5 +1,7 @@
 "use server";
-import { accountOrigin, allowAttempt, isBot, TOO_MANY } from "@/lib/guard";
+import { accountOrigin, allowAttempt, clientIp, isBot, TOO_MANY } from "@/lib/guard";
+import { cookies, headers } from "next/headers";
+import { adultCookieName } from "@/lib/age-gate";
 import { cleanReference, referenceError } from "@/lib/payment-reference";
 
 import { redirect } from "next/navigation";
@@ -115,4 +117,45 @@ export async function customerRegister(_: AuthState, fd: FormData): Promise<Auth
   await supabase.auth.signInWithPassword({ email, password });
   revalidatePath(`/${slug}`, "layout");
   redirect(target(slug, String(fd.get("next") ?? "")));
+}
+
+// ------------------------------------------------------------ Tiendas solo para mayores de edad
+
+/**
+ * El cliente confirma que es mayor de edad para ver una tienda no apta para menores. Queda registrado
+ * (con su nombre y email si tenía sesión) para que la tienda lo vea en Ajustes.
+ */
+export async function confirmAdult(slug: string): Promise<{ error?: string; ok?: boolean }> {
+  const admin = createAdminClient();
+  const { data: store } = await admin.from("stores").select("id, slug, adults_only").eq("slug", String(slug).toLowerCase()).maybeSingle();
+  if (!store) return { error: "Tienda no encontrada" };
+  if (store.adults_only) {
+    if (!(await allowAttempt("mayor_edad", 30, 3600))) return { error: TOO_MANY };
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { data: profile } = user
+      ? await admin.from("profiles").select("full_name, email").eq("id", user.id).maybeSingle()
+      : { data: null };
+    const h = await headers();
+    const { error } = await admin.from("store_age_confirmations").insert({
+      store_id: store.id,
+      user_id: user?.id ?? null,
+      name: profile?.full_name ?? null,
+      email: profile?.email ?? user?.email ?? null,
+      ip: await clientIp(),
+      user_agent: (h.get("user-agent") ?? "").slice(0, 300),
+    });
+    if (error) return { error: "No se pudo registrar tu confirmación. Intenta de nuevo." };
+  }
+  (await cookies()).set(adultCookieName(store.id), "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: `/${store.slug}`,
+    maxAge: 60 * 60 * 24 * 365,
+  });
+  revalidatePath(`/${store.slug}`, "layout");
+  return { ok: true };
 }

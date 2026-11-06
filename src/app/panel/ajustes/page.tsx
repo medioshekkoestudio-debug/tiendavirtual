@@ -10,6 +10,8 @@ import { getOwnerStore } from "@/lib/auth";
 import type { Category } from "@/lib/types";
 import { IndustryForm } from "./industry-form";
 import { ShowBsToggle } from "./show-bs-toggle";
+import { AdultsOnlyToggle } from "./adults-only";
+import { AgeConfirmations } from "./age-confirmations";
 import { SlugForm } from "./slug-form";
 
 export const metadata = { title: "Ajustes" };
@@ -49,6 +51,11 @@ export default async function SettingsPage() {
       </section>
       <section className="card p-5">
         <ShowBsToggle initial={store.show_bs ?? true} />
+      </section>
+      <section className="card p-5">
+        <AdultsOnlyToggle initial={store.adults_only ?? false} />
+        {/* El registro se muestra también si la apagó: las confirmaciones anteriores siguen siendo su constancia */}
+        <AgeConfirmations supabase={supabase} storeId={store.id} active={store.adults_only ?? false} />
       </section>
       <section className="card p-5">
         <h2 className="mb-1 text-lg font-bold">Rubro</h2>

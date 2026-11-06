@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { adultCookieName } from "@/lib/age-gate";
+import { AgeGate } from "./age-gate";
 import { BottomNav } from "@/components/bottom-nav";
 import { CartProvider } from "@/components/cart";
 import { themeStyle } from "@/components/theme-vars";
@@ -51,6 +54,16 @@ export default async function StoreLayout({ children, params }: Params & { child
   }
 
   const { profile } = await getSession();
+
+  // No apta para menores: hasta que el cliente confirme su edad no se muestra nada de la tienda (el dueño entra directo)
+  if (store.adults_only && profile?.id !== store.owner_id && !(await cookies()).get(adultCookieName(store.id))) {
+    return (
+      <div style={themeStyle(store)}>
+        <AgeGate slug={store.slug} name={store.name} logoUrl={store.logo_url} />
+      </div>
+    );
+  }
+
   const base = `/${store.slug}`;
   // Business es una página web: Inicio, Tienda y Nosotros además de las compras y los mensajes
   const business = siteTier(store) === "business";

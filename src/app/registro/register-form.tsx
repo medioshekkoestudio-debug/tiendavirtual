@@ -50,6 +50,25 @@ export function RegistrationFields() {
       </select>
       <p className="mt-1.5 text-xs text-slate-500">Te sugeriremos categorías según tu rubro. Puedes cambiarlo luego en Ajustes.</p>
     </div>
+    <fieldset>
+      <legend className="label">¿Tu tienda es apta para menores de edad?</legend>
+      <div className="grid grid-cols-2 gap-2">
+        {(
+          [
+            ["si", "Sí, es apta"],
+            ["no", "No, solo +18"],
+          ] as const
+        ).map(([value, label]) => (
+          <label key={value} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium has-[:checked]:border-brand has-[:checked]:bg-brand/5">
+            <input type="radio" name="apta_menores" value={value} required className="size-4 accent-[var(--brand)]" />
+            {label}
+          </label>
+        ))}
+      </div>
+      <p className="mt-1.5 text-xs text-slate-500">
+        Si vendes artículos solo para adultos (licores, tabaco, productos íntimos…), tus clientes deberán confirmar que son mayores de edad para ver tu tienda. Puedes cambiarlo luego en Ajustes.
+      </p>
+    </fieldset>
     <div>
       <label className="label" htmlFor="description">Describe tu empresa</label>
       <textarea
