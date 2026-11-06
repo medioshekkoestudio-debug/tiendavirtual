@@ -8,7 +8,8 @@ import { cn, formatDate, formatMoney, periodStart } from "@/lib/utils";
 import { INACTIVE_FILTERS, STAGES, daysInactive, inactiveTone, stageDates, stageIndex, type Journey } from "@/lib/journey";
 import { SitePlanSelect } from "./site-plan-select";
 import { StoreToggle } from "./store-toggle";
-import { siteTier } from "@/lib/site";
+import { freeUntil, siteTier } from "@/lib/site";
+import { PlanChip } from "./plan-chip";
 import type { PlanKey } from "@/lib/types";
 import { WhatsAppUserButton } from "./whatsapp-button";
 
@@ -71,9 +72,11 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
   const [{ data, error }, { data: journeyData, error: journeyError }, { data: sitePlans }] = await Promise.all([
     supabase.rpc("superadmin_store_stats"),
     supabase.rpc("superadmin_user_journey"),
-    supabase.from("stores").select("id, site_plan"),
+    supabase.from("stores").select("id, site_plan, trial_ends_at"),
   ]);
-  const sitePlanById = new Map(((sitePlans ?? []) as { id: string; site_plan: PlanKey | null }[]).map((s) => [s.id, s.site_plan]));
+  const storePlan = new Map(
+    ((sitePlans ?? []) as { id: string; site_plan: PlanKey | null; trial_ends_at: string | null }[]).map((s) => [s.id, s]),
+  );
   const journeys = new Map(((journeyData ?? []) as Journey[]).map((j) => [j.store_id, { ...j, orders: Number(j.orders) }]));
   const all = ((data ?? []) as StatRow[]).map((r) => {
     const products = Number(r.products);
@@ -85,7 +88,13 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
       sales: Number(r.sales),
       revenue: Number(r.revenue),
       commission: Number(r.commission),
-      sitePlan: siteTier({ plan: isPlan(r.plan) ? r.plan : null, plan_expires_at: r.plan_expires_at, site_plan: sitePlanById.get(r.store_id) ?? null }),
+      sitePlan: siteTier({ plan: isPlan(r.plan) ? r.plan : null, plan_expires_at: r.plan_expires_at, site_plan: storePlan.get(r.store_id)?.site_plan ?? null }),
+      freeUntil: freeUntil({
+        plan: isPlan(r.plan) ? r.plan : null,
+        plan_expires_at: r.plan_expires_at,
+        site_plan: null,
+        trial_ends_at: storePlan.get(r.store_id)?.trial_ends_at ?? null,
+      }),
       stage: stageIndex(journey, products),
       stageDates: stageDates(journey, r.created_at),
       inactive: daysInactive(r.last_activity, r.created_at),
@@ -232,7 +241,8 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
               <tr>
                 <th className="px-4 py-2">Tienda</th>
                 <th className="px-4 py-2">Usuario</th>
-                <th className="px-4 py-2">Tipo</th>
+                <th className="px-4 py-2">Acceso</th>
+                <th className="px-4 py-2">Plan</th>
                 <th className="px-4 py-2">Etapa</th>
                 <th className="px-4 py-2 text-right">Productos</th>
                 <th className="px-4 py-2 text-right">Ventas</th>
@@ -265,6 +275,9 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
                   <td className="px-4 py-3">
                     <span className={cn("chip whitespace-nowrap", SEGMENTS[r.segment].className)}>{SEGMENTS[r.segment].label}</span>
                     {r.segment === "cupon" && r.coupon_code && <p className="mt-1 font-mono text-xs text-slate-500">{r.coupon_code}</p>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <PlanChip plan={r.sitePlan} freeUntil={r.freeUntil} />
                     <SitePlanSelect storeId={r.store_id} value={r.sitePlan} />
                   </td>
                   <td className="px-4 py-3">
@@ -297,7 +310,7 @@ export default async function SuperadminHome({ searchParams }: { searchParams: P
               ))}
               {!rows.length && (
                 <tr>
-                  <td colSpan={11} className="px-4 py-10 text-center text-slate-500">Ninguna tienda con estos filtros.</td>
+                  <td colSpan={12} className="px-4 py-10 text-center text-slate-500">Ninguna tienda con estos filtros.</td>
                 </tr>
               )}
             </tbody>

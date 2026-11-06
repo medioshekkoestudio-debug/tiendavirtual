@@ -9,6 +9,9 @@ import type { Profile, Store } from "@/lib/types";
 import { cn, formatDate, formatMoney } from "@/lib/utils";
 import type { StatRow } from "../../page";
 import { WhatsAppUserButton } from "../../whatsapp-button";
+import { PlanChip } from "../../plan-chip";
+import { SitePlanSelect } from "../../site-plan-select";
+import { freeUntil, siteTier } from "@/lib/site";
 
 export const metadata = { title: "Usuario" };
 
@@ -69,7 +72,14 @@ export default async function UserDetailPage({ params, searchParams }: { params:
     ["Configuración", store.onboarding_completed ? "Terminada" : `En el paso ${store.onboarding_step}`],
     ["Tienda", store.is_active ? "Activa" : "Desactivada"],
     [
-      "Plan",
+      "Plan de la tienda",
+      <div key="p" className="space-y-1.5">
+        <PlanChip plan={siteTier(store)} freeUntil={freeUntil(store)} detail />
+        <SitePlanSelect storeId={store.id} value={siteTier(store)} />
+      </div>,
+    ],
+    [
+      "Plan pagado",
       planActive && isPlan(store.plan) ? `${PLANS[store.plan].label} (${store.plan_cycle}) hasta ${formatDate(store.plan_expires_at, false)}`
         : store.plan_expires_at ? `Vencido el ${formatDate(store.plan_expires_at, false)}` : "Nunca pagó un plan",
     ],

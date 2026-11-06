@@ -44,7 +44,7 @@ export type Segment = "suscripcion" | "cupon" | "sin_plan";
 export const SEGMENTS: Record<Segment, { label: string; className: string }> = {
   suscripcion: { label: "Suscripción", className: "bg-emerald-100 text-emerald-800" },
   cupon: { label: "Cupón", className: "bg-sky-100 text-sky-800" },
-  sin_plan: { label: "Sin plan", className: "bg-slate-100 text-slate-600" },
+  sin_plan: { label: "Sin pagar", className: "bg-slate-100 text-slate-600" },
 };
 
 /** Teléfono venezolano a formato de WhatsApp: 0414-1234567 → 584141234567 */

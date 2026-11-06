@@ -15,7 +15,7 @@ export function SitePlanSelect({ storeId, value }: { storeId: string; value: Pla
   const [pending, startTransition] = useTransition();
   return (
     <label className="mt-1.5 block text-xs text-slate-500">
-      Plan:
+      Cambiar:
       <select
         className="ml-1 rounded-lg border border-slate-200 bg-white px-1.5 py-0.5 text-xs font-semibold text-slate-800 disabled:opacity-50"
         value={value}
