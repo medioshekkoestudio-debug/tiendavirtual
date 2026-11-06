@@ -9,14 +9,24 @@ import { getSession } from "@/lib/auth";
 import { isDuplicateEmailError, parseRegistration, registrationMetadata } from "@/lib/registration";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { TRIAL_COUPON } from "@/lib/constants";
 
 const code = (fd: FormData) => String(fd.get("coupon") ?? "").trim().slice(0, 40);
+
+/** La prueba gratis (/prueba-gratis) es un cupón por dentro, pero no se le habla de cupones */
+const isTrial = (coupon: string) => coupon.toLowerCase() === TRIAL_COUPON;
+const trialError = (message: string) =>
+  message.includes("ya usó")
+    ? "Tu tienda ya usó su prueba gratis. Elige un plan para seguir usando tu app."
+    : message.includes("inválido")
+      ? "La prueba gratis no está disponible en este momento. Elige un plan."
+      : message;
 
 /** Canjea el cupón para la tienda de la sesión actual y entra al panel */
 async function redeemAndGo(coupon: string): Promise<FormState> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("redeem_coupon", { p_code: coupon });
-  if (error) return { error: error.message };
+  if (error) return { error: isTrial(coupon) ? trialError(error.message) : error.message };
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -51,7 +61,7 @@ export async function loginWithCoupon(_: FormState, fd: FormData): Promise<FormS
   if (!email || !password) return { error: "Ingresa tu email y contraseña" };
   if (isBot(fd)) return { error: "Email o contraseña incorrectos" };
   if (!(await allowAttempt("login", 15, 600))) return { error: TOO_MANY };
-  if (!(await couponIsValid(coupon))) return { error: "Cupón inválido o vencido" };
+  if (!(await couponIsValid(coupon))) return { error: isTrial(coupon) ? trialError("inválido") : "Cupón inválido o vencido" };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -70,7 +80,7 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
   const coupon = code(fd);
   if (!coupon) return { error: "Escribe tu cupón" };
   if (isBot(fd)) return { error: "No se pudo crear la cuenta" };
-  if (!(await couponIsValid(coupon))) return { error: "Cupón inválido o vencido" };
+  if (!(await couponIsValid(coupon))) return { error: isTrial(coupon) ? trialError("inválido") : "Cupón inválido o vencido" };
   const parsed = parseRegistration(fd);
   if ("error" in parsed) return { error: parsed.error };
   if (!(await allowAttempt("registro", 5, 3600))) return { error: TOO_MANY };
@@ -93,7 +103,7 @@ export async function registerWithCoupon(_: FormState, fd: FormData): Promise<Fo
   }
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  notifyAdmin([...signupLines(parsed.data, `cupón ${coupon}`), adminLink("/superadmin")]);
+  notifyAdmin([...signupLines(parsed.data, isTrial(coupon) ? "prueba gratis" : `cupón ${coupon}`), adminLink("/superadmin")]);
   if (error) return { error: "Cuenta creada, pero no se pudo iniciar sesión. Intenta desde Iniciar sesión." };
   return redeemAndGo(coupon);
 }

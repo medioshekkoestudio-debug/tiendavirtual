@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Gift } from "lucide-react";
 import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
 import { getLandingContent } from "@/lib/landing";
-import { PLANS, SITE_DOMAIN } from "@/lib/constants";
+import { PLANS, SITE_DOMAIN, FREE_TRIAL_DAYS } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
 import { PlansSection } from "./plans-section";
 
@@ -102,7 +102,13 @@ export default async function LandingPage() {
             </span>
             <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">{c.hero_title}</h1>
             <p className="mt-4 text-lg text-white/85">{c.hero_subtitle}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/prueba-gratis"
+              className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-accent/60 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 md:text-base"
+            >
+              <Gift className="size-4 text-accent" /> Prueba gratis por {FREE_TRIAL_DAYS} días <ArrowRight className="size-4" />
+            </Link>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/suscripcion"
                 className="btn w-full bg-accent px-7 py-3.5 text-base font-bold text-[#004d40] shadow-lg shadow-black/20 transition hover:scale-[1.02] hover:brightness-110 sm:w-auto md:text-lg"

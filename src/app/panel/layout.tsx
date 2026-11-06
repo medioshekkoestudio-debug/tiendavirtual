@@ -86,7 +86,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       </div>
       <MarkHasAccount />
       <ActivityTracker />
-      <AccessGate blocked={!access && !planPending} hadCoupon={!!store.coupon_code} />
+      <AccessGate blocked={!access && !planPending} couponCode={store.coupon_code ?? null} />
       <BottomNav
         side
         items={[

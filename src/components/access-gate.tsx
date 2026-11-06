@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Lock, Ticket } from "lucide-react";
+import { TRIAL_COUPON } from "@/lib/constants";
 
 /**
  * Aviso que no se puede cerrar cuando la tienda no tiene plan ni cupón vigente: tapa cualquier pantalla
  * del panel y lleva a comprar un plan. Pagar comisiones sigue permitido.
  */
-export function AccessGate({ blocked, hadCoupon }: { blocked: boolean; hadCoupon: boolean }) {
+export function AccessGate({ blocked, couponCode }: { blocked: boolean; couponCode: string | null }) {
   const pathname = usePathname();
   if (!blocked || pathname.startsWith("/panel/comisiones")) return null;
   return (
@@ -18,7 +19,7 @@ export function AccessGate({ blocked, hadCoupon }: { blocked: boolean; hadCoupon
           <Lock className="size-7" />
         </span>
         <h2 id="gate-title" className="mt-4 text-xl font-bold">
-          {hadCoupon ? "Tu cupón terminó" : "Activa tu plan"}
+          {couponCode?.toLowerCase() === TRIAL_COUPON ? "Tu prueba gratis terminó" : couponCode ? "Tu cupón terminó" : "Activa tu plan"}
         </h2>
         <p className="mt-2 text-slate-600">Para seguir usando tu app y tu tienda, elige un plan y paga. Apenas aprobemos tu pago vuelves a tenerlo todo.</p>
         <div className="mt-5 space-y-2">

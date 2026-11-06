@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
     <>
       {pending && <PendingPlanNotice />}
       <OnboardingWizard store={store} userId={user.id} categories={(categories ?? []) as Category[]} />
-      <AccessGate blocked={!access && !pending} hadCoupon={!!store.coupon_code} />
+      <AccessGate blocked={!access && !pending} couponCode={store.coupon_code ?? null} />
     </>
   );
 }

@@ -6,9 +6,12 @@ import { Ticket } from "lucide-react";
 import { FormError } from "@/components/auth-shell";
 import { RegistrationFields } from "@/app/registro/register-form";
 import { cn } from "@/lib/utils";
+import { TRIAL_COUPON } from "@/lib/constants";
 import { loginWithCoupon, redeemCoupon, registerWithCoupon } from "./actions";
 
-function CouponField({ initial }: { initial: string }) {
+function CouponField({ initial, trial }: { initial: string; trial?: boolean }) {
+  // Prueba gratis: el cupón va fijo y oculto
+  if (trial) return <input type="hidden" name="coupon" value={TRIAL_COUPON} />;
   return (
     <div>
       <label className="label" htmlFor="coupon">Cupón</label>
@@ -31,22 +34,22 @@ function CouponField({ initial }: { initial: string }) {
 }
 
 /** Con sesión de tienda: solo el cupón */
-export function RedeemForm({ initial }: { initial: string }) {
+export function RedeemForm({ initial, trial }: { initial: string; trial?: boolean }) {
   const [state, action, pending] = useActionState(redeemCoupon, undefined);
   return (
     <form action={action} className="space-y-4">
-      <CouponField initial={initial} />
+      <CouponField initial={initial} trial={trial} />
       <FormError message={state?.error} />
       <button className="btn-primary w-full" disabled={pending}>
-        {pending ? "Activando…" : "Activar cupón"}
+        {pending ? "Activando…" : trial ? "Activar mi prueba gratis" : "Activar cupón"}
       </button>
     </form>
   );
 }
 
 /** Sin sesión: «Ya tengo cuenta» (email y contraseña) o «Soy nuevo» (registro de la empresa) */
-export function CouponForms({ initial }: { initial: string }) {
-  const [mode, setMode] = useState<"login" | "registro">("login");
+export function CouponForms({ initial, trial }: { initial: string; trial?: boolean }) {
+  const [mode, setMode] = useState<"login" | "registro">(trial ? "registro" : "login");
   const [loginState, loginAction, loginPending] = useActionState(loginWithCoupon, undefined);
   const [regState, regAction, regPending] = useActionState(registerWithCoupon, undefined);
 
@@ -75,7 +78,7 @@ export function CouponForms({ initial }: { initial: string }) {
       {mode === "login" ? (
         <form action={loginAction} className="space-y-4">
           <Honeypot />
-          <CouponField initial={initial} />
+          <CouponField initial={initial} trial={trial} />
           <div>
             <label className="label" htmlFor="email">Email</label>
             <input id="email" name="email" type="email" autoComplete="email" required className="input" />
@@ -86,16 +89,16 @@ export function CouponForms({ initial }: { initial: string }) {
           </div>
           <FormError message={loginState?.error} />
           <button className="btn-primary w-full" disabled={loginPending}>
-            {loginPending ? "Entrando…" : "Entrar con mi cupón"}
+            {loginPending ? "Entrando…" : trial ? "Entrar y empezar mi prueba" : "Entrar con mi cupón"}
           </button>
         </form>
       ) : (
         <form action={regAction} className="space-y-4">
-          <CouponField initial={initial} />
+          <CouponField initial={initial} trial={trial} />
           <RegistrationFields />
           <FormError message={regState?.error} />
           <button className="btn-primary w-full py-3 text-base" disabled={regPending}>
-            {regPending ? "Creando tu tienda…" : "Crear mi tienda con el cupón"}
+            {regPending ? "Creando tu tienda…" : trial ? "Crear mi tienda gratis" : "Crear mi tienda con el cupón"}
           </button>
         </form>
       )}

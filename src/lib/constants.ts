@@ -305,3 +305,7 @@ export const DEFAULT_LANDING: LandingContent = {
   ],
   footer_text: "© Linki App — Marketplace de tiendas",
 };
+
+/** Cupón de la prueba gratis del banner de la landing (/prueba-gratis); creado por la migración 20261106120000 */
+export const TRIAL_COUPON = "prueba7dias";
+export const FREE_TRIAL_DAYS = 7;
