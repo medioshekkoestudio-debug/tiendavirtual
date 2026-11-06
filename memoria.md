@@ -250,4 +250,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   Probado en producción con tienda desechable (luego borrada).
 - **Plan Business: hasta 500 productos** (antes ilimitado), solo texto en `PLANS`. Los límites 30/100/500 aún no se aplican.
 - Tiendas con prueba gratis o cupón quedan sin plan: diseño Emprendedor, pero comisión 1 % (default de la columna), no 1,5 %.
-  Se le preguntó a la dueña si las quiere como Emprendedor completo (comisión y límite): sin respuesta aún.
+  → Resuelto el 6-nov: Emprendedor completo y 0 % en los días gratis (ver abajo).
+- **Plan, límite de productos y comisión** (`42177d3`, migraciones `20261106150000_limite_productos.sql` y
+  `20261106160000_comision_por_plan.sql`). Plan de la tienda = `store_plan_tier()` / `siteTier()`: `site_plan` → plan pagado
+  vigente → Emprendedor (prueba gratis y cupones quedan en Emprendedor). Límite 30/100/500 con el trigger `products_limit`
+  (cuenta también los ocultos); el panel muestra «N / máx.» y bloquea «Nuevo producto». Comisión con `store_commission_rate()`:
+  0 en días gratis (trial_ends_at vigente sin plan pagado), si no 1,5/1/0,5 %; el trigger `orders_commission` la fija al crear el
+  pedido. `stores.commission_rate` ya no se usa para calcular. El selector del Superadmin ahora dice «Plan:» y cambia diseño,
+  límite y comisión, no los días de acceso. `PLANS[*].maxProducts/commissionRate` deben coincidir con las funciones SQL.
+  Probado en producción con tienda desechable (30 → bloquea el 31; pedido $100: 0 en días gratis, 1,50 después, 1,00 en Pro).
