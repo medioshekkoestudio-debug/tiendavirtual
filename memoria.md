@@ -233,3 +233,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   comprobante (CallMeBot no envía imágenes). Falta `CALLMEBOT_APIKEY`, pedida desde el WhatsApp del 0422.
   El 0412-8364248 de `platform_settings.payment_methods` es el Pago Móvil de cobro: NO es el de atención, no se cambió.
 - La Action de migraciones falló por `SUPABASE_ACCESS_TOKEN` vencido; la usuaria lo renovó el 6-nov. `actions/checkout@v5`.
+- **Aviso de vencimiento de la prueba** probado en producción (cuenta desechable con fecha vencida, luego borrada): `AccessGate`
+  «Tu prueba gratis terminó»; `/panel/comisiones` sigue abierto. Migración `20261106130000_aviso_prueba_gratis.sql`: la campana
+  dice «Tu prueba gratis venció» / «Se vence tu prueba gratis el …» (copia de `_notify_store_access` con ese cambio).
+- **WhatsApp de soporte en la landing**: icono en el pie y botón flotante abajo a la derecha (`wa.me/584225465427` con mensaje).
+  `SUPPORT_WHATSAPP` vive en `constants.ts`.
+- **Términos y Condiciones** (`lib/terms.ts`, `TERMS_VERSION = "2026-11"`; texto del Word de la dueña con 2 erratas corregidas):
+  página `/terminos-y-condiciones` (enlace en el pie y en el sitemap) y casilla obligatoria `accept_terms` en `RegistrationFields`
+  (pasarela de planes, prueba gratis y cupón), con ventana para leerlos. `parseRegistration` la exige y `registrationMetadata`
+  guarda `terms_accepted_at` y `terms_version` en el user_metadata. Al cambiar el texto, subir `TERMS_VERSION`.
