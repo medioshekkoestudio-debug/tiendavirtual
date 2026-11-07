@@ -259,3 +259,11 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   pedido. `stores.commission_rate` ya no se usa para calcular. El selector del Superadmin ahora dice «Plan:» y cambia diseño,
   límite y comisión, no los días de acceso. `PLANS[*].maxProducts/commissionRate` deben coincidir con las funciones SQL.
   Probado en producción con tienda desechable (30 → bloquea el 31; pedido $100: 0 en días gratis, 1,50 después, 1,00 en Pro).
+- **Superadmin: plan de cada tienda** (`a877f93`): columna «Plan» con `PlanChip` (etiqueta del plan y días sin comisión) y
+  `SitePlanSelect` («Cambiar:»); la columna «Tipo» pasa a «Acceso» y el segmento «Sin plan» a «Sin pagar» (`lib/activity.ts`).
+  La ficha `/superadmin/usuarios/[id]` muestra «Plan de la tienda» (con selector) y «Plan pagado».
+- **Botón de soporte para dueños** (`91cad4c`): `components/support-button.tsx`, píldora verde pequeña «Soporte» abajo a la
+  derecha (encima de la barra móvil) en `panel/layout.tsx` y en `/onboarding`; abre `wa.me/584225465427` con «Soy de la tienda
+  «X» (linkiapp.com/slug)…». Se oculta en `/panel/mensajes` (Mensajes es tienda↔cliente, no llega a Linki App). Probado en producción.
+- **Pendientes de la dueña**: `CALLMEBOT_APIKEY` (desde el WhatsApp del 0422) en Vercel y revisar que `ADMIN_WHATSAPP_PHONE`
+  en Vercel no tenga el número viejo; sin eso los avisos al admin no salen.
