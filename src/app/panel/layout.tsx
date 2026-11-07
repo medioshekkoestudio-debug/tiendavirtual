@@ -4,6 +4,7 @@ import { ExternalLink, LogOut, Percent, Settings } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { BottomNav } from "@/components/bottom-nav";
 import { AccessGate } from "@/components/access-gate";
+import { SupportButton } from "@/components/support-button";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { MarkHasAccount } from "@/components/account-flag";
 import { InstallAppButton } from "@/components/install-app";
@@ -84,6 +85,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       <div className="lg:pl-56">
         <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
       </div>
+      <SupportButton storeName={store.name} slug={store.slug} />
       <MarkHasAccount />
       <ActivityTracker />
       <AccessGate blocked={!access && !planPending} couponCode={store.coupon_code ?? null} />

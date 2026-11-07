@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AccessGate } from "@/components/access-gate";
+import { SupportButton } from "@/components/support-button";
 import { PendingPlanNotice } from "@/components/notifications";
 import { hasAccess, hasPendingPlanPayment } from "@/lib/access";
 import { getOwnerStore } from "@/lib/auth";
@@ -18,6 +19,7 @@ export default async function OnboardingPage() {
     <>
       {pending && <PendingPlanNotice />}
       <OnboardingWizard store={store} userId={user.id} categories={(categories ?? []) as Category[]} />
+      <SupportButton storeName={store.name} slug={store.slug} />
       <AccessGate blocked={!access && !pending} couponCode={store.coupon_code ?? null} />
     </>
   );
