@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Plus, Search } from "lucide-react";
 import type { Category, Product, Store } from "@/lib/types";
 import { cn, formatBs, formatMoney, toBs } from "@/lib/utils";
@@ -85,7 +86,34 @@ export function StorefrontHome({
   /** Título de la página para lectores de pantalla (Business: el catálogo es una página aparte) */
   title?: string;
 }) {
-  const [query, setQuery] = useState("");
+  // La búsqueda vive en ?q= para que el buscador de la barra superior y el del catálogo sean el mismo
+  const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const urlQuery = linkBase ? (params.get("q") ?? "") : "";
+  const [query, setQueryState] = useState(urlQuery);
+  const pushed = useRef(urlQuery);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Solo se copia de la URL lo que viene de afuera (la barra superior), no el eco de lo que se escribe aquí
+  useEffect(() => {
+    if (urlQuery.trim() !== pushed.current.trim()) {
+      pushed.current = urlQuery;
+      setQueryState(urlQuery);
+    }
+  }, [urlQuery]);
+  const setQuery = (q: string) => {
+    setQueryState(q);
+    if (!linkBase) return;
+    pushed.current = q;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      const sp = new URLSearchParams(window.location.search);
+      if (q.trim()) sp.set("q", q.trim());
+      else sp.delete("q");
+      const qs = sp.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }, 300);
+  };
   const [cat, setCat] = useState<string | null>(null);
   const parents = categories.filter((c) => !c.parent_id);
   const href = (p: Product) => (linkBase ? `${linkBase}/producto/${p.id}` : undefined);

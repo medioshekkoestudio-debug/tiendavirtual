@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 import { adultCookieName } from "@/lib/age-gate";
 import { AgeGate } from "./age-gate";
 import { BottomNav } from "@/components/bottom-nav";
@@ -87,14 +88,18 @@ export default async function StoreLayout({ children, params }: Params & { child
             </Link>
           </div>
         )}
+        <Suspense fallback={<div className="h-14" />}>
         <StoreTopBar
           slug={store.slug}
+          accent={store.accent_color}
+          searchHref={business ? `${base}/tienda` : base}
           name={store.name}
           logoUrl={store.logo_url}
           color={store.primary_color}
           links={business ? [{ href: base, label: "Inicio" }, ...pages] : undefined}
           user={profile ? { name: profile.full_name || profile.email || "Mi cuenta" } : null}
         />
+        </Suspense>
         <main className="mx-auto max-w-3xl">{children}</main>
         <CookieBanner scope={store.slug} name={store.name} aboveNav />
         <BottomNav
