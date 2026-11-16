@@ -284,3 +284,15 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   precio «Desde» si los modelos tienen precios distintos. Pedidos y Mis compras muestran lo elegido.
 - **Zoom de fotos** (`components/image-zoom.tsx`): en la ficha, tocar la foto o una miniatura abre el visor a pantalla completa
   (doble toque/clic, pellizco o rueda para zoom, arrastrar para mover, deslizar o flechas entre fotos).
+- **Barra superior de la tienda** (`[slug]/top-bar.tsx`): logo grande en cuadro blanco que sobresale, sin nombre (solo sr-only),
+  fondo = `accent_color` aclarado 30 % con línea inferior en `primary_color`; letras/iconos negros o blancos con `contrastText`.
+  El buscador en la barra se probó y se quitó a pedido; el del catálogo sigue y guarda la búsqueda en `?q=`.
+- Sin logo sobre el banner (ProHero/BusinessHero). Visor de fotos con fondo blanco.
+- **Productos relacionados** (`components/related-products.tsx`): misma categoría (primero misma subcategoría y con stock),
+  3 visibles en móvil / 4 en PC, scroll horizontal, flechas en PC, avanza solo cada 3,5 s.
+- **Compartir producto**: icono redondo junto al nombre (sobre la foto se perdía); en el teléfono abre el menú del sistema,
+  en PC WhatsApp Web. `generateMetadata` de la ficha da vista previa con foto, nombre y precio.
+- **iPhone**: la ficha abría con el desplazamiento anterior y la foto/flecha quedaban bajo la barra → `scrollTo(0)` al abrir
+  y `scroll-padding-top: 4.5rem`. Sin rebote: `overscroll-behavior-y: none` en html/body (también quita «deslizar para
+  recargar» en Android). Confirmado por la dueña en su iPhone. Para emular iPhone: Playwright + WebKit
+  (`npx playwright install webkit`, fuera del repo).
