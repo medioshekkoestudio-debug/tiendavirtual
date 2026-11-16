@@ -52,6 +52,8 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  /* Al desplazarse a una sección (o al cambiar de página) el contenido no queda debajo de la barra fija de la tienda */
+  scroll-padding-top: 4.5rem;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }

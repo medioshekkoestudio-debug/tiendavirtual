@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Expand, Minus, Plus, Share2, ShoppingCart } from "lucide-react";
 import { useCart } from "@/components/cart";
 import { ImageViewer } from "@/components/image-zoom";
@@ -21,6 +21,12 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
   const [added, setAdded] = useState(false);
   const [viewer, setViewer] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // La ficha siempre abre desde arriba: en el iPhone el navegador a veces conserva el desplazamiento de la página
+  // anterior y la parte de arriba de la foto (con la flecha de volver) quedaba escondida debajo de la barra
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+  }, [product.id]);
 
   // WhatsApp directo: el amigo recibe el enlace a la vista de este producto (con su foto, por la vista previa)
   function shareWhatsApp() {
