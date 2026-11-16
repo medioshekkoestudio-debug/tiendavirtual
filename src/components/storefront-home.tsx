@@ -6,11 +6,15 @@ import { Plus, Search } from "lucide-react";
 import type { Category, Product, Store } from "@/lib/types";
 import { cn, formatBs, formatMoney, toBs } from "@/lib/utils";
 import { useCart } from "./cart";
+import { needsChoice, priceRange } from "@/lib/product-options";
 import { StoreSlider } from "./store-slider";
 
 export function ProductCard({ product, href, compact, bsRate }: { product: Product; href?: string; compact?: boolean; bsRate?: number | null }) {
   const cart = useCart();
   const out = product.stock <= 0;
+  const choose = needsChoice(product);
+  const range = priceRange(product);
+  const from = range.min < range.max;
   const body = (
     <>
       <div className="relative">
@@ -24,15 +28,27 @@ export function ProductCard({ product, href, compact, bsRate }: { product: Produ
       </div>
       <div className="p-2.5">
         <p className={cn("font-brand line-clamp-2 font-semibold leading-snug", compact ? "text-sm" : "text-[15px]")}>{product.name}</p>
-        <p className="mt-1 font-bold text-brand">{formatMoney(product.price)}</p>
-        {bsRate ? <p className="pr-9 text-[11px] font-medium text-slate-500">{formatBs(toBs(product.price, bsRate))}</p> : null}
+        <p className="mt-1 font-bold text-brand">
+          {from && <span className="text-xs font-medium text-slate-500">Desde </span>}
+          {formatMoney(range.min)}
+        </p>
+        {bsRate ? <p className="pr-9 text-[11px] font-medium text-slate-500">{formatBs(toBs(range.min, bsRate))}</p> : null}
       </div>
     </>
   );
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       {href ? <Link href={href}>{body}</Link> : body}
-      {cart && !out && (
+      {cart && !out && choose && href && (
+        <Link
+          href={href}
+          aria-label={`Elegir opciones de ${product.name}`}
+          className="absolute bottom-2.5 right-2.5 grid size-8 place-items-center rounded-full bg-brand text-on-brand shadow transition active:scale-90"
+        >
+          <Plus className="size-4" />
+        </Link>
+      )}
+      {cart && !out && !choose && (
         <button
           type="button"
           aria-label={`Agregar ${product.name} al carrito`}

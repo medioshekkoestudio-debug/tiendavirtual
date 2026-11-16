@@ -92,6 +92,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 <li key={it.id} className="flex justify-between gap-2">
                   <span className="truncate">
                     {it.quantity} × {it.product_name}
+                    {it.variant && <span className="ml-1 text-slate-600">— {it.variant}</span>}
                     {it.category_id && <span className="ml-1 text-xs text-slate-400">({catName.get(it.category_id)})</span>}
                   </span>
                   <span className="font-medium">{formatMoney(it.quantity * Number(it.unit_price))}</span>

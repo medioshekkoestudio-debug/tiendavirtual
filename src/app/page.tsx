@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Gift } from "lucide-react";
 import { LandingAuthButtons } from "@/components/account-flag";
 import { Logo } from "@/components/logo";
+import { CookieBanner } from "@/components/cookie-banner";
 import { getLandingContent } from "@/lib/landing";
 import { PLANS, SITE_DOMAIN, FREE_TRIAL_DAYS, SUPPORT_WHATSAPP } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
@@ -238,6 +239,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      <CookieBanner scope="landing" name="Linki App" />
       <footer className="flex flex-col items-center gap-3 border-t py-8 text-center text-sm text-slate-500">
         <Logo className="h-7" />
         <ul className="flex gap-3">

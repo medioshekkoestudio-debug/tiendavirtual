@@ -17,7 +17,14 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   const catalog = (
     <StorefrontHome store={store} products={products} categories={categories} linkBase={base} bsRate={bsRate} hideIntro={tier !== "emprendedor"} />
   );
-  if (tier === "emprendedor") return catalog;
+  if (tier === "emprendedor") {
+    return (
+      <>
+        {catalog}
+        <SiteFooter store={store} base={base} />
+      </>
+    );
+  }
 
   const site = resolveSite(store);
   // Foto de portada: la que eligió, si no la primera del slider o de un producto
@@ -33,7 +40,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
         <div className="pt-2">{catalog}</div>
         <About site={site} image={aboutImage} />
         <Contact site={site} base={base} />
-        <SiteFooter name={store.name} base={base} />
+        <SiteFooter store={store} base={base} />
       </>
     );
   }
@@ -49,7 +56,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
       <Testimonials site={site} />
       <CtaBand base={base} />
       <Contact site={site} base={base} wide />
-      <SiteFooter name={store.name} base={base} business />
+      <SiteFooter store={store} base={base} business />
     </FullBleed>
   );
 }

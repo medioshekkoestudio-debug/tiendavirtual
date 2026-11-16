@@ -5,6 +5,7 @@ import { getActiveOwnerStore } from "./auth";
 import { FONT_OPTIONS } from "./font-options";
 import { PAYMENT_METHOD_KEYS, isRubro } from "./constants";
 import { cleanMethodConfig } from "./payment-details";
+import { cleanOptions, sizeChoices, type ProductOptions } from "./product-options";
 import { GALLERY_SLOTS, HIGHLIGHT_SLOTS, TESTIMONIAL_SLOTS, VALUE_SLOTS, safeImage, type SiteContent } from "./site";
 import type { OrderStatus, PaymentMethodConfig, PaymentMethodKey } from "./types";
 
@@ -190,6 +191,8 @@ export type ProductInput = {
   subcategory_id: string | null;
   image_url: string | null;
   is_active: boolean;
+  product_type: "basic" | "complete";
+  options: ProductOptions;
 };
 
 export async function saveProduct(input: ProductInput): Promise<ActionResult> {
@@ -200,6 +203,10 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
   if (!name) return { error: "El producto necesita un nombre" };
   if (!Number.isFinite(price) || price < 0) return { error: "Precio inválido" };
   if (!Number.isFinite(stock) || stock < 0) return { error: "Stock inválido" };
+  const complete = input.product_type === "complete";
+  const options = cleanOptions(input.options);
+  if (complete && !options.models.length && !sizeChoices(options).length)
+    return { error: "Agrega al menos un modelo, una talla o una medida (o elige Producto básico)" };
 
   const row = {
     store_id: store.id,
@@ -211,6 +218,8 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
     subcategory_id: input.subcategory_id || null,
     image_url: cleanUrl(input.image_url),
     is_active: input.is_active,
+    product_type: complete ? ("complete" as const) : ("basic" as const),
+    options: complete ? options : {},
   };
   const query = input.id
     ? supabase.from("products").update(row).eq("id", input.id).eq("store_id", store.id).select("id").single()

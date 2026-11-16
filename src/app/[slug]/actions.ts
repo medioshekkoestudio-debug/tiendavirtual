@@ -13,7 +13,7 @@ import type { PaymentMethodKey } from "@/lib/types";
 export type CheckoutInput = {
   storeId: string;
   slug: string;
-  items: { product_id: string; quantity: number }[];
+  items: { product_id: string; quantity: number; model_id?: string; size?: string }[];
   customer: { name: string; cedula: string; phone: string; email: string; notes: string };
   delivery: { type: "envio" | "retiro"; address: string; scheduled_for: string | null };
   payment: { method: PaymentMethodKey; reference: string };
@@ -69,7 +69,12 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
 
   const { data, error } = await supabase.rpc("place_order", {
     p_store: input.storeId,
-    p_items: input.items.map((i) => ({ product_id: i.product_id, quantity: Math.trunc(i.quantity) })),
+    p_items: input.items.map((i) => ({
+      product_id: i.product_id,
+      quantity: Math.trunc(i.quantity),
+      ...(i.model_id ? { model_id: String(i.model_id).slice(0, 20) } : {}),
+      ...(i.size ? { size: String(i.size).slice(0, 40) } : {}),
+    })),
     p_customer: input.customer,
     p_delivery: input.delivery,
     p_payment: input.payment,

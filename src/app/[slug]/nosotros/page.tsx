@@ -54,7 +54,7 @@ export default async function AboutPage({ params }: Params) {
       <Testimonials site={site} />
       <CtaBand base={base} title="¿Te gustaría conocer lo que hacemos?" />
       <Contact site={site} base={base} wide />
-      <SiteFooter name={store.name} base={base} business />
+      <SiteFooter store={store} base={base} business />
     </FullBleed>
   );
 }

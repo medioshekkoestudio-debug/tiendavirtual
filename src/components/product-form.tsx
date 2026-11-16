@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { saveProduct, type ProductInput } from "@/lib/store-actions";
 import type { Category, Product } from "@/lib/types";
 import { ImageUpload } from "./image-upload";
+import { ProductOptionsEditor } from "./product-options-editor";
+import { cn } from "@/lib/utils";
 
 function readDraft(key: string): ProductInput | null {
   try {
@@ -39,6 +41,8 @@ export function ProductForm({
     subcategory_id: product?.subcategory_id ?? null,
     image_url: product?.image_url ?? null,
     is_active: product?.is_active ?? true,
+    product_type: product?.product_type ?? "basic",
+    options: product?.options ?? {},
   };
   // Borrador en este navegador: si la ventana se cierra o el teléfono recarga la página al elegir la foto,
   // lo escrito se recupera al volver a abrir el mismo producto. Se borra al guardar.
@@ -54,7 +58,7 @@ export function ProductForm({
   useEffect(() => {
     const draft = readDraft(draftKey);
     if (draft) {
-      setForm(draft);
+      setForm({ ...draft, product_type: draft.product_type ?? "basic", options: draft.options ?? {} });
       setRestored(true);
     }
     setReady(true);
@@ -92,6 +96,26 @@ export function ProductForm({
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de producto">
+        {(
+          [
+            ["basic", "Producto básico", "Una foto y un precio"],
+            ["complete", "Producto completo", "Modelos, tallas o medidas"],
+          ] as const
+        ).map(([k, title, sub]) => (
+          <button
+            key={k}
+            type="button"
+            role="radio"
+            aria-checked={form.product_type === k}
+            onClick={() => set("product_type", k)}
+            className={cn("rounded-xl border-2 p-3 text-left", form.product_type === k ? "border-brand bg-brand/5" : "border-slate-200 bg-white")}
+          >
+            <span className="block text-sm font-semibold">{title}</span>
+            <span className="block text-xs text-slate-500">{sub}</span>
+          </button>
+        ))}
+      </div>
       {restored && (
         <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
           <span className="flex-1">Recuperamos lo que estabas escribiendo.</span>
@@ -101,7 +125,7 @@ export function ProductForm({
         </div>
       )}
       <ImageUpload
-        label="Imagen del producto"
+        label={form.product_type === "complete" ? "Imagen principal" : "Imagen del producto"}
         value={form.image_url}
         onChange={(u) => set("image_url", u)}
         userId={userId}
@@ -119,7 +143,7 @@ export function ProductForm({
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label" htmlFor="p-price">Precio (USD)</label>
+          <label className="label" htmlFor="p-price">{form.product_type === "complete" ? "Precio general (USD)" : "Precio (USD)"}</label>
           <input
             id="p-price"
             className="input"
@@ -132,7 +156,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className="label" htmlFor="p-stock">Stock</label>
+          <label className="label" htmlFor="p-stock">{form.product_type === "complete" ? "Stock total" : "Stock"}</label>
           <input
             id="p-stock"
             className="input"
@@ -176,6 +200,9 @@ export function ProductForm({
           </select>
         </div>
       </div>
+      {form.product_type === "complete" && (
+        <ProductOptionsEditor value={form.options} onChange={(v) => set("options", v)} basePrice={form.price} userId={userId} />
+      )}
       <label className="flex items-center gap-2 text-sm font-medium">
         <input type="checkbox" className="size-4 accent-[var(--brand)]" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} />
         Visible en la tienda

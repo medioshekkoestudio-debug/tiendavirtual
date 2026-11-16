@@ -20,7 +20,7 @@ export default async function StoreCatalogPage({ params }: { params: Promise<{ s
       <div className="mx-auto max-w-5xl">
         <StorefrontHome store={store} products={products} categories={categories} linkBase={base} bsRate={bsRate} hideIntro title={`Tienda de ${store.name}`} />
       </div>
-      <SiteFooter name={store.name} base={base} business />
+      <SiteFooter store={store} base={base} business />
     </FullBleed>
   );
 }

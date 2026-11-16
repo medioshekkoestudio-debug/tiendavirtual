@@ -117,6 +117,9 @@ export type Product = {
   image_url: string | null;
   is_active: boolean;
   created_at: string;
+  /** basic = un solo precio; complete = modelos, tallas o medidas (ver lib/product-options.ts) */
+  product_type: "basic" | "complete";
+  options: import("./product-options").ProductOptions;
 };
 
 export type OrderStatus = "pendiente" | "pagado" | "enviado" | "entregado" | "cancelado";
@@ -131,6 +134,8 @@ export type OrderItem = {
   subcategory_id: string | null;
   quantity: number;
   unit_price: number;
+  /** Modelo y talla/medida elegidos: «Azul · Talla M» */
+  variant: string | null;
 };
 
 export type Payment = {

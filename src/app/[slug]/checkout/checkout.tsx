@@ -99,7 +99,7 @@ export function Checkout({
       const res = await placeOrder({
         storeId,
         slug,
-        items: cart.items.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
+        items: cart.items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, model_id: i.model_id, size: i.size })),
         customer,
         delivery: {
           type: delivery,
@@ -167,7 +167,7 @@ export function Checkout({
             ) : (
               <ul className="divide-y divide-slate-100">
                 {cart.items.map((i) => (
-                  <li key={i.product_id} className="flex items-center gap-3 py-3">
+                  <li key={i.key} className="flex items-center gap-3 py-3">
                     {i.image_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={i.image_url} alt="" className="size-14 rounded-xl object-cover" />
@@ -176,20 +176,21 @@ export function Checkout({
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{i.name}</p>
+                      {i.variant && <p className="truncate text-xs text-slate-500">{i.variant}</p>}
                       <Money usd={i.price} rate={rate} className="text-sm text-slate-500" bsClassName="text-[11px]" />
                       <div className="mt-1 flex items-center gap-2">
-                        <button type="button" className="rounded-lg border p-1" aria-label="Menos" onClick={() => cart.setQty(i.product_id, i.quantity - 1)}>
+                        <button type="button" className="rounded-lg border p-1" aria-label="Menos" onClick={() => cart.setQty(i.key, i.quantity - 1)}>
                           <Minus className="size-3.5" />
                         </button>
                         <span className="w-6 text-center text-sm font-semibold">{i.quantity}</span>
-                        <button type="button" className="rounded-lg border p-1" aria-label="Más" onClick={() => cart.setQty(i.product_id, i.quantity + 1)}>
+                        <button type="button" className="rounded-lg border p-1" aria-label="Más" onClick={() => cart.setQty(i.key, i.quantity + 1)}>
                           <Plus className="size-3.5" />
                         </button>
                       </div>
                     </div>
                     <div className="text-right">
                       <Money usd={i.price * i.quantity} rate={rate} className="items-end font-bold" />
-                      <button type="button" className="mt-1 text-rose-500" aria-label="Quitar" onClick={() => cart.remove(i.product_id)}>
+                      <button type="button" className="mt-1 text-rose-500" aria-label="Quitar" onClick={() => cart.remove(i.key)}>
                         <Trash2 className="size-4" />
                       </button>
                     </div>

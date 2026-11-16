@@ -267,3 +267,20 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   «X» (linkiapp.com/slug)…». Se oculta en `/panel/mensajes` (Mensajes es tienda↔cliente, no llega a Linki App). Probado en producción.
 - **Pendientes de la dueña**: `CALLMEBOT_APIKEY` (desde el WhatsApp del 0422) en Vercel y revisar que `ADMIN_WHATSAPP_PHONE`
   en Vercel no tenga el número viejo; sin eso los avisos al admin no salen.
+
+### 2026-11-16 — Sesión 4 (sin subir: pendiente de revisión en local)
+- **Aviso de cookies** (`components/cookie-banner.tsx`): abajo en la landing y en cada tienda (encima de la barra inferior),
+  la primera vez. La aceptación se guarda por separado (`linki:cookies:landing` y `linki:cookies:<slug>`) en localStorage + cookie 1 año.
+- **Antes del pie de cada tienda** (`components/store-legal.tsx`, dentro de `SiteFooter`, que ahora recibe `store`): insignias de
+  los métodos de pago activados por la tienda, «© {año} {tienda}. Todos los derechos reservados.» y aviso de responsabilidad
+  (la tienda responde por productos, envíos y garantías; Linki App solo da la plataforma). El plan Emprendedor y la ficha del
+  producto ahora también tienen pie.
+- **Producto básico o completo** (migración `20261116120000_producto_completo.sql`: `products.product_type`, `products.options`
+  jsonb, `order_items.variant`; `place_order` reescrito). Completo = modelos (foto + precio propio opcional) y tallas
+  (XS–XL + propias) o medidas (Pequeño–Muy grande con ancho/largo/profundidad opcionales en cm); cada modelo puede
+  desactivar tallas/medidas. Lógica compartida en `lib/product-options.ts`; editor `components/product-options-editor.tsx`.
+  La base valida modelo/talla y pone el precio del modelo (el navegador solo manda ids). Stock es uno solo por producto.
+  Carrito con una línea por producto+modelo+talla (`CartItem.key`); el «+» de la tarjeta lleva a la ficha si hay que elegir;
+  precio «Desde» si los modelos tienen precios distintos. Pedidos y Mis compras muestran lo elegido.
+- **Zoom de fotos** (`components/image-zoom.tsx`): en la ficha, tocar la foto o una miniatura abre el visor a pantalla completa
+  (doble toque/clic, pellizco o rueda para zoom, arrastrar para mover, deslizar o flechas entre fotos).

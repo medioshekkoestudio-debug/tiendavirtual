@@ -50,7 +50,10 @@ export default async function MyPurchasesPage({ params }: { params: Promise<{ sl
             <ul className="mt-3 space-y-1 text-sm">
               {o.order_items.map((it) => (
                 <li key={it.id} className="flex justify-between gap-2">
-                  <span className="truncate">{it.quantity} × {it.product_name}</span>
+                  <span className="truncate">
+                    {it.quantity} × {it.product_name}
+                    {it.variant && <span className="text-slate-500"> — {it.variant}</span>}
+                  </span>
                   <span>{formatMoney(it.quantity * Number(it.unit_price))}</span>
                 </li>
               ))}

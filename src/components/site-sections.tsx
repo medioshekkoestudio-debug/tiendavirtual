@@ -7,9 +7,10 @@ import {
 } from "lucide-react";
 import type { IconKey, ResolvedSite } from "@/lib/site";
 import { instagramLink, whatsappLink } from "@/lib/site";
-import type { Product } from "@/lib/types";
+import type { Product, Store } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "./storefront-home";
+import { StoreLegal } from "./store-legal";
 
 const ICONS: Record<IconKey, LucideIcon> = {
   star: Star, truck: Truck, shield: Shield, heart: Heart, sparkles: Sparkles, clock: Clock,
@@ -281,10 +282,12 @@ export function Contact({ site, base, wide }: { site: ResolvedSite; base: string
   );
 }
 
-export function SiteFooter({ name, base, business }: { name: string; base: string; business?: boolean }) {
+export function SiteFooter({ store, base, business }: { store: Pick<Store, "name" | "payment_methods">; base: string; business?: boolean }) {
   return (
-    <footer className="mt-14 border-t border-slate-200 px-4 pt-8 text-center text-sm text-slate-500">
-      <p className="font-brand text-base font-bold text-slate-800">{name}</p>
+    <>
+      <StoreLegal store={store} />
+      <footer className="mt-8 border-t border-slate-200 px-4 pt-8 text-center text-sm text-slate-500">
+      <p className="font-brand text-base font-bold text-slate-800">{store.name}</p>
       {business && (
         <nav className="mt-3 flex justify-center gap-5 font-medium">
           <Link href={base}>Inicio</Link>
@@ -297,7 +300,8 @@ export function SiteFooter({ name, base, business }: { name: string; base: strin
         Hecho con{" "}
         <a href="https://linkiapp.com" className="font-semibold text-slate-700">Linki App</a>
       </p>
-    </footer>
+      </footer>
+    </>
   );
 }
 

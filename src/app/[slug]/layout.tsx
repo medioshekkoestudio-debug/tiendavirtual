@@ -6,6 +6,7 @@ import { adultCookieName } from "@/lib/age-gate";
 import { AgeGate } from "./age-gate";
 import { BottomNav } from "@/components/bottom-nav";
 import { CartProvider } from "@/components/cart";
+import { CookieBanner } from "@/components/cookie-banner";
 import { themeStyle } from "@/components/theme-vars";
 import { getSession } from "@/lib/auth";
 import { siteTier } from "@/lib/site";
@@ -95,6 +96,7 @@ export default async function StoreLayout({ children, params }: Params & { child
           user={profile ? { name: profile.full_name || profile.email || "Mi cuenta" } : null}
         />
         <main className="mx-auto max-w-3xl">{children}</main>
+        <CookieBanner scope={store.slug} name={store.name} aboveNav />
         <BottomNav
           items={[
             { href: base, label: "Inicio", icon: "home", exact: true },
