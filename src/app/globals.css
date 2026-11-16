@@ -54,6 +54,8 @@ html {
   -webkit-tap-highlight-color: transparent;
   /* Al desplazarse a una sección (o al cambiar de página) el contenido no queda debajo de la barra fija de la tienda */
   scroll-padding-top: 4.5rem;
+  /* Sin el rebote al estirar arriba o abajo (iPhone); también quita el «deslizar para recargar» de Android */
+  overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -63,6 +65,7 @@ body {
   background: #f5f7f6;
   color: #004d40;
   overflow-x: clip;
+  overscroll-behavior-y: none;
 }
 
 .font-brand {
