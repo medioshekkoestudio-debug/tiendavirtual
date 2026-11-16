@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Check, Expand, Minus, Plus, Share2, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Expand, Minus, Plus, Share2, ShoppingCart } from "lucide-react";
 import { useCart } from "@/components/cart";
 import { ImageViewer } from "@/components/image-zoom";
 import { whatsAppShareUrl } from "@/components/share-whatsapp";
-import { WHATSAPP_ICON_PATH } from "@/lib/whatsapp-icon";
 import { choicesFor, measureText, variantLabel, type ProductModel } from "@/lib/product-options";
 import type { Product } from "@/lib/types";
 import { cn, formatBs, formatMoney, toBs } from "@/lib/utils";
@@ -22,7 +21,6 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
   const [added, setAdded] = useState(false);
   const [viewer, setViewer] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // WhatsApp directo: el amigo recibe el enlace a la vista de este producto (con su foto, por la vista previa)
   function shareWhatsApp() {
@@ -31,10 +29,10 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
     window.open(whatsAppShareUrl(message), "_blank", "noopener,noreferrer");
   }
 
-  // Compartir: menú del teléfono (WhatsApp, Instagram…) si existe; si no, copia el enlace
+  // Compartir: en el teléfono abre su menú (WhatsApp, Instagram…); donde no existe, va directo a WhatsApp
   async function share() {
     const url = window.location.origin + window.location.pathname;
-    const data = { title: product.name, text: `Mira ${product.name} — ${formatMoney(price)}`, url };
+    const data = { title: product.name, text: `¡Mira este producto! 👀 ${product.name} — ${formatMoney(price)}`, url };
     if (navigator.share) {
       try {
         await navigator.share(data);
@@ -43,14 +41,7 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
         if ((e as Error).name === "AbortError") return;
       }
     }
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      window.prompt("Copia el enlace del producto:", url);
-      return;
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    shareWhatsApp();
   }
 
   // Galería: la foto principal y la de cada modelo (sin repetir)
@@ -112,13 +103,8 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
           <ArrowLeft className="size-5" />
         </Link>
         <button type="button" onClick={share} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow" aria-label="Compartir producto" title="Compartir">
-          {copied ? <Check className="size-5 text-emerald-600" /> : <Share2 className="size-5" />}
+          <Share2 className="size-5" />
         </button>
-        {copied && (
-          <span role="status" className="absolute right-3 top-14 rounded-full bg-slate-900/85 px-3 py-1 text-xs font-medium text-white">
-            ¡Enlace copiado!
-          </span>
-        )}
       </div>
 
       {images.length > 1 && (
@@ -143,20 +129,7 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
       )}
 
       <div className="space-y-4 px-4 pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="font-brand text-2xl font-bold">{product.name}</h1>
-        </div>
-        <div className="flex gap-2">
-          <button type="button" onClick={shareWhatsApp} className="btn flex-1 bg-[#25D366] py-2 text-sm text-white hover:bg-[#1ebe5b]">
-            <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden>
-              <path d={WHATSAPP_ICON_PATH} />
-            </svg>
-            Compartir por WhatsApp
-          </button>
-          <button type="button" onClick={share} className="btn-outline shrink-0 px-3 py-2 text-sm" aria-label="Compartir producto (otras apps o copiar enlace)" title="Más opciones">
-            <Share2 className="size-4" />
-          </button>
-        </div>
+        <h1 className="font-brand text-2xl font-bold">{product.name}</h1>
         <div>
           <p className="text-2xl font-extrabold text-brand">{formatMoney(price)}</p>
           {bsRate && <p className="text-sm font-medium text-slate-500">{formatBs(toBs(price, bsRate))}</p>}
