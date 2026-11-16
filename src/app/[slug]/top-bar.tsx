@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { LogOut, QrCode, Search, ShoppingBag, ShoppingCart, User, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { LogOut, QrCode, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { signOut } from "@/app/auth-actions";
 import { useCart } from "@/components/cart";
 import { InstallAppButton } from "@/components/install-app";
@@ -24,80 +24,6 @@ function lighten(hex: string, amount: number) {
   );
 }
 
-/** Buscador de la barra: en la página del catálogo filtra mientras se escribe (?q=); en otra página, al dar Enter lleva al catálogo. */
-function HeaderSearch({ searchHref }: { searchHref: string }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
-  const onCatalog = pathname === searchHref;
-  const [value, setValue] = useState(onCatalog ? (params.get("q") ?? "") : "");
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const pushed = useRef(value);
-  const urlQuery = onCatalog ? (params.get("q") ?? "") : "";
-
-  // Si el buscador del catálogo cambia ?q=, la barra lo refleja (sin pisar lo que se está escribiendo aquí)
-  useEffect(() => {
-    if (onCatalog && urlQuery.trim() !== pushed.current.trim()) {
-      pushed.current = urlQuery;
-      setValue(urlQuery);
-    }
-  }, [urlQuery, onCatalog]);
-
-  function go(q: string, live: boolean) {
-    pushed.current = q;
-    const url = q.trim() ? `${searchHref}?q=${encodeURIComponent(q.trim())}` : searchHref;
-    if (live) router.replace(url, { scroll: false });
-    else {
-      router.push(url + "#catalogo");
-    }
-  }
-
-  function change(q: string) {
-    setValue(q);
-    if (!onCatalog) return;
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => go(q, true), 250);
-  }
-
-  return (
-    <form
-      role="search"
-      className="relative min-w-0 flex-1"
-      onSubmit={(e) => {
-        e.preventDefault();
-        clearTimeout(timer.current);
-        go(value, false);
-        (document.activeElement as HTMLElement | null)?.blur();
-      }}
-    >
-      <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 opacity-70" aria-hidden />
-      <input
-        type="search"
-        enterKeyHint="search"
-        value={value}
-        onChange={(e) => change(e.target.value)}
-        placeholder="Buscar producto"
-        aria-label="Buscar producto"
-        className="h-9 w-full rounded-full border-0 bg-white/40 pl-8 pr-8 text-base text-current outline-none placeholder:text-current placeholder:opacity-60 focus:bg-white/70 focus:ring-2 focus:ring-white/80 sm:text-sm [&::-webkit-search-cancel-button]:hidden"
-      />
-      {value && (
-        <button
-          type="button"
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-1 opacity-70 hover:opacity-100"
-          aria-label="Borrar búsqueda"
-          onClick={() => {
-            clearTimeout(timer.current);
-            setValue("");
-            if (onCatalog) go("", true);
-          }}
-        >
-          <X className="size-4" />
-        </button>
-      )}
-    </form>
-  );
-}
-
 export function StoreTopBar({
   slug,
   name,
@@ -106,7 +32,6 @@ export function StoreTopBar({
   accent,
   user,
   links,
-  searchHref,
 }: {
   slug: string;
   name: string;
@@ -116,10 +41,8 @@ export function StoreTopBar({
   /** Color de acento sacado del logo: fondo de la barra */
   accent: string;
   user: { name: string } | null;
-  /** Páginas de la web (plan Business): en PC van junto al buscador */
+  /** Páginas de la web (plan Business): en PC van junto al logo */
   links?: { href: string; label: string }[];
-  /** Página donde está el catálogo (el buscador filtra ahí) */
-  searchHref: string;
 }) {
   const cart = useCart();
   const pathname = usePathname();
@@ -158,7 +81,7 @@ export function StoreTopBar({
           </nav>
         )}
 
-        <HeaderSearch searchHref={searchHref} />
+        <div className="flex-1" />
 
         <div className="flex shrink-0 items-center">
           <button type="button" onClick={() => setQrOpen(true)} className={iconBtn} aria-label="Compartir tienda" title="Compartir tienda">

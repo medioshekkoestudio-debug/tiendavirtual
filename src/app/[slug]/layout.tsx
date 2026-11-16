@@ -92,7 +92,6 @@ export default async function StoreLayout({ children, params }: Params & { child
         <StoreTopBar
           slug={store.slug}
           accent={store.accent_color}
-          searchHref={business ? `${base}/tienda` : base}
           name={store.name}
           logoUrl={store.logo_url}
           color={store.primary_color}
