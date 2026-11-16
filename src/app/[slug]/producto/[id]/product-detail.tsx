@@ -102,9 +102,6 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
         <Link href={`/${slug}`} className="absolute left-3 top-3 rounded-full bg-white/90 p-2 shadow" aria-label="Volver">
           <ArrowLeft className="size-5" />
         </Link>
-        <button type="button" onClick={share} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow" aria-label="Compartir producto" title="Compartir">
-          <Share2 className="size-5" />
-        </button>
       </div>
 
       {images.length > 1 && (
@@ -129,7 +126,19 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
       )}
 
       <div className="space-y-4 px-4 pt-4">
-        <h1 className="font-brand text-2xl font-bold">{product.name}</h1>
+        {/* Compartir junto al nombre, en el color de la tienda: sobre la foto se perdía en las fotos claras */}
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="font-brand text-2xl font-bold">{product.name}</h1>
+          <button
+            type="button"
+            onClick={share}
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-on-brand shadow-md transition active:scale-90"
+            aria-label="Compartir producto"
+            title="Compartir"
+          >
+            <Share2 className="size-5" />
+          </button>
+        </div>
         <div>
           <p className="text-2xl font-extrabold text-brand">{formatMoney(price)}</p>
           {bsRate && <p className="text-sm font-medium text-slate-500">{formatBs(toBs(price, bsRate))}</p>}
