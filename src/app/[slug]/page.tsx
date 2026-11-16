@@ -35,7 +35,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   if (tier === "pro") {
     return (
       <>
-        <ProHero site={site} logoUrl={store.logo_url} image={heroImage} />
+        <ProHero site={site} image={heroImage} />
         <Highlights site={site} />
         <div className="pt-2">{catalog}</div>
         <About site={site} image={aboutImage} />
@@ -48,7 +48,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   // El contenedor de la tienda es angosto; la landing usa todo el ancho y centra cada sección
   return (
     <FullBleed>
-      <BusinessHero site={site} logoUrl={store.logo_url} image={heroImage} base={base} />
+      <BusinessHero site={site} image={heroImage} base={base} />
       <Highlights site={site} wide />
       <FeaturedProducts products={products.slice(0, 8)} base={base} bsRate={bsRate} />
       <About site={site} image={aboutImage} wide more={`${base}/nosotros`} />

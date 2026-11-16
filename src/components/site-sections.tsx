@@ -47,22 +47,12 @@ function PhotoBackdrop({ src }: { src: string }) {
   );
 }
 
-function Logo({ src, name, size = "size-14" }: { src: string | null; name: string; size?: string }) {
-  return src ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt="" className={cn(size, "rounded-2xl bg-white object-contain p-1.5 shadow-lg")} />
-  ) : (
-    <span className={cn(size, "font-brand grid place-items-center rounded-2xl bg-white text-xl font-bold text-brand shadow-lg")}>{name[0]}</span>
-  );
-}
-
-/** Presentación del plan Pro: foto o color de marca, logo, nombre y frase */
-export function ProHero({ site, logoUrl, image }: { site: ResolvedSite; logoUrl: string | null; image: string | null }) {
+/** Presentación del plan Pro: foto o color de marca, nombre y frase (el logo ya va en la barra superior) */
+export function ProHero({ site, image }: { site: ResolvedSite; image: string | null }) {
   return (
     <section className="relative overflow-hidden text-white sm:mx-4 sm:mt-4 sm:rounded-3xl">
       {image ? <PhotoBackdrop src={image} /> : <BrandBackdrop />}
       <div className="relative flex min-h-64 flex-col justify-end gap-3 p-6 sm:min-h-72 sm:p-8">
-        <Logo src={logoUrl} name={site.hero_title} />
         <h1 className="font-brand text-3xl font-extrabold leading-tight drop-shadow sm:text-4xl">{site.hero_title}</h1>
         <p className="max-w-xl text-[15px] leading-relaxed text-white/90">{site.hero_subtitle}</p>
         <a href="#catalogo" className="mt-1 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow">
@@ -74,12 +64,11 @@ export function ProHero({ site, logoUrl, image }: { site: ResolvedSite; logoUrl:
 }
 
 /** Inicio del plan Business: portada a todo lo ancho */
-export function BusinessHero({ site, logoUrl, image, base }: { site: ResolvedSite; logoUrl: string | null; image: string | null; base: string }) {
+export function BusinessHero({ site, image, base }: { site: ResolvedSite; image: string | null; base: string }) {
   return (
     <FullBleed className="-mt-px overflow-hidden text-white">
       {image ? <PhotoBackdrop src={image} /> : <BrandBackdrop />}
       <div className="relative mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-center gap-5 px-6 py-16 sm:min-h-[560px]">
-        <Logo src={logoUrl} name={site.hero_title} size="size-16" />
         <h1 className="font-brand max-w-3xl text-4xl font-extrabold leading-[1.05] drop-shadow sm:text-6xl">{site.hero_title}</h1>
         <p className="max-w-xl text-lg leading-relaxed text-white/90">{site.hero_subtitle}</p>
         <div className="flex flex-wrap gap-3 pt-2">
