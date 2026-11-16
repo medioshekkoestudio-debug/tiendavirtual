@@ -106,17 +106,17 @@ export function ImageViewer({ images, index, onIndex, onClose }: { images: Img[]
 
   if (!img) return null;
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 text-white" role="dialog" aria-modal="true" aria-label={img.alt}>
+    <div className="fixed inset-0 z-[100] flex flex-col bg-white text-slate-900" role="dialog" aria-modal="true" aria-label={img.alt}>
       <div className="flex items-center justify-between gap-2 p-3">
-        <span className="text-sm text-white/70">{images.length > 1 ? `${index + 1} / ${images.length}` : ""}</span>
+        <span className="text-sm text-slate-500">{images.length > 1 ? `${index + 1} / ${images.length}` : ""}</span>
         <div className="flex items-center gap-1">
-          <button type="button" className="rounded-full p-2 hover:bg-white/10" aria-label="Alejar" onClick={() => zoomTo(scale - 0.75)}>
+          <button type="button" className="rounded-full p-2 hover:bg-slate-100" aria-label="Alejar" onClick={() => zoomTo(scale - 0.75)}>
             <ZoomOut className="size-5" />
           </button>
-          <button type="button" className="rounded-full p-2 hover:bg-white/10" aria-label="Acercar" onClick={() => zoomTo(scale + 0.75)}>
+          <button type="button" className="rounded-full p-2 hover:bg-slate-100" aria-label="Acercar" onClick={() => zoomTo(scale + 0.75)}>
             <ZoomIn className="size-5" />
           </button>
-          <button type="button" className="rounded-full p-2 hover:bg-white/10" aria-label="Cerrar" onClick={onClose}>
+          <button type="button" className="rounded-full p-2 hover:bg-slate-100" aria-label="Cerrar" onClick={onClose}>
             <X className="size-6" />
           </button>
         </div>
@@ -142,7 +142,7 @@ export function ImageViewer({ images, index, onIndex, onClose }: { images: Img[]
           <>
             <button
               type="button"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/15 p-2 hover:bg-white/25"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md ring-1 ring-slate-200 hover:bg-slate-100"
               aria-label="Foto anterior"
               onPointerDown={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
@@ -152,7 +152,7 @@ export function ImageViewer({ images, index, onIndex, onClose }: { images: Img[]
             </button>
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/15 p-2 hover:bg-white/25"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md ring-1 ring-slate-200 hover:bg-slate-100"
               aria-label="Foto siguiente"
               onPointerDown={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
@@ -163,7 +163,7 @@ export function ImageViewer({ images, index, onIndex, onClose }: { images: Img[]
           </>
         )}
       </div>
-      <p className="p-3 text-center text-xs text-white/60">Toca dos veces o pellizca para hacer zoom</p>
+      <p className="p-3 text-center text-xs text-slate-500">Toca dos veces o pellizca para hacer zoom</p>
     </div>,
     document.body,
   );
