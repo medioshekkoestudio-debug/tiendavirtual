@@ -324,6 +324,12 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - **Icono de la app de cada tienda = su logo** (`[slug]/app-icon/[size]/route.tsx`): logo sobre blanco con `ImageResponse`
   (192/512, `?maskable=1` con más margen, 180 para iPhone). Solo lee logos de nuestro Storage (PNG/JPG/GIF); sin logo,
   inicial sobre el color. El manifiesto lo pide con `?v=` = hash de logo+color+nombre para no quedar con el viejo.
+- **Slider principal** (`components/store-slider.tsx`): también en el plan Pro, arriba de `ProHero` (solo si hay fotos
+  en el slider; entonces la portada sin foto propia usa los colores de la marca en vez de repetir la 1.ª del slider).
+  Se desliza con el dedo (umbral 40 px, `touch-pan-y` para no bloquear el scroll vertical) y el avance automático
+  (4,5 s) es un `setTimeout` que depende del índice: elegir un punto o deslizar reinicia la cuenta; con la pestaña
+  oculta no avanza pero sigue contando (`tick`). Productos relacionados revisados: 3 a la vista en móvil, 4 en PC,
+  flechas y avance automático OK, sin cambios.
 - **Favicon:** revisado en producción, es el de Linki en todo; si alguien ve el de Vercel es caché viejo del teléfono
   (el sitio no tuvo favicon hasta el 31-oct).
 - El servidor local se cayó dos veces por falta de memoria de la PC; las pruebas se hicieron con cuentas desechables
