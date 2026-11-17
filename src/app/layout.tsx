@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   applicationName: "Linki App",
   keywords: ["tienda online", "crear tienda online", "tienda virtual", "catálogo digital", "app para mi negocio", "Pago móvil", "Venezuela", "PWA", "Linki App"],
   appleWebApp: { capable: true, title: "Linki App", statusBarStyle: "default" },
+  // Cada tienda y el panel ponen el suyo en su layout (ver app/manifest.webmanifest/route.ts)
+  manifest: "/manifest.webmanifest",
   // Google toma el icono del sitio de aquí (múltiplos de 48 px); /favicon.ico lo sirve src/app/favicon.ico
   icons: {
     icon: [
