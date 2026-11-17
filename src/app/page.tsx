@@ -78,7 +78,7 @@ export default async function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/" aria-label={c.brand_name}>
-            <Logo className="h-9 md:h-11" />
+            <Logo className="h-8 sm:h-9 md:h-11" />
           </Link>
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <a href="#que-es" className="hover:text-slate-900">¿Qué es?</a>

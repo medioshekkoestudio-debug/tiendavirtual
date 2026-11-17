@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Marca en este navegador que ya hay una cuenta (se pone al entrar al panel). Así la landing le muestra
@@ -19,21 +20,26 @@ export function MarkHasAccount() {
   return null;
 }
 
-/** Botones de la barra de la landing según si en este navegador ya hubo una cuenta */
+/** Botones de la barra de la landing: siempre «Iniciar sesión» (para todas las tiendas) y «Crea tu tienda».
+ *  A quien ya tuvo cuenta en este navegador se le resalta el inicio de sesión. */
 export function LandingAuthButtons() {
   const [hasAccount, setHasAccount] = useState(false);
   useEffect(() => {
     try {
       setHasAccount(localStorage.getItem(KEY) === "1");
     } catch {
-      // Sin almacenamiento: se muestra «Crea tu tienda»
+      // Sin almacenamiento: se muestran los dos botones igual
     }
   }, []);
 
   return (
-    <div className="flex items-center gap-2">
-      {hasAccount && <Link href="/login" className="btn-ghost">Iniciar sesión</Link>}
-      <Link href="/suscripcion" className={cn("btn-primary", hasAccount && "hidden sm:inline-flex")}>
+    <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <Link href="/login" className={cn(hasAccount ? "btn-primary" : "btn-outline", "whitespace-nowrap px-3 sm:px-4")}>
+        <LogIn className="hidden size-4 sm:block" />
+        <span className="sm:hidden">Entrar</span>
+        <span className="hidden sm:inline">Iniciar sesión</span>
+      </Link>
+      <Link href="/suscripcion" className={cn(hasAccount ? "btn-outline" : "btn-primary", "whitespace-nowrap px-3 sm:px-4")}>
         Crea tu tienda
       </Link>
     </div>
