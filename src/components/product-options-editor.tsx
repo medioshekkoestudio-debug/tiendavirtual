@@ -13,7 +13,7 @@ import {
   type Sizing,
 } from "@/lib/product-options";
 import { cn } from "@/lib/utils";
-import { ImageUpload } from "./image-upload";
+import { CROP_PRODUCT, ImageUpload } from "./image-upload";
 
 const numOrNull = (v: string) => (v.trim() === "" ? null : Math.max(0, Number(v)));
 
@@ -87,6 +87,7 @@ export function ProductOptionsEditor({
                 userId={userId}
                 folder="products"
                 className="aspect-square w-20 shrink-0"
+                crop={CROP_PRODUCT}
               />
               <div className="min-w-0 flex-1 space-y-2">
                 <input

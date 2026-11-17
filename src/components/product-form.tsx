@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveProduct, type ProductInput } from "@/lib/store-actions";
 import type { Category, Product } from "@/lib/types";
-import { ImageUpload } from "./image-upload";
+import { CROP_PRODUCT, ImageUpload } from "./image-upload";
 import { ProductOptionsEditor } from "./product-options-editor";
 import { cn } from "@/lib/utils";
 
@@ -131,7 +131,8 @@ export function ProductForm({
         userId={userId}
         folder="products"
         className="aspect-square w-40"
-        hint="Cuadrada, 800×800 px recomendado."
+        crop={CROP_PRODUCT}
+        hint="Al elegirla podrás recortarla en cuadrado, como se ve en la tienda."
       />
       <div>
         <label className="label" htmlFor="p-name">Nombre</label>

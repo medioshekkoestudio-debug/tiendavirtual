@@ -7,7 +7,7 @@ import { paletteFromLogo } from "@/lib/logo-colors";
 import { saveBranding } from "@/lib/store-actions";
 import type { Store } from "@/lib/types";
 import { FontPicker } from "./font-picker";
-import { ImageUpload } from "./image-upload";
+import { CROP_SLIDER, ImageUpload } from "./image-upload";
 import { StoreSlider } from "./store-slider";
 import { themeStyle } from "./theme-vars";
 
@@ -168,6 +168,7 @@ export function BrandingForm({
               userId={userId}
               folder="slider"
               className="aspect-[5/2] w-full"
+              crop={CROP_SLIDER}
               onChange={(u) => set("slider_images", form.slider_images.map((x, j) => (j === i ? u : x)))}
             />
           ))}
