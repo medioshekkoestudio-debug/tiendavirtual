@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,15 +19,33 @@ export function StoreSlider({
   const slides = images.length ? images : [null];
   const [rawIndex, setIndex] = useState(0);
   const index = rawIndex % slides.length;
+  const touchX = useRef<number | null>(null);
+  const go = (i: number) => setIndex(((i % slides.length) + slides.length) % slides.length);
 
+  // Avanza solo cada 4,5 s. Depende del índice: si la persona desliza o toca un punto, la cuenta vuelve a empezar
+  // (antes podía saltar al siguiente un instante después de elegir uno)
+  const [tick, setTick] = useState(0);
   useEffect(() => {
     if (slides.length < 2) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % slides.length), 4500);
-    return () => clearInterval(t);
-  }, [slides.length]);
+    const t = setTimeout(() => {
+      if (document.visibilityState === "visible") setIndex((i) => (i + 1) % slides.length);
+      else setTick((n) => n + 1); // pestaña oculta: no avanza, pero vuelve a contar
+    }, 4500);
+    return () => clearTimeout(t);
+  }, [rawIndex, tick, slides.length]);
 
   return (
-    <div className={cn("relative w-full overflow-hidden bg-brand-2", heightClass)}>
+    <div
+      className={cn("relative w-full touch-pan-y overflow-hidden bg-brand-2", heightClass)}
+      // Deslizar con el dedo: izquierda = siguiente, derecha = anterior
+      onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+      onTouchEnd={(e) => {
+        if (touchX.current === null || slides.length < 2) return;
+        const dx = e.changedTouches[0].clientX - touchX.current;
+        touchX.current = null;
+        if (Math.abs(dx) > 40) go(index + (dx < 0 ? 1 : -1));
+      }}
+    >
       <div className="flex h-full transition-transform duration-700" style={{ transform: `translateX(-${index * 100}%)` }}>
         {slides.map((src, i) =>
           src ? (
@@ -56,7 +74,7 @@ export function StoreSlider({
               key={i}
               type="button"
               aria-label={`Ir al slide ${i + 1}`}
-              onClick={() => setIndex(i)}
+              onClick={() => go(i)}
               className={cn("h-1.5 rounded-full bg-white/90 transition-all", i === index ? "w-6" : "w-1.5 opacity-60")}
             />
           ))}
