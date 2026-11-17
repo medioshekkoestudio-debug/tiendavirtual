@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RotateCcw } from "lucide-react";
-import { ImageUpload } from "@/components/image-upload";
+import { CROP_ABOUT, CROP_GALLERY, CROP_HERO, ImageUpload } from "@/components/image-upload";
 import { GALLERY_SLOTS, TESTIMONIAL_SLOTS, type Highlight, type ResolvedSite, type SiteContent, type SiteTier } from "@/lib/site";
 import { saveSiteContent } from "@/lib/store-actions";
 
@@ -112,12 +112,13 @@ export function SiteEditor({
         <Field label="Frase de presentación" value={form.hero_subtitle} max={220} rows={2} onChange={(v) => set("hero_subtitle", v)} />
         <ImageUpload
           label="Foto de portada"
-          hint="Horizontal, de buena calidad."
+          hint="Al elegirla podrás recortarla. Deja lo importante al centro: en el teléfono se ven menos los bordes."
           value={form.hero_image}
           onChange={(u) => set("hero_image", u)}
           userId={userId}
           folder="pagina"
-          className="aspect-[16/7] w-full"
+          className="aspect-video w-full"
+          crop={CROP_HERO}
         />
         <p className="text-xs text-slate-500">
           {sliderImage ? "Sin foto se usa la primera imagen de tu slider." : "Sin foto se usa un fondo con los colores de tu marca."}
@@ -138,7 +139,7 @@ export function SiteEditor({
       <Section title="Quiénes somos" hint="Cuenta tu historia: cómo empezaste, qué haces y por qué elegirte.">
         <Field label="Título de la sección" value={form.about_title} max={60} onChange={(v) => set("about_title", v)} />
         <Field label="Texto" value={form.about_text} max={3000} rows={6} onChange={(v) => set("about_text", v)} />
-        <ImageUpload label="Foto" value={form.about_image} onChange={(u) => set("about_image", u)} userId={userId} folder="pagina" className="aspect-[4/3] w-full max-w-sm" />
+        <ImageUpload label="Foto" value={form.about_image} onChange={(u) => set("about_image", u)} userId={userId} folder="pagina" className="aspect-[4/3] w-full max-w-sm" crop={CROP_ABOUT} />
       </Section>
 
       {business && (
@@ -169,6 +170,7 @@ export function SiteEditor({
                   userId={userId}
                   folder="pagina"
                   className="aspect-square w-full"
+                  crop={CROP_GALLERY}
                 />
               ))}
             </div>
