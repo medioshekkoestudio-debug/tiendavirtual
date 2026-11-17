@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import {
-  About, Contact, CtaBand, FeaturedProducts, FullBleed, Gallery, Highlights, SiteFooter, Testimonials,
+  About, BusinessHero, Contact, CtaBand, FeaturedProducts, FullBleed, Gallery, Highlights, ProHero, SiteFooter, Testimonials,
 } from "@/components/site-sections";
 import { StorefrontHome } from "@/components/storefront-home";
 import { StoreSlider } from "@/components/store-slider";
@@ -29,19 +29,17 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
 
   const site = resolveSite(store);
   const productImages = products.map((p) => p.image_url).filter((u): u is string => !!u);
-  // En todos los planes la portada es el slider principal (ya no hay banner con título y frase)
-  const slider = (
-    <>
-      <h1 className="sr-only">{store.name}</h1>
-      <StoreSlider images={store.slider_images} storeName={store.name} />
-    </>
-  );
+  // Pro y Business: arriba el slider principal (como en Emprendedor) y debajo el banner con nombre y frase.
+  // El banner usa los colores de la marca, salvo que la tienda le ponga una foto propia en «Página web → Portada».
+  const slider = <StoreSlider images={store.slider_images} storeName={store.name} />;
+  const heroImage = site.hero_image ?? null;
   const aboutImage = site.about_image ?? store.slider_images[1] ?? productImages[0] ?? null;
 
   if (tier === "pro") {
     return (
       <>
         {slider}
+        <ProHero site={site} image={heroImage} />
         <Highlights site={site} />
         <div className="pt-2">{catalog}</div>
         <About site={site} image={aboutImage} />
@@ -55,6 +53,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   return (
     <FullBleed>
       {slider}
+      <BusinessHero site={site} image={heroImage} base={base} />
       <Highlights site={site} wide />
       <FeaturedProducts products={products.slice(0, 8)} base={base} bsRate={bsRate} />
       <About site={site} image={aboutImage} wide more={`${base}/nosotros`} />

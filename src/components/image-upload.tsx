@@ -14,6 +14,8 @@ const MAX_BYTES_CROP = 20 * 1024 * 1024;
 /** Formas de recorte según dónde se va a ver la foto */
 export const CROP_PRODUCT = { aspect: 1, maxWidth: 1200, title: "Recorta la foto del producto" };
 export const CROP_SLIDER = { aspect: 5 / 2, maxWidth: 1800, title: "Recorta la foto del slide" };
+/** Portada de la página web: se adapta a cada pantalla, así que se recorta horizontal y la página ajusta los bordes */
+export const CROP_HERO = { aspect: 16 / 9, maxWidth: 1920, title: "Recorta la foto de portada" };
 export const CROP_ABOUT = { aspect: 4 / 3, maxWidth: 1200, title: "Recorta la foto de «Quiénes somos»" };
 export const CROP_GALLERY = { aspect: 1, maxWidth: 1200, title: "Recorta la foto de la galería" };
 

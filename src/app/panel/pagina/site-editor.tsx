@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RotateCcw } from "lucide-react";
-import { CROP_ABOUT, CROP_GALLERY, ImageUpload } from "@/components/image-upload";
+import { CROP_ABOUT, CROP_GALLERY, CROP_HERO, ImageUpload } from "@/components/image-upload";
 import { GALLERY_SLOTS, TESTIMONIAL_SLOTS, type Highlight, type ResolvedSite, type SiteContent, type SiteTier } from "@/lib/site";
 import { saveSiteContent } from "@/lib/store-actions";
 
@@ -107,16 +107,23 @@ export function SiteEditor({
 
   return (
     <div className="space-y-5">
-      {/* Ya no hay banner con título y frase: la portada de la tienda es el slider principal en todos los planes */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-        <p className="font-bold text-slate-900">Portada</p>
-        <p className="mt-1">
-          Lo primero que ven tus clientes es tu <strong>slider principal</strong>
-          {sliderImage ? "" : " (aún no tiene fotos: mientras tanto se ve el nombre de tu tienda sobre tus colores)"}. Sus fotos se
-          cambian en{" "}
-          <a href="/panel/ajustes" className="font-semibold text-brand underline">Ajustes → Slider principal</a>.
+      <Section title="Portada" hint="El banner con tu nombre y tu frase, justo debajo del slider.">
+        <Field label="Título" value={form.hero_title} max={80} onChange={(v) => set("hero_title", v)} />
+        <Field label="Frase de presentación" value={form.hero_subtitle} max={220} rows={2} onChange={(v) => set("hero_subtitle", v)} />
+        <ImageUpload
+          label="Foto de portada"
+          hint="Al elegirla podrás recortarla. Deja lo importante al centro: en el teléfono se ven menos los bordes."
+          value={form.hero_image}
+          onChange={(u) => set("hero_image", u)}
+          userId={userId}
+          folder="pagina"
+          className="aspect-video w-full"
+          crop={CROP_HERO}
+        />
+        <p className="text-xs text-slate-500">
+          Va debajo de tu slider principal. Sin foto se usa un fondo con los colores de tu marca.
         </p>
-      </div>
+      </Section>
 
       <Section title="Puntos fuertes" hint="Tres razones para comprarte.">
         <div className="grid gap-4 sm:grid-cols-3">
