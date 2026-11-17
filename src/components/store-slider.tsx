@@ -3,19 +3,31 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
+/** Proporción del recortador (2,5:1). Es también la más BAJA permitida: el slide nunca queda más bajo que esto.
+ *  La más alta es 5:4 (fotos cuadradas o verticales se ven completas sobre su copia desenfocada). */
+const DEFAULT_RATIO = 5 / 2;
+const MIN_RATIO = 5 / 4;
+const MAX_RATIO = DEFAULT_RATIO;
+
 /**
- * Slider principal de la tienda. Proporción fija 2,5:1 (igual en teléfono, tablet y PC) para que la imagen
- * subida se vea completa: con un alto en % de pantalla la forma cambiaba y la foto se recortaba distinto en cada equipo.
+ * Slider principal de la tienda (todos los planes). Toma la forma de su primera foto (ancho ÷ alto, entre 5:4 y 2,5:1):
+ * así la foto se ve completa y a todo el ancho. Las fotos del recortador son 2,5:1 (como siempre); las subidas antes
+ * (p. ej. 4:3 o cuadradas) ya no quedan pequeñas en una franja con bordes borrosos, y las muy alargadas (4:1) no
+ * dejan el slide más bajo que 2,5:1. En PC el alto tiene tope para no ocupar toda la pantalla.
+ * Si las fotos tienen formas distintas, las demás se ven completas sobre su propia copia desenfocada.
  */
-export function StoreSlider({
-  images,
-  storeName,
-  heightClass = "aspect-[5/2]",
-}: {
-  images: string[];
-  storeName: string;
-  heightClass?: string;
-}) {
+export function StoreSlider({ images, storeName }: { images: string[]; storeName: string }) {
+  const [ratio, setRatio] = useState(DEFAULT_RATIO);
+  const first = useRef<HTMLImageElement>(null);
+  const measure = (img: HTMLImageElement | null) => {
+    if (!img?.naturalWidth || !img.naturalHeight) return;
+    setRatio(Math.min(MAX_RATIO, Math.max(MIN_RATIO, img.naturalWidth / img.naturalHeight)));
+  };
+  // La foto puede terminar de cargar antes de que React tome el control (onLoad no llega): se mide al montar
+  useEffect(() => {
+    if (first.current?.complete) measure(first.current);
+  }, [images[0]]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const slides = images.length ? images : [null];
   const [rawIndex, setIndex] = useState(0);
   const index = rawIndex % slides.length;
@@ -36,7 +48,8 @@ export function StoreSlider({
 
   return (
     <div
-      className={cn("relative w-full touch-pan-y overflow-hidden bg-brand-2", heightClass)}
+      className="relative w-full touch-pan-y overflow-hidden bg-brand-2"
+      style={{ aspectRatio: String(ratio), maxHeight: "min(70vh, 520px)" }}
       // Deslizar con el dedo: izquierda = siguiente, derecha = anterior
       onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
       onTouchEnd={(e) => {
@@ -55,7 +68,13 @@ export function StoreSlider({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-70 blur-xl" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`${storeName} — slide ${i + 1}`} className="relative size-full object-contain" />
+              <img
+                ref={i === 0 ? first : undefined}
+                onLoad={i === 0 ? (e) => measure(e.currentTarget) : undefined}
+                src={src}
+                alt={`${storeName} — slide ${i + 1}`}
+                className="relative size-full object-contain"
+              />
             </div>
           ) : (
             <div
