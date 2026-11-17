@@ -268,7 +268,7 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
 - **Pendientes de la dueña**: `CALLMEBOT_APIKEY` (desde el WhatsApp del 0422) en Vercel y revisar que `ADMIN_WHATSAPP_PHONE`
   en Vercel no tenga el número viejo; sin eso los avisos al admin no salen.
 
-### 2026-11-16 — Sesión 4 (sin subir: pendiente de revisión en local)
+### 2026-11-16 — Sesión 4 (todo en producción)
 - **Aviso de cookies** (`components/cookie-banner.tsx`): abajo en la landing y en cada tienda (encima de la barra inferior),
   la primera vez. La aceptación se guarda por separado (`linki:cookies:landing` y `linki:cookies:<slug>`) en localStorage + cookie 1 año.
 - **Antes del pie de cada tienda** (`components/store-legal.tsx`, dentro de `SiteFooter`, que ahora recibe `store`): insignias de
@@ -296,3 +296,35 @@ Permisos de UPDATE limitados por columna (un dueño no puede cambiar su comisió
   y `scroll-padding-top: 4.5rem`. Sin rebote: `overscroll-behavior-y: none` en html/body (también quita «deslizar para
   recargar» en Android). Confirmado por la dueña en su iPhone. Para emular iPhone: Playwright + WebKit
   (`npx playwright install webkit`, fuera del repo).
+
+### 2026-11-17 — Sesión 5 (todo en producción)
+- **Soporte: Karina Moncada (Novias Deleste, `noviasdeleste`) no podía entrar.** La cuenta estaba bien (pago aprobado,
+  sin ban, email confirmado). Intentó entrar 5 veces antes de que se aprobara el pago (veía «pago en revisión») y después
+  nunca acertó la contraseña. Solución: la recuperación de abajo. Diagnóstico útil: `rate_limits` guarda los intentos
+  por IP (`login:<ip>`) y `auth.users.last_sign_in_at` dice si alguna vez entró.
+- **Recuperar contraseña sin correo** (`app/recuperar`, copiado del flujo de La Mejor Llave): email + cédula + teléfono
+  del registro (se limpian guiones/puntos/+58) → contraseña nueva en la misma pantalla → entra directo al panel.
+  Mismo mensaje para todo fallo; límite 5/h por correo y 10/h por IP (`hit_rate_limit`); Superadmin excluido.
+  El permiso del paso 2 es un token HMAC (clave de servicio) atado a `auth.users.updated_at` y que vence en 10 min:
+  al cambiar la contraseña deja de valer (un solo uso) sin tabla nueva. Solo sirve a dueños de tienda: los clientes
+  no dan cédula al registrarse. Enlace «¿Olvidaste tu contraseña?» y ojito en `/login`.
+- **Landing:** botón «Iniciar sesión» (en móvil «Entrar») siempre visible junto a «Crea tu tienda» (`account-flag.tsx`).
+  El login de dueños es `linkiapp.com/login`; `/<tienda>/login` es el de clientes.
+- **Recortar fotos al subirlas** (`components/image-cropper.tsx` con `react-easy-crop@6.2.4` fijada; prop `crop` de
+  `ImageUpload`): producto/modelos/galería 1:1, slide 5:2, portada 16:9, «Quiénes somos» 4:3. Sale JPG con fondo blanco
+  y ancho máximo (1200–1920 px), así que acepta fotos de hasta 20 MB. Botón ✂️ para recortar de nuevo una ya subida.
+- **Varias fotos por producto** (migración `20261117120000_fotos_producto.sql`: `products.images text[]`, máx. 10,
+  filtradas con `safe_url` en `trg_sanitize_product`). `image_url` sigue siendo la principal (lista, carrito,
+  vista previa). Panel: `components/product-photos.tsx` (⭐ principal, ✕ quitar, ✂️ recortar). Ficha: miniaturas de
+  principal + adicionales + modelos; la miniatura pasa a la foto grande y la grande abre el visor.
+  La migración se subió sola primero (el local usa la base de producción).
+- **Manifiesto:** `app/manifest.ts` (archivo especial de Next) pisaba el `manifest` de todos los layouts, y tiendas y
+  panel se instalaban como «Linki App». Ahora el de Linki es la ruta `app/manifest.webmanifest/route.ts` + `manifest`
+  en el layout raíz. **No volver a crear `app/manifest.ts`.**
+- **Icono de la app de cada tienda = su logo** (`[slug]/app-icon/[size]/route.tsx`): logo sobre blanco con `ImageResponse`
+  (192/512, `?maskable=1` con más margen, 180 para iPhone). Solo lee logos de nuestro Storage (PNG/JPG/GIF); sin logo,
+  inicial sobre el color. El manifiesto lo pide con `?v=` = hash de logo+color+nombre para no quedar con el viejo.
+- **Favicon:** revisado en producción, es el de Linki en todo; si alguien ve el de Vercel es caché viejo del teléfono
+  (el sitio no tuvo favicon hasta el 31-oct).
+- El servidor local se cayó dos veces por falta de memoria de la PC; las pruebas se hicieron con cuentas desechables
+  (creadas y borradas con sus fotos) y Playwright en el scratchpad.
