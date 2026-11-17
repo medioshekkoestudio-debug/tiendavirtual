@@ -29,6 +29,8 @@ export async function saveBranding(input: {
   accent_color: string;
   font_key: string;
   slider_images: (string | null)[];
+  /** Dirección física (se guarda en site_content.address, la misma que usa «Página web») */
+  address?: string;
 }): Promise<ActionResult> {
   const { supabase, store } = await getActiveOwnerStore(true);
   const name = input.name.trim().slice(0, 80);
@@ -48,6 +50,9 @@ export async function saveBranding(input: {
       accent_color: input.accent_color,
       font_key: font,
       slider_images: input.slider_images.map(cleanUrl).filter((u): u is string => !!u).slice(0, 3),
+      ...(typeof input.address === "string"
+        ? { site_content: { ...(store.site_content ?? {}), address: input.address.trim().slice(0, 200) } }
+        : {}),
       onboarding_step: Math.max(store.onboarding_step, 1),
     })
     .eq("id", store.id);

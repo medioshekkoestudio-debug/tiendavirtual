@@ -239,7 +239,8 @@ export function CtaBand({ base, title = "¿Listo para hacer tu pedido?" }: { bas
 }
 
 /** Contacto: WhatsApp, Instagram, dirección, horario y el chat de la tienda (siempre disponible) */
-export function Contact({ site, base, wide }: { site: ResolvedSite; base: string; wide?: boolean }) {
+/** `hideAddress`: en el inicio la dirección ya tiene su propia sección, antes de los métodos de pago */
+export function Contact({ site, base, wide, hideAddress }: { site: ResolvedSite; base: string; wide?: boolean; hideAddress?: boolean }) {
   const wa = whatsappLink(site.whatsapp);
   const ig = instagramLink(site.instagram);
   return (
@@ -247,9 +248,9 @@ export function Contact({ site, base, wide }: { site: ResolvedSite; base: string
       <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-7">
         <Eyebrow>Contacto</Eyebrow>
         <h2 className="font-brand mt-1 text-2xl font-extrabold">Estamos para ayudarte</h2>
-        {(site.address || site.hours) && (
+        {((site.address && !hideAddress) || site.hours) && (
           <ul className="mt-4 space-y-2 text-sm text-slate-700">
-            {site.address && (
+            {site.address && !hideAddress && (
               <li className="flex gap-2"><MapPin className="mt-0.5 size-4 shrink-0 text-brand" /> {site.address}</li>
             )}
             {site.hours && (
@@ -271,10 +272,11 @@ export function Contact({ site, base, wide }: { site: ResolvedSite; base: string
   );
 }
 
-export function SiteFooter({ store, base, business }: { store: Pick<Store, "name" | "payment_methods">; base: string; business?: boolean }) {
+/** `address`: solo en el inicio de la tienda (la sección «Dirección» va antes de los métodos de pago) */
+export function SiteFooter({ store, base, business, address }: { store: Pick<Store, "name" | "payment_methods">; base: string; business?: boolean; address?: string | null }) {
   return (
     <>
-      <StoreLegal store={store} />
+      <StoreLegal store={store} address={address} />
       <footer className="mt-8 border-t border-slate-200 px-4 pt-8 text-center text-sm text-slate-500">
       <p className="font-brand text-base font-bold text-slate-800">{store.name}</p>
       {business && (

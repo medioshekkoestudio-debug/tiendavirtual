@@ -15,6 +15,8 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   const { products, categories, bsRate } = await getStoreCatalog(store);
   const base = `/${store.slug}`;
   const tier = siteTier(store);
+  // Dirección física (Ajustes o Página web): en el inicio va antes de los métodos de pago, en todos los planes
+  const address = store.site_content?.address?.trim() || null;
   const catalog = (
     <StorefrontHome store={store} products={products} categories={categories} linkBase={base} bsRate={bsRate} hideIntro={tier !== "emprendedor"} />
   );
@@ -22,7 +24,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
     return (
       <>
         {catalog}
-        <SiteFooter store={store} base={base} />
+        <SiteFooter store={store} base={base} address={address} />
       </>
     );
   }
@@ -43,8 +45,8 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
         <Highlights site={site} />
         <div className="pt-2">{catalog}</div>
         <About site={site} image={aboutImage} />
-        <Contact site={site} base={base} />
-        <SiteFooter store={store} base={base} />
+        <Contact site={site} base={base} hideAddress />
+        <SiteFooter store={store} base={base} address={address} />
       </>
     );
   }
@@ -60,8 +62,8 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
       <Gallery images={site.gallery.length ? site.gallery : productImages.slice(0, 6)} />
       <Testimonials site={site} />
       <CtaBand base={base} />
-      <Contact site={site} base={base} wide />
-      <SiteFooter store={store} base={base} business />
+      <Contact site={site} base={base} wide hideAddress />
+      <SiteFooter store={store} base={base} business address={address} />
     </FullBleed>
   );
 }

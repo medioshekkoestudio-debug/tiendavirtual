@@ -1,4 +1,4 @@
-import { Landmark, Smartphone } from "lucide-react";
+import { Landmark, MapPin, Smartphone } from "lucide-react";
 import { PAYMENT_METHOD_KEYS, PAYMENT_METHODS } from "@/lib/constants";
 import type { PaymentMethodKey, Store } from "@/lib/types";
 
@@ -39,12 +39,32 @@ function MethodBadge({ k }: { k: PaymentMethodKey }) {
   }
 }
 
-/** Métodos de pago que activó la tienda + copyright y aviso de responsabilidad. Va antes del pie de la tienda. */
-export function StoreLegal({ store }: { store: Pick<Store, "name" | "payment_methods"> }) {
+/**
+ * Dirección (solo en el inicio, si la tienda la puso) + métodos de pago que activó la tienda + copyright y aviso de
+ * responsabilidad. Va antes del pie de la tienda.
+ */
+export function StoreLegal({ store, address }: { store: Pick<Store, "name" | "payment_methods">; address?: string | null }) {
   const methods = PAYMENT_METHOD_KEYS.filter((k) => store.payment_methods?.[k]?.enabled);
   const year = new Date().getFullYear();
+  const place = address?.trim();
   return (
     <section className="mt-14 border-t border-slate-200 px-4 pt-8 text-center" aria-label="Métodos de pago y aviso legal">
+      {place && (
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Dirección</p>
+          <p className="mx-auto mt-3 flex max-w-md items-start justify-center gap-2 text-sm font-medium text-slate-800">
+            <MapPin className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden /> {place}
+          </p>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-block text-sm font-semibold text-brand underline"
+          >
+            Ver en el mapa
+          </a>
+        </div>
+      )}
       {methods.length > 0 && (
         <>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Métodos de pago</p>

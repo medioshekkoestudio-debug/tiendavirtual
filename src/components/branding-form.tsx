@@ -35,6 +35,7 @@ export function BrandingForm({
     accent_color: store.accent_color,
     font_key: store.font_key,
     slider_images: Array.from({ length: SLIDER_SLOTS }, (_, i) => store.slider_images[i] ?? null) as (string | null)[],
+    address: store.site_content?.address ?? "",
   });
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
     setSaved(false);
@@ -191,6 +192,22 @@ export function BrandingForm({
           placeholder="Cuéntales a tus clientes quiénes son, qué venden y por qué elegirlos."
           value={form.description}
           onChange={(e) => set("description", e.target.value)}
+        />
+      </section>
+
+      <section className="space-y-2">
+        <h3 className="text-lg font-bold">Dirección de tu tienda</h3>
+        <p className="text-sm text-slate-600">
+          Si atiendes en un lugar físico, escribe la dirección: tus clientes la verán en el inicio de tu tienda, con un enlace al
+          mapa. Déjala vacía si solo vendes en línea.
+        </p>
+        <input
+          className="input"
+          maxLength={200}
+          placeholder="Ej.: Urb. Prebo, Valencia, Venezuela"
+          autoComplete="street-address"
+          value={form.address}
+          onChange={(e) => set("address", e.target.value)}
         />
       </section>
 
