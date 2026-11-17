@@ -112,7 +112,9 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
         ) : (
           <div className="font-brand grid aspect-[4/3] w-full place-items-center bg-brand/10 text-6xl font-bold text-brand">{product.name[0]}</div>
         )}
-        <Link href={`/${slug}`} className="absolute left-3 top-3 rounded-full bg-white/90 p-2 shadow" aria-label="Volver">
+        {/* A la derecha: a la izquierda la tapaba el logo de la tienda, que sobresale de la barra superior */}
+        <Link href={`/${slug}`} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow" aria-label="Volver">
+
           <ArrowLeft className="size-5" />
         </Link>
       </div>
