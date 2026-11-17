@@ -190,6 +190,8 @@ export type ProductInput = {
   category_id: string | null;
   subcategory_id: string | null;
   image_url: string | null;
+  /** Fotos adicionales (sin la principal) */
+  images?: string[];
   is_active: boolean;
   product_type: "basic" | "complete";
   options: ProductOptions;
@@ -208,6 +210,10 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
   if (complete && !options.models.length && !sizeChoices(options).length)
     return { error: "Agrega al menos un modelo, una talla o una medida (o elige Producto básico)" };
 
+  // Fotos: la principal y las demás sin repetir, máximo 10 adicionales (la base vuelve a filtrar las URL)
+  const mainImage = cleanUrl(input.image_url);
+  const extraImages = [...new Set((Array.isArray(input.images) ? input.images : []).map((u) => cleanUrl(u)).filter((u): u is string => !!u && u !== mainImage))].slice(0, 10);
+
   const row = {
     store_id: store.id,
     name,
@@ -216,7 +222,8 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
     stock,
     category_id: input.category_id || null,
     subcategory_id: input.subcategory_id || null,
-    image_url: cleanUrl(input.image_url),
+    image_url: mainImage,
+    images: extraImages,
     is_active: input.is_active,
     product_type: complete ? ("complete" as const) : ("basic" as const),
     options: complete ? options : {},

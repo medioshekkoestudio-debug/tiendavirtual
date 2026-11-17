@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveProduct, type ProductInput } from "@/lib/store-actions";
 import type { Category, Product } from "@/lib/types";
-import { CROP_PRODUCT, ImageUpload } from "./image-upload";
+import { ProductPhotos } from "./product-photos";
 import { ProductOptionsEditor } from "./product-options-editor";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +40,7 @@ export function ProductForm({
     category_id: product?.category_id ?? null,
     subcategory_id: product?.subcategory_id ?? null,
     image_url: product?.image_url ?? null,
+    images: product?.images ?? [],
     is_active: product?.is_active ?? true,
     product_type: product?.product_type ?? "basic",
     options: product?.options ?? {},
@@ -58,7 +59,7 @@ export function ProductForm({
   useEffect(() => {
     const draft = readDraft(draftKey);
     if (draft) {
-      setForm({ ...draft, product_type: draft.product_type ?? "basic", options: draft.options ?? {} });
+      setForm({ ...draft, product_type: draft.product_type ?? "basic", options: draft.options ?? {}, images: draft.images ?? [] });
       setRestored(true);
     }
     setReady(true);
@@ -124,15 +125,11 @@ export function ProductForm({
           </button>
         </div>
       )}
-      <ImageUpload
-        label={form.product_type === "complete" ? "Imagen principal" : "Imagen del producto"}
-        value={form.image_url}
-        onChange={(u) => set("image_url", u)}
+      {/* La primera foto es la principal (image_url); las demás van en images */}
+      <ProductPhotos
+        photos={[form.image_url, ...(form.images ?? [])].filter((u): u is string => !!u)}
+        onChange={(list) => setForm((f) => ({ ...f, image_url: list[0] ?? null, images: list.slice(1) }))}
         userId={userId}
-        folder="products"
-        className="aspect-square w-40"
-        crop={CROP_PRODUCT}
-        hint="Al elegirla podrás recortarla en cuadrado, como se ve en la tienda."
       />
       <div>
         <label className="label" htmlFor="p-name">Nombre</label>

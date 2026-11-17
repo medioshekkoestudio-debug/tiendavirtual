@@ -20,6 +20,8 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [viewer, setViewer] = useState<number | null>(null);
+  /** Foto elegida en las miniaturas (null = la del modelo elegido o la principal) */
+  const [photo, setPhoto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // La ficha siempre abre desde arriba: en el iPhone el navegador a veces conserva el desplazamiento de la página
@@ -50,16 +52,19 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
     shareWhatsApp();
   }
 
-  // Galería: la foto principal y la de cada modelo (sin repetir)
+  // Galería: la foto principal, las fotos adicionales y la de cada modelo (sin repetir)
   const images = useMemo(() => {
     const list: { src: string; alt: string; modelId?: string }[] = [];
     if (product.image_url) list.push({ src: product.image_url, alt: product.name });
+    (product.images ?? []).forEach((src, i) => {
+      if (src && !list.some((x) => x.src === src)) list.push({ src, alt: `${product.name} — foto ${i + 2}` });
+    });
     for (const m of models) {
       if (m.image_url && !list.some((i) => i.src === m.image_url)) list.push({ src: m.image_url, alt: `${product.name} — ${m.name}`, modelId: m.id });
     }
     return list;
-  }, [product.image_url, product.name, models]);
-  const shownSrc = model?.image_url || product.image_url || images[0]?.src || null;
+  }, [product.image_url, product.images, product.name, models]);
+  const shownSrc = photo || model?.image_url || product.image_url || images[0]?.src || null;
   const shownIndex = Math.max(0, images.findIndex((i) => i.src === shownSrc));
 
   const choices = choicesFor(opts, model);
@@ -68,6 +73,7 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
 
   function pickModel(m: ProductModel) {
     setModel(m);
+    setPhoto(null);
     setAdded(false);
     if (size && !choicesFor(opts, m).includes(size)) setSize(null);
   }
@@ -82,7 +88,8 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
         product_id: product.id,
         name: product.name,
         price,
-        image_url: shownSrc,
+        // En el carrito, la foto del modelo o la principal (no la miniatura que se estaba mirando)
+        image_url: model?.image_url || product.image_url || shownSrc,
         stock: product.stock,
         ...(complete && (model || size) ? { model_id: model?.id, size: size ?? undefined, variant: label } : {}),
       },
@@ -112,14 +119,15 @@ export function ProductDetail({ product, slug, bsRate }: { product: Product; slu
 
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto px-4 pt-3">
-          {images.map((im, i) => (
+          {images.map((im) => (
             <button
               key={im.src}
               type="button"
+              // Una miniatura pasa a la foto grande (la grande se toca para ampliar); la de un modelo además lo elige
               onClick={() => {
                 const m = models.find((x) => x.id === im.modelId);
                 if (m) pickModel(m);
-                setViewer(i);
+                else setPhoto(im.src);
               }}
               className={cn("shrink-0 overflow-hidden rounded-xl border-2", im.src === shownSrc ? "border-brand" : "border-transparent")}
               aria-label={`Ver ${im.alt}`}

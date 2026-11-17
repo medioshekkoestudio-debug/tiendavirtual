@@ -114,7 +114,10 @@ export type Product = {
   description: string;
   price: number;
   stock: number;
+  /** Foto principal: la de la lista de productos, el carrito y la vista previa al compartir */
   image_url: string | null;
+  /** Fotos adicionales, en orden (sin la principal). Puede faltar en filas viejas o antes de la migración */
+  images?: string[] | null;
   is_active: boolean;
   created_at: string;
   /** basic = un solo precio; complete = modelos, tallas o medidas (ver lib/product-options.ts) */
