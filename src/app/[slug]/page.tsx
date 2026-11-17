@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import {
-  About, BusinessHero, Contact, CtaBand, FeaturedProducts, FullBleed, Gallery, Highlights, ProHero, SiteFooter, Testimonials,
+  About, Contact, CtaBand, FeaturedProducts, FullBleed, Gallery, Highlights, SiteFooter, Testimonials,
 } from "@/components/site-sections";
 import { StorefrontHome } from "@/components/storefront-home";
 import { StoreSlider } from "@/components/store-slider";
@@ -28,19 +28,20 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   }
 
   const site = resolveSite(store);
-  // Foto de portada: la que eligió, si no la primera del slider o de un producto
   const productImages = products.map((p) => p.image_url).filter((u): u is string => !!u);
-  // En Pro el slider va arriba: la portada no repite su primera foto (sin foto propia usa los colores de la marca)
-  const proSlider = tier === "pro" && store.slider_images.length > 0;
-  const heroImage = site.hero_image ?? (proSlider ? null : store.slider_images[0] ?? null);
+  // En todos los planes la portada es el slider principal (ya no hay banner con título y frase)
+  const slider = (
+    <>
+      <h1 className="sr-only">{store.name}</h1>
+      <StoreSlider images={store.slider_images} storeName={store.name} />
+    </>
+  );
   const aboutImage = site.about_image ?? store.slider_images[1] ?? productImages[0] ?? null;
 
   if (tier === "pro") {
     return (
       <>
-        {/* El mismo slider principal del plan Emprendedor, arriba de la portada */}
-        {proSlider && <StoreSlider images={store.slider_images} storeName={store.name} />}
-        <ProHero site={site} image={heroImage} />
+        {slider}
         <Highlights site={site} />
         <div className="pt-2">{catalog}</div>
         <About site={site} image={aboutImage} />
@@ -53,7 +54,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ slu
   // El contenedor de la tienda es angosto; la landing usa todo el ancho y centra cada sección
   return (
     <FullBleed>
-      <BusinessHero site={site} image={heroImage} base={base} />
+      {slider}
       <Highlights site={site} wide />
       <FeaturedProducts products={products.slice(0, 8)} base={base} bsRate={bsRate} />
       <About site={site} image={aboutImage} wide more={`${base}/nosotros`} />

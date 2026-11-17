@@ -27,63 +27,6 @@ function Eyebrow({ children, light }: { children: React.ReactNode; light?: boole
 }
 
 /** Fondo de marca cuando no hay foto: degradado con círculos suaves */
-function BrandBackdrop() {
-  return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden bg-gradient-to-br from-brand-2 to-brand">
-      <div className="absolute -right-16 -top-16 size-64 rounded-full bg-white/10" />
-      <div className="absolute -bottom-24 -left-10 size-72 rounded-full bg-white/10" />
-      <div className="absolute right-1/4 top-1/3 size-24 rounded-full bg-accent/30 blur-2xl" />
-    </div>
-  );
-}
-
-function PhotoBackdrop({ src }: { src: string }) {
-  return (
-    <div aria-hidden className="absolute inset-0">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" className="size-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/10" />
-    </div>
-  );
-}
-
-/** Presentación del plan Pro: foto o color de marca, nombre y frase (el logo ya va en la barra superior) */
-export function ProHero({ site, image }: { site: ResolvedSite; image: string | null }) {
-  return (
-    <section className="relative overflow-hidden text-white sm:mx-4 sm:mt-4 sm:rounded-3xl">
-      {image ? <PhotoBackdrop src={image} /> : <BrandBackdrop />}
-      <div className="relative flex min-h-64 flex-col justify-end gap-3 p-6 sm:min-h-72 sm:p-8">
-        <h1 className="font-brand text-3xl font-extrabold leading-tight drop-shadow sm:text-4xl">{site.hero_title}</h1>
-        <p className="max-w-xl text-[15px] leading-relaxed text-white/90">{site.hero_subtitle}</p>
-        <a href="#catalogo" className="mt-1 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow">
-          Ver productos <ArrowRight className="size-4" />
-        </a>
-      </div>
-    </section>
-  );
-}
-
-/** Inicio del plan Business: portada a todo lo ancho */
-export function BusinessHero({ site, image, base }: { site: ResolvedSite; image: string | null; base: string }) {
-  return (
-    <FullBleed className="-mt-px overflow-hidden text-white">
-      {image ? <PhotoBackdrop src={image} /> : <BrandBackdrop />}
-      <div className="relative mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-center gap-5 px-6 py-16 sm:min-h-[560px]">
-        <h1 className="font-brand max-w-3xl text-4xl font-extrabold leading-[1.05] drop-shadow sm:text-6xl">{site.hero_title}</h1>
-        <p className="max-w-xl text-lg leading-relaxed text-white/90">{site.hero_subtitle}</p>
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Link href={`${base}/tienda`} className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-slate-900 shadow-lg transition hover:scale-[1.02]">
-            Ver catálogo <ArrowRight className="size-4" />
-          </Link>
-          <Link href={`${base}/nosotros`} className="inline-flex items-center rounded-full border-2 border-white/70 px-6 py-3 font-bold text-white transition hover:bg-white/10">
-            Conócenos
-          </Link>
-        </div>
-      </div>
-    </FullBleed>
-  );
-}
-
 export function Highlights({ site, wide }: { site: ResolvedSite; wide?: boolean }) {
   return (
     <section className={cn("px-4", wide ? "mx-auto max-w-5xl pt-14" : "pt-6")}>
