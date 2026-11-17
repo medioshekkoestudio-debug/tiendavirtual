@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     alternates: { canonical: `/${store.slug}` },
     manifest: `/${store.slug}/manifest.webmanifest`,
     appleWebApp: { capable: true, title: store.name },
-    icons: store.logo_url ? { icon: store.logo_url, apple: store.logo_url } : undefined,
+    // En el iPhone el icono al «Agregar a inicio» es el logo sobre blanco (un PNG transparente saldría con fondo negro)
+    icons: store.logo_url ? { icon: store.logo_url, apple: `/${store.slug}/app-icon/180` } : undefined,
     openGraph: { title: store.name, description: store.description, images: store.slider_images[0] ? [store.slider_images[0]] : undefined },
   };
 }
